@@ -1,0 +1,246 @@
+/* public/css/users.css */
+
+/* ══════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════ */
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #374151;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-back:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    color: #111827;
+}
+
+.page-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.page-subtitle {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0.15rem 0 0;
+}
+
+/* ══════════════════════════════════════
+   FORM LAYOUT
+══════════════════════════════════════ */
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ── Carte de section ── */
+.form-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.form-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.25rem;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #374151;
+}
+
+.form-card-header i {
+    color: #2563eb;
+    font-size: 0.9rem;
+}
+
+/* Couleurs par rôle */
+.header-admin       { background: #eff6ff; border-bottom-color: #bfdbfe; color: #1d4ed8; }
+.header-admin i     { color: #1d4ed8; }
+
+.header-approbateur     { background: #f0fdf4; border-bottom-color: #bbf7d0; color: #15803d; }
+.header-approbateur i   { color: #15803d; }
+
+.header-validateur      { background: #fffbeb; border-bottom-color: #fde68a; color: #b45309; }
+.header-validateur i    { color: #b45309; }
+
+.header-porteur         { background: #f0f9ff; border-bottom-color: #bae6fd; color: #0369a1; }
+.header-porteur i       { color: #0369a1; }
+
+.form-card-body {
+    padding: 1.25rem;
+}
+
+/* ── Grille de champs ── */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 1.5rem;
+}
+
+.form-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+/* ── Labels ── */
+.field-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+/* ── Inputs ── */
+.field-input {
+    width: 100%;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #111827;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+}
+
+.field-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.field-input.is-invalid {
+    border-color: #dc2626;
+}
+
+.field-input.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+select.field-input {
+    cursor: pointer;
+    appearance: auto;
+}
+
+/* ── Erreur ── */
+.field-error {
+    font-size: 0.78rem;
+    color: #dc2626;
+}
+
+/* ── Checkbox ── */
+.form-check-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.field-checkbox {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: #2563eb;
+}
+
+/* ── Section rôle cachée ── */
+.d-none { display: none !important; }
+
+/* ══════════════════════════════════════
+   ACTIONS
+══════════════════════════════════════ */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 0;
+}
+
+.btn-cancel {
+    padding: 0.55rem 1.25rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    text-decoration: none;
+    background: #fff;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-cancel:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    color: #111827;
+}
+
+.btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.25rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-save:hover {
+    background: #1d4ed8;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-cancel,
+    .btn-save {
+        text-align: center;
+        justify-content: center;
+    }
+}

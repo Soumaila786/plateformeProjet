@@ -1,0 +1,354 @@
+/* public/css/login.css */
+
+:root {
+    --primary:      #2563eb;
+    --primary-dark: #1d4ed8;
+    --border:       #d1d5db;
+    --border-focus: #2563eb;
+    --text:         #111827;
+    --text-muted:   #6b7280;
+    --bg-page:      #f3f4f6;
+    --bg-card:      #ffffff;
+    --error:        #dc2626;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--bg-page);
+}
+
+/* ===================================LAYOUT============================== */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+/* ================================HEADER====================================== */
+.login-header {
+    padding: 2rem 2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}
+
+.login-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px; height: 48px;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.login-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.25rem;
+}
+
+.login-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ================================BODY================================ */
+
+.login-body {
+    padding: 1.75rem 2rem;
+}
+
+/* ── Alerte erreur normale ── */
+.login-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+
+/* =======================ALERTES DE BLOCAGE======================== */
+
+.alert-block {
+    display: flex;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid;
+    margin-bottom: 0.5rem;
+}
+
+/* Blocage temporaire */
+.alert-temp {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.alert-temp .alert-icon {
+    color: #d97706;
+    background: #fef3c7;
+}
+
+.alert-temp .alert-title { color: #92400e; }
+.alert-temp .alert-text  { color: #78350f; }
+
+/* Blocage définitif */
+.alert-permanent {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.alert-permanent .alert-icon {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.alert-permanent .alert-title { color: #991b1b; }
+.alert-permanent .alert-text  { color: #7f1d1d; }
+
+/* Icône commune */
+.alert-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 0.1rem;
+}
+
+.alert-content { flex: 1; min-width: 0; }
+
+.alert-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+}
+
+.alert-text {
+    font-size: 0.8rem;
+    margin: 0 0 0.75rem;
+    line-height: 1.5;
+}
+
+/*  Compte à rebours  */
+.countdown-wrap {
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.countdown-timer {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: monospace;
+    color: #d97706;
+    letter-spacing: 2px;
+}
+
+.countdown-bar-wrap {
+    height: 4px;
+    background: #fde68a;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.countdown-bar {
+    height: 100%;
+    background: #f59e0b;
+    border-radius: 99px;
+    transition: width 0.9s linear;
+    width: 100%;
+}
+
+/*  =========================FORMULAIRE ============================ */
+
+.form-group { margin-bottom: 1.25rem; }
+
+.form-label-top {
+    display: block;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+}
+
+/* Sélecteur de rôle */
+.role-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+.role-option {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    user-select: none;
+}
+
+.role-option input[type="radio"] { display: none; }
+.role-option i { font-size: 0.9rem; flex-shrink: 0; }
+
+.role-option:hover,
+.role-option.selected {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #eff6ff;
+    font-weight: 600;
+}
+
+/* Champs texte */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0.85rem;
+    color: #9ca3af;
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.6rem 0.85rem 0.6rem 2.4rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.88rem;
+    color: var(--text);
+    background: white;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input-field:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.input-field.error { border-color: var(--error); }
+
+.toggle-pwd {
+    position: absolute;
+    right: 0.85rem;
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+.toggle-pwd:hover { color: var(--text-muted); }
+
+.field-error {
+    display: block;
+    color: var(--error);
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+}
+
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.remember-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.forgot-link {
+    font-size: 0.82rem;
+    color: var(--primary);
+    text-decoration: none;
+}
+.forgot-link:hover { text-decoration: underline; }
+
+.btn-submit {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-submit:hover { background: var(--primary-dark); }
+
+/* FOOTER */
+.login-footer {
+    padding: 0.85rem 2rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.login-footer i { color: var(--primary); margin-right: 0.25rem; }
+
+
+/* ======================================RESPONSIVE==================================== */
+
+@media (max-width: 480px) {
+    .login-body   { padding: 1.5rem; }
+    .login-header { padding: 1.5rem; }
+    .role-grid    { grid-template-columns: 1fr 1fr; }
+    .login-options { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+}

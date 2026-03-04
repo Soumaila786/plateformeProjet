@@ -1,0 +1,101 @@
+/* public/css/parametres.css */
+
+.parametres-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    max-width: 680px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.param-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.param-subtitle {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0.2rem 0 0;
+}
+
+/* ── Liste ── */
+.param-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+/* ── Carte ── */
+.param-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+    cursor: pointer;
+}
+
+.param-card:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+/* ── Icône ── */
+.param-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 8px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+/* ── Texte ── */
+.param-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.param-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.15rem;
+}
+
+.param-desc {
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* ── Flèche ── */
+.param-arrow {
+    color: #d1d5db;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.param-card:hover .param-arrow {
+    color: #9ca3af;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .parametres-page { padding: 1rem; }
+}
