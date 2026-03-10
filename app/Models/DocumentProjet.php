@@ -14,16 +14,16 @@ class DocumentProjet extends Model
         'cheminFichier',
         'dateUpload',
         'projet_id',
-        'uploader_id'
+        'uploader_id',
     ];
 
-    protected $casts = [
-        'dateUpload' => 'datetime'
-    ];
+    protected $dates = ['dateUpload'];
+
+    // ── Relations ──
 
     public function projet()
     {
-        return $this->belongsTo(Projet::class);
+        return $this->belongsTo(Projet::class, 'projet_id');
     }
 
     public function uploader()

@@ -1,79 +1,52 @@
 @extends('layouts.app')
-
-@section('title', 'Créer un secteur')
-
+@section('title', 'Nouveau secteur')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/secteurs.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 @endpush
-
 @section('content')
-
-<div class="secteurs-page">
-
+<div class="projets-page">
     <div class="page-header">
-        <a href="{{ route('admin.secteurs.index') }}" class="btn-back">
-            <i class="fas fa-arrow-left"></i>
-        </a>
+        <a href="{{ route('admin.secteurs.index') }}" class="btn-back"><i class="fas fa-arrow-left"></i></a>
         <div>
-            <h1 class="secteurs-title">Créer un secteur</h1>
-            <p class="secteurs-subtitle">Ajouter un nouveau secteur d'activité</p>
+            <h1 class="projets-title">Nouveau secteur</h1>
+            <p class="projets-subtitle">Remplissez les informations du secteur</p>
         </div>
     </div>
-
-    <form action="{{ route('admin.secteurs.store') }}" method="POST" class="secteur-form">
+    <form action="{{ route('admin.secteurs.store') }}" method="POST" class="projet-form">
         @csrf
-
         <div class="form-card">
-            <div class="form-card-header">
-                <i class="fas fa-building"></i>
-                <span>Informations du secteur</span>
-            </div>
+            <div class="form-card-header"><i class="fas fa-tags"></i><span>Informations</span></div>
             <div class="form-card-body">
-
-                <div class="form-col-full">
-                    <label for="nomSecteur" class="field-label">
-                        Nom du secteur <span class="required">*</span>
-                    </label>
-                    <input type="text"
-                            id="nomSecteur" name="nomSecteur"
-                            value="{{ old('nomSecteur') }}"
-                            class="field-input @error('nomSecteur') is-invalid @enderror"
-                            placeholder="Ex : Agriculture, Santé, Éducation..."
-                            required>
-                    @error('nomSecteur')<span class="field-error">{{ $message }}</span>@enderror
+                <div class="form-row">
+                    <div class="form-col form-col-full">
+                        <label class="field-label">Nom du secteur <span class="required">*</span></label>
+                        <input type="text" name="nomSecteur" value="{{ old('nomSecteur') }}"
+                               class="field-input @error('nomSecteur') is-invalid @enderror"
+                               placeholder="Ex : Agriculture, Santé..." required>
+                        @error('nomSecteur')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-col form-col-full">
+                        <label class="field-label">Description</label>
+                        <textarea name="description" rows="3"
+                                  class="field-input field-textarea @error('description') is-invalid @enderror"
+                                  placeholder="Description (optionnel)...">{{ old('description') }}</textarea>
+                        @error('description')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-col">
+                        <label class="field-label">Statut</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="statut" {{ old('statut', true) ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Actif</span>
+                        </label>
+                    </div>
                 </div>
-
-                <div class="form-col-full">
-                    <label for="description" class="field-label">Description</label>
-                    <textarea id="description" name="description"
-                                class="field-input field-textarea @error('description') is-invalid @enderror"
-                                placeholder="Décrivez brièvement ce secteur..."
-                                rows="3">{{ old('description') }}</textarea>
-                    @error('description')<span class="field-error">{{ $message }}</span>@enderror
-                </div>
-
-                <div class="form-check-row">
-                    <input class="field-checkbox" type="checkbox"
-                            id="statutSecteur" name="statutSecteur"
-                            {{ old('statutSecteur', true) ? 'checked' : '' }}>
-                    <label for="statutSecteur" class="field-label" style="margin:0; cursor:pointer;">
-                        Secteur actif
-                    </label>
-                </div>
-
             </div>
         </div>
-
         <div class="form-actions">
             <a href="{{ route('admin.secteurs.index') }}" class="btn-cancel">Annuler</a>
-            <button type="submit" class="btn-save">
-                <i class="fas fa-save"></i>
-                Créer le secteur
-            </button>
+            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Créer le secteur</button>
         </div>
-
     </form>
-
 </div>
-
 @endsection

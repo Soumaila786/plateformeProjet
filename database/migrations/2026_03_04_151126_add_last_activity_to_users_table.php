@@ -6,17 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 class AddLastActivityToUsersTable extends Migration
 {
-   public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->timestamp('last_activity')->nullable()->after('updated_at');
-    });
-}
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            if (!Schema::hasColumn('users', 'last_activity')) {
+                $table->timestamp('last_activity')->nullable()->after('updated_at');
+            }
+        });
+    }
 
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('users', 'last_activity')) {
+                $table->dropColumn('last_activity');
+            }
         });
     }
 }

@@ -1,78 +1,90 @@
 @extends('layouts.app')
 
-@section('title', 'Secteurs d\'activité')
+@section('title', 'Secteurs')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/secteur.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 @endpush
 
 @section('content')
 
-<div class="secteurs-page">
+<div class="projets-page">
 
-    {{-- ── Header ── --}}
-    <div class="secteurs-header">
+    <div class="projets-header">
         <div>
-            <h1 class="secteurs-title">Secteurs d'activité</h1>
-            <p class="secteurs-subtitle">{{ $secteurs->count() }} secteur{{ $secteurs->count() > 1 ? 's' : '' }}</p>
+            <h1 class="projets-title">Secteurs d'activité</h1>
+            <p class="projets-subtitle">{{ $secteurs->count() }} secteur{{ $secteurs->count() > 1 ? 's' : '' }}</p>
         </div>
         <a href="{{ route('admin.secteurs.create') }}" class="btn-add">
-            <i class="fas fa-plus"></i>
-            Ajouter
+            <i class="fas fa-plus"></i> Nouveau secteur
         </a>
     </div>
 
-    {{-- ── Grille ── --}}
-    <div class="secteurs-grid">
+    @if(session('success'))
+    <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+    <div class="alert alert-error"><i class="fas fa-times-circle"></i> {{ session('error') }}</div>
+    @endif
 
+    {{-- Cards Grid --}}
+    <div class="cards-grid">
         @forelse($secteurs as $secteur)
         <div class="secteur-card">
-            <div class="secteur-inner">
-
+            <div class="secteur-card-top">
                 <div class="secteur-icon">
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-tag"></i>
                 </div>
-
-                <div class="secteur-body">
-                    <div class="secteur-name-row">
-                        <h3 class="secteur-name">{{ $secteur->nomSecteur }}</h3>
-                        <span class="secteur-dot {{ $secteur->statutSecteur ? 'dot-active' : 'dot-inactive' }}"
-                              title="{{ $secteur->statutSecteur ? 'Actif' : 'Inactif' }}">
-                        </span>
-                    </div>
-                    <p class="secteur-desc">{{ $secteur->description ?? '—' }}</p>
-                    <p class="secteur-count">
-                        {{ $secteur->projets->count() }} projets{{ $secteur->projets->count() > 1 ? 's' : '' }}
-                    </p>
-
-                    {{-- Actions --}}
-                    <div class="secteur-actions">
-                        <a href="{{ route('admin.secteurs.edit', $secteur) }}" class="btn-action btn-edit">
-                            <i class="fas fa-pencil-alt"></i> Modifier
-                        </a>
-                        <form method="POST" action="{{ route('admin.secteurs.destroy', $secteur) }}"
-                              onsubmit="return confirm('Supprimer ce secteur ?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-action btn-delete">
-                                <i class="fas fa-trash"></i> Supprimer
-                            </button>
-                        </form>
-                    </div>
+                <div>
+                    @if($secteur->statutSecteur)
+                        <span class="status-badge status-green">Actif</span>
+                    @else
+                        <span class="status-badge status-red">Inactif</span>
+                    @endif
                 </div>
+            </div>
 
+            <h3 class="secteur-card-nom">{{ $secteur->nomSecteur }}</h3>
+
+            @if($secteur->description)
+            <p class="secteur-card-desc">{{ Str::limit($secteur->description, 80) }}</p>
+            @else
+            <p class="secteur-card-desc" style="font-style:italic;">Aucune description.</p>
+            @endif
+
+            <div class="secteur-card-footer">
+                <span class="secteur-projets-count">
+                    <i class="fas fa-folder"></i>
+                    {{ $secteur->projets->count() }} projet{{ $secteur->projets->count() > 1 ? 's' : '' }}
+                </span>
+                <div class="user-card-footer" style="border:none;padding:0;">
+                    <a href="{{ route('admin.secteurs.edit', $secteur) }}" class="btn-icon" title="Modifier">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <form method="POST" action="{{ route('admin.secteurs.toggle-status', $secteur) }}" style="display:inline;">
+                        @csrf
+                        <button type="submit"
+                                class="btn-icon {{ $secteur->statutSecteur ? 'btn-icon-warning' : 'btn-icon-success' }}"
+                                title="{{ $secteur->statutSecteur ? 'Désactiver' : 'Activer' }}">
+                            <i class="fas {{ $secteur->statutSecteur ? 'fa-toggle-off' : 'fa-toggle-on' }}"></i>
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.secteurs.destroy', $secteur) }}"
+                            onsubmit="return confirm('Supprimer ce secteur ?')" style="display:inline;">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn-icon btn-icon-danger" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         @empty
-        <div class="secteurs-empty">
-            <i class="fas fa-building"></i>
-            <p>Aucun secteur enregistré.</p>
-            <a href="{{ route('admin.secteurs.create') }}" class="btn-add" style="margin-top:0.5rem;">
-                <i class="fas fa-plus"></i> Créer le premier secteur
-            </a>
+        <div class="cards-empty" style="grid-column:1/-1;">
+            <i class="fas fa-tags"></i>
+            <p>Aucun secteur trouvé.</p>
         </div>
         @endforelse
-
     </div>
 
 </div>

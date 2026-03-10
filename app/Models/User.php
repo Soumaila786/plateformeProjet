@@ -1,14 +1,15 @@
 <?php
-// app/Models/User.php
 
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasRoles;
+
+    protected $table = 'users';
 
     protected $fillable = [
         'nomComplet',
@@ -19,54 +20,27 @@ class User extends Authenticatable
         'motDePasse',
         'role',
         'actif',
-        'dateCreation'
+        'dateCreation',
     ];
 
     protected $hidden = [
         'motDePasse',
-        'remember_token',
     ];
 
     protected $casts = [
-        'actif' => 'boolean',
+        'actif'        => 'boolean',
         'dateCreation' => 'datetime',
     ];
 
+    // Spatie utilise 'password' par défaut — on pointe vers motDePasse
     public function getAuthPassword()
     {
         return $this->motDePasse;
     }
 
-    // Relations avec les tables spécifiques selon le rôle
-    public function admin()
+    // Relations
+    public function projets()
     {
-        return $this->hasOne(Admin::class, 'user_id');
-    }
-
-    public function approbateur()
-    {
-        return $this->hasOne(Approbateur::class, 'user_id');
-    }
-
-    public function validateur()
-    {
-        return $this->hasOne(Validateur::class, 'user_id');
-    }
-
-    public function porteur()
-    {
-        return $this->hasOne(Porteur::class, 'user_id');
-    }
-
-    // Notifications
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class, 'destinataire_id');
-    }
-
-    // Commentaires écrits par l'utilisateur
-    public function commentaires()
-    {
-        return $this->hasMany(Commentaire::class, 'users_id');
+        return $this->hasMany(Projet::class);
     }
 }
