@@ -35,25 +35,25 @@
                     <div class="form-col form-col-full">
                         <label class="field-label">Titre <span class="required">*</span></label>
                         <input type="text" name="titre"
-                               value="{{ old('titre') }}"
-                               class="field-input @error('titre') is-invalid @enderror"
-                               placeholder="Titre du projet" required>
+                                value="{{ old('titre') }}"
+                                class="field-input @error('titre') is-invalid @enderror"
+                                placeholder="Titre du projet" required>
                         @error('titre')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col form-col-full">
                         <label class="field-label">Description <span class="required">*</span></label>
                         <textarea name="description" rows="3"
-                                  class="field-input field-textarea @error('description') is-invalid @enderror"
-                                  placeholder="Description du projet..." required>{{ old('description') }}</textarea>
+                                    class="field-input field-textarea @error('description') is-invalid @enderror"
+                                    placeholder="Description du projet..." required>{{ old('description') }}</textarea>
                         @error('description')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col form-col-full">
                         <label class="field-label">Objectif</label>
                         <textarea name="objectif" rows="2"
-                                  class="field-input field-textarea @error('objectif') is-invalid @enderror"
-                                  placeholder="Objectif principal...">{{ old('objectif') }}</textarea>
+                                    class="field-input field-textarea @error('objectif') is-invalid @enderror"
+                                    placeholder="Objectif principal...">{{ old('objectif') }}</textarea>
                         @error('objectif')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
@@ -73,9 +73,9 @@
                     <div class="form-col">
                         <label class="field-label">Durée (mois)</label>
                         <input type="number" name="duree"
-                               value="{{ old('duree') }}"
-                               class="field-input @error('duree') is-invalid @enderror"
-                               placeholder="Ex : 12" min="1">
+                                value="{{ old('duree') }}"
+                                class="field-input @error('duree') is-invalid @enderror"
+                                placeholder="Ex : 12" min="1">
                         @error('duree')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
@@ -87,7 +87,7 @@
         <div class="form-card">
             <div class="form-card-header">
                 <i class="fas fa-coins"></i>
-                <span>Budget & Planification</span>
+                <span>Budget </span>
             </div>
             <div class="form-card-body">
                 <div class="form-row">
@@ -95,34 +95,34 @@
                     <div class="form-col">
                         <label class="field-label">Budget total (F CFA)</label>
                         <input type="number" name="budgetTotal"
-                               value="{{ old('budgetTotal') }}"
-                               class="field-input @error('budgetTotal') is-invalid @enderror"
-                               placeholder="0" min="0" step="1">
+                                value="{{ old('budgetTotal') }}"
+                                class="field-input @error('budgetTotal') is-invalid @enderror"
+                                placeholder="0" min="0" step="1">
                         @error('budgetTotal')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
                         <label class="field-label">Montant demandé (F CFA) <span class="required">*</span></label>
                         <input type="number" name="montantDemande"
-                               value="{{ old('montantDemande') }}"
-                               class="field-input @error('montantDemande') is-invalid @enderror"
-                               placeholder="0" min="0" step="1" required>
+                                value="{{ old('montantDemande') }}"
+                                class="field-input @error('montantDemande') is-invalid @enderror"
+                                placeholder="0" min="0" step="1" required>
                         @error('montantDemande')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
-                        <label class="field-label">Date de début</label>
+                        <label class="field-label">Date de début probable</label>
                         <input type="date" name="dateDebut"
-                               value="{{ old('dateDebut') }}"
-                               class="field-input @error('dateDebut') is-invalid @enderror">
+                                value="{{ old('dateDebut') }}"
+                                class="field-input @error('dateDebut') is-invalid @enderror">
                         @error('dateDebut')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
-                        <label class="field-label">Date de fin</label>
+                        <label class="field-label">Date de fin probable</label>
                         <input type="date" name="dateFin"
-                               value="{{ old('dateFin') }}"
-                               class="field-input @error('dateFin') is-invalid @enderror">
+                                value="{{ old('dateFin') }}"
+                                class="field-input @error('dateFin') is-invalid @enderror">
                         @error('dateFin')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
@@ -139,8 +139,8 @@
             <div class="form-card-body">
 
                 <input type="file" id="documents" name="documents[]"
-                       multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                       style="display:none">
+                        multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        style="display:none">
 
                 <div class="doc-toolbar">
                     <button type="button" class="btn-attach" onclick="document.getElementById('documents').click()">

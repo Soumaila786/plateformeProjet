@@ -4,21 +4,31 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\MailService;
+use App\Helpers\PasswordGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
+
 class UserController extends Controller
 {
+
+    protected $mailService;
+
+    // Injection du service dans le constructeur
+    public function __construct(MailService $mailService){
+        $this->mailService = $mailService;
+    }
+
     // ── Liste ──
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $query = User::query();
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('nomComplet', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -36,8 +46,7 @@ class UserController extends Controller
     }
 
     // ── Formulaire création ──
-    public function create()
-    {
+    public function create(){
         return view('admin.users.create');
     }
 
@@ -48,24 +57,29 @@ class UserController extends Controller
             'nomComplet'  => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email',
             'role'        => 'required|in:admin,porteur,approbateur,validateur',
-            'motDePasse'  => 'required|string|min:8|confirmed',
             'telephone'   => 'nullable|string|max:20',
             'organisation'=> 'nullable|string|max:255',
         ]);
 
-        User::create([
+        // Générer un mot de passe aléatoire (8 caractères par défaut)
+        $motDePasse = PasswordGenerator::generate(10); // 10 caractères
+
+        $user = User::create([
             'nomComplet'   => $request->nomComplet,
             'email'        => $request->email,
             'role'         => $request->role,
-            'motDePasse'   => Hash::make($request->motDePasse),
+            'motDePasse'   => Hash::make($motDePasse),
             'telephone'    => $request->telephone,
             'organisation' => $request->organisation,
             'actif'        => true,
             'dateCreation' => now(),
         ]);
 
+        // ENVOI DE L'EMAIL - UNE SEULE LIGNE
+        $this->mailService->envoyerCompteCreee($user, $motDePasse);
+
         return redirect()->route('admin.users.index')
-                         ->with('success', 'Utilisateur créé avec succès.');
+                            ->with('success', 'Utilisateur créé avec succès.');
     }
 
     // ── Détail ──

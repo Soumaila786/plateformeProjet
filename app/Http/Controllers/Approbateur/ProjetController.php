@@ -8,13 +8,18 @@ use App\Models\Planification;
 use App\Models\Commentaire;
 use App\Models\DocumentProjet;
 use App\Services\NotificationService;
+use App\Services\MailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ProjetController extends Controller
-{
-    public function index(Request $request)
-    {
+class ProjetController extends Controller{
+
+    protected $mailService;
+    public function __construct(MailService $mailService){
+        $this->mailService = $mailService;
+    }
+
+    public function index(Request $request){
         $query = Projet::with(['porteur', 'secteur'])
             ->whereIn('statutProjet', ['soumis', 'en_examen']);
 
@@ -22,7 +27,7 @@ class ProjetController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('titre', 'like', "%{$search}%")
-                  ->orWhere('codeProjet', 'like', "%{$search}%");
+                    ->orWhere('codeProjet', 'like', "%{$search}%");
             });
         }
 
@@ -34,14 +39,12 @@ class ProjetController extends Controller
         return view('approbateur.projets.index', compact('projets'));
     }
 
-    public function show(Projet $projet)
-    {
+    public function show(Projet $projet){
         $projet->load(['porteur', 'secteur', 'planifications', 'documents.uploader', 'commentaires.utilisateur']);
         return view('approbateur.projets.show', compact('projet'));
     }
 
-    public function mesProjets(Request $request)
-    {
+    public function mesProjets(Request $request){
         $projets = Projet::with(['porteur', 'secteur'])
             ->whereIn('statutProjet', ['approuve', 'rejete', 'en_examen', 'valide'])
             ->latest()->paginate(10);
@@ -49,8 +52,7 @@ class ProjetController extends Controller
     }
 
     // ── Mettre en examen ──
-    public function examiner(Projet $projet)
-    {
+    public function examiner(Projet $projet){
         $projet->update(['statutProjet' => 'en_examen']);
 
         NotificationService::notifierPorteur(
@@ -60,12 +62,11 @@ class ProjetController extends Controller
         );
 
         return redirect()->route('approbateur.projets.show', $projet)
-                         ->with('success', 'Projet mis en examen.');
+                            ->with('success', 'Projet mis en examen.');
     }
 
     // ── Approuver ──
-    public function approuver(Request $request, Projet $projet)
-    {
+    public function approuver(Request $request, Projet $projet){
         $request->validate([
             'commentaire' => 'nullable|string|max:1000',
         ]);
@@ -85,6 +86,9 @@ class ProjetController extends Controller
             ]);
         }
 
+        // Pour projet approuvé
+        $this->mailService->envoyerProjetApprouve($projet);
+
         NotificationService::notifierPorteur(
             $projet,
             'Félicitations ! Votre projet « ' . $projet->titre . ' » a été approuvé et transmis pour validation.',
@@ -98,12 +102,11 @@ class ProjetController extends Controller
         );
 
         return redirect()->route('approbateur.projets.show', $projet)
-                         ->with('success', 'Projet approuvé.');
+                            ->with('success', 'Projet approuvé.');
     }
 
     // ── Rejeter ──
-    public function rejeter(Request $request, Projet $projet)
-    {
+    public function rejeter(Request $request, Projet $projet){
         $request->validate([
             'motifRejet'          => 'required|string|max:1000',
             'messageModification' => 'nullable|string|max:1000',
@@ -117,7 +120,7 @@ class ProjetController extends Controller
             'messageModification' => $request->messageModification,
         ]);
 
-        Commentaire::create([
+        $commentaire = Commentaire::create([
             'message'         => 'Rejet : ' . $request->motifRejet,
             'typeCommentaire' => 'rejet',
             'dateEnvoi'       => now(),
@@ -139,6 +142,10 @@ class ProjetController extends Controller
             ? 'Votre projet « ' . $projet->titre . ' » a été retourné en brouillon pour modification. Motif : ' . $request->motifRejet
             : 'Votre projet « ' . $projet->titre . ' » a été rejeté. Motif : ' . $request->motifRejet;
 
+
+       // Envoyer l'email avec le commentaire
+        $this->mailService->envoyerProjetRejete($projet, $commentaire);
+
         NotificationService::notifierPorteur($projet, $msgPorteur, 'rejet');
 
         return redirect()->route('approbateur.projets.show', $projet)
@@ -146,8 +153,7 @@ class ProjetController extends Controller
     }
 
     // ── Changer statut d'une activité planifiée ──
-    public function changerStatutActivite(Request $request, Projet $projet, Planification $planification)
-    {
+    public function changerStatutActivite(Request $request, Projet $projet, Planification $planification){
         $request->validate([
             'statutActivite' => 'required|in:en_attente,financee,en_cours,termine,annule',
         ]);
@@ -175,8 +181,7 @@ class ProjetController extends Controller
         return back()->with('success', 'Statut de l\'activité mis à jour : ' . ($labels[$request->statutActivite] ?? ''));
     }
 
-    public function downloadDocument(Projet $projet, DocumentProjet $document)
-    {
+    public function downloadDocument(Projet $projet, DocumentProjet $document){
         $path = storage_path('app/public/' . $document->cheminFichier);
         if (!file_exists($path)) {
             return back()->with('error', 'Fichier introuvable.');

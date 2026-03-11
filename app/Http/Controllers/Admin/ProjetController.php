@@ -20,7 +20,7 @@ class ProjetController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('titre', 'like', "%{$search}%")
-                  ->orWhere('codeProjet', 'like', "%{$search}%");
+                    ->orWhere('codeProjet', 'like', "%{$search}%");
             });
         }
 

@@ -136,11 +136,11 @@
                             <span class="info-value">{{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Date de début</span>
+                            <span class="info-label">Date de début probable</span>
                             <span class="info-value">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Date de fin</span>
+                            <span class="info-label">Date de fin probable</span>
                             <span class="info-value">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</span>
                         </div>
                         @if($projet->dateApprobation)

@@ -60,44 +60,16 @@
             <form method="POST" action="{{ route('login.post') }}">
                 @csrf
 
-                {{-- Sélecteur de rôle --}}
-                <div class="form-group">
-                    <label class="form-label-top">Profil</label>
-                    <div class="role-grid">
-                        <label class="role-option {{ old('role') == 'admin' ? 'selected' : '' }}">
-                            <input type="radio" name="role" value="admin" {{ old('role') == 'admin' ? 'checked' : '' }} required>
-                            <i class="fas fa-user-shield"></i>
-                            <span>Administrateur</span>
-                        </label>
-                        <label class="role-option {{ old('role') == 'approbateur' ? 'selected' : '' }}">
-                            <input type="radio" name="role" value="approbateur" {{ old('role') == 'approbateur' ? 'checked' : '' }} required>
-                            <i class="fas fa-user-check"></i>
-                            <span>Approbateur</span>
-                        </label>
-                        <label class="role-option {{ old('role') == 'validateur' ? 'selected' : '' }}">
-                            <input type="radio" name="role" value="validateur" {{ old('role') == 'validateur' ? 'checked' : '' }} required>
-                            <i class="fas fa-user-cog"></i>
-                            <span>Validateur</span>
-                        </label>
-                        <label class="role-option {{ old('role') == 'porteur' ? 'selected' : '' }}">
-                            <input type="radio" name="role" value="porteur" {{ old('role') == 'porteur' ? 'checked' : '' }} required>
-                            <i class="fas fa-user-tie"></i>
-                            <span>Porteur</span>
-                        </label>
-                    </div>
-                    @error('role')<span class="field-error">{{ $message }}</span>@enderror
-                </div>
-
                 {{-- Email --}}
                 <div class="form-group">
                     <label class="form-label-top" for="email">Adresse e-mail</label>
                     <div class="input-wrapper">
                         <i class="fas fa-envelope input-icon"></i>
                         <input type="email" id="email" name="email"
-                                value="{{ old('email') }}"
-                                class="input-field @error('email') error @enderror"
-                                placeholder="exemple@domaine.com"
-                                required autofocus>
+                               value="{{ old('email') }}"
+                               class="input-field @error('email') error @enderror"
+                               placeholder="exemple@domaine.com"
+                               required autofocus>
                     </div>
                     @error('email')<span class="field-error">{{ $message }}</span>@enderror
                 </div>
@@ -108,8 +80,8 @@
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" id="password" name="password"
-                                class="input-field @error('password') error @enderror"
-                                placeholder="••••••••" required>
+                               class="input-field @error('password') error @enderror"
+                               placeholder="••••••••" required>
                         <button type="button" class="toggle-pwd" onclick="togglePassword()">
                             <i class="fas fa-eye" id="togglePasswordIcon"></i>
                         </button>
@@ -158,13 +130,7 @@
         }
     }
 
-    // ── Sélecteur de rôle ──
-    document.querySelectorAll('.role-option input').forEach(radio => {
-        radio.addEventListener('change', function () {
-            document.querySelectorAll('.role-option').forEach(el => el.classList.remove('selected'));
-            this.closest('.role-option').classList.add('selected');
-        });
-    });
+
 
     // ── Compte à rebours basé sur le timestamp réel ──
     @if(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp)

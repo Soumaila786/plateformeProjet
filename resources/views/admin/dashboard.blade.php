@@ -20,6 +20,8 @@
     </div>
 </div>
 
+<div class="trait"></div>
+
 {{-- ── Stats Projets ── --}}
 <p class="dash-section-label">Projets</p>
 <div class="admin-stats-grid">
@@ -49,6 +51,8 @@
     </div>
 </div>
 
+<div class="trait"></div>
+
 {{-- ── Stats Utilisateurs ── --}}
 <p class="dash-section-label" style="margin-top:24px;">Utilisateurs & Secteurs</p>
 <div class="admin-stats-grid-4">
@@ -72,6 +76,8 @@
     </div>
 </div>
 
+<div class="trait"></div>
+
 {{-- ── Layout principal ── --}}
 <div class="admin-main-grid">
 
@@ -79,7 +85,7 @@
     <div style="display:flex;flex-direction:column;gap:16px;">
 
         {{-- Projets récents --}}
-        <div class="form-card">
+        <div class="form-card m-3">
             <div class="form-card-header" style="justify-content:space-between;">
                 <span><i class="fas fa-folder-open"></i> Projets récents</span>
                 <a href="{{ route('admin.projets.index') }}" class="dash-table-link">Voir tout →</a>
@@ -121,7 +127,7 @@
         </div>
 
         {{-- Utilisateurs récents --}}
-        <div class="form-card">
+        <div class="form-card mt-3">
             <div class="form-card-header" style="justify-content:space-between;">
                 <span><i class="fas fa-users"></i> Utilisateurs récents</span>
                 <a href="{{ route('admin.users.index') }}" class="dash-table-link">Voir tout →</a>
@@ -165,30 +171,19 @@
     {{-- Colonne droite ── --}}
     <div style="display:flex;flex-direction:column;gap:16px;">
 
-        {{-- Graphique statuts --}}
-        <div class="form-card">
+        {{-- Graphique statuts en barres --}}
+        <div class="form-card m-3" >
             <div class="form-card-header">
-                <i class="fas fa-chart-pie"></i>
+                <i class="fas fa-chart-bar"></i>
                 <span>Répartition par statut</span>
             </div>
             <div class="form-card-body" style="padding:16px;">
-                <canvas id="chartStatuts" height="200"></canvas>
-            </div>
-        </div>
-
-        {{-- Graphique rôles --}}
-        <div class="form-card">
-            <div class="form-card-header">
-                <i class="fas fa-chart-bar"></i>
-                <span>Utilisateurs par rôle</span>
-            </div>
-            <div class="form-card-body" style="padding:16px;">
-                <canvas id="chartRoles" height="180"></canvas>
+                <canvas id="chartStatuts" height="220"></canvas>
             </div>
         </div>
 
         {{-- Raccourcis --}}
-        <div class="form-card">
+        <div class="form-card m-3">
             <div class="form-card-header">
                 <i class="fas fa-bolt"></i>
                 <span>Raccourcis</span>
@@ -213,44 +208,42 @@
 
 @push('scripts')
 <script>
-// ── Statuts ──
 new Chart(document.getElementById('chartStatuts'), {
-    type: 'doughnut',
+    type: 'bar',
     data: {
         labels: ['Brouillon','Soumis','En examen','Approuvé','Validé','Rejeté'],
         datasets: [{
+            label: 'Projets',
             data: [{{ $projetsBrouillon }},{{ $projetsSoumis }},{{ $projetsEnExamen }},{{ $projetsApprouves }},{{ $projetsValides }},{{ $projetsRejetes }}],
-            backgroundColor: ['#9ca3af','#3b82f6','#f59e0b','#16a34a','#0d9488','#dc2626'],
-            borderWidth: 2, borderColor: '#fff',
+            backgroundColor: [
+                'rgba(156,163,175,.5)',
+                'rgba(59,130,246,.5)',
+                'rgba(245,158,11,.5)',
+                'rgba(22,163,74,.5)',
+                'rgba(13,148,136,.5)',
+                'rgba(220,38,38,.5)',
+            ],
+            borderColor: ['#9ca3af','#3b82f6','#f59e0b','#16a34a','#0d9488','#dc2626'],
+            borderWidth: 2,
+            borderRadius: 6,
+            barPercentage: 0.55,
         }]
     },
     options: {
         responsive: true,
         plugins: {
-            legend: { position: 'bottom', labels: { font: { family:'Outfit', size:11 }, padding:12, usePointStyle:true } }
-        }
-    }
-});
-
-// ── Rôles ──
-new Chart(document.getElementById('chartRoles'), {
-    type: 'bar',
-    data: {
-        labels: ['Admin','Porteur','Approbateur','Validateur'],
-        datasets: [{
-            label: 'Utilisateurs',
-            data: [{{ $usersByRole->get('admin',0) }},{{ $usersByRole->get('porteur',0) }},{{ $usersByRole->get('approbateur',0) }},{{ $usersByRole->get('validateur',0) }}],
-            backgroundColor: ['rgba(99,102,241,.5)','rgba(59,130,246,.5)','rgba(245,158,11,.5)','rgba(13,148,136,.5)'],
-            borderColor:     ['#6366f1','#3b82f6','#f59e0b','#0d9488'],
-            borderWidth: 2, borderRadius: 6,
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
+            legend: { display: false }
+        },
         scales: {
-            y: { beginAtZero:true, ticks:{ stepSize:1, font:{ family:'Outfit', size:11 } }, grid:{ color:'#f3f4f6' } },
-            x: { ticks:{ font:{ family:'Outfit', size:11 } }, grid:{ display:false } }
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { family: 'Outfit', size: 11 } },
+                grid: { color: '#f3f4f6' }
+            },
+            x: {
+                ticks: { font: { family: 'Outfit', size: 11 } },
+                grid: { display: false }
+            }
         }
     }
 });

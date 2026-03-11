@@ -1,18 +1,14 @@
 @extends('layouts.app')
-
 @section('title', 'Paramètres')
-
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/parametre.css') }}">
 @endpush
-
 @section('content')
 <div class="parametres-page">
     <div class="param-header">
         <h1 class="param-title">Paramètres</h1>
         <p class="param-subtitle">Configuration de votre compte</p>
     </div>
-
     <div class="param-list">
         <a href="{{ route('parametres.profil') }}" class="param-card">
             <div class="param-icon"><i class="fas fa-user"></i></div>
@@ -22,7 +18,6 @@
             </div>
             <i class="fas fa-chevron-right param-arrow"></i>
         </a>
-
         <a href="{{ route('parametres.securite') }}" class="param-card">
             <div class="param-icon"><i class="fas fa-shield-alt"></i></div>
             <div class="param-info">
@@ -31,7 +26,6 @@
             </div>
             <i class="fas fa-chevron-right param-arrow"></i>
         </a>
-
         <a href="{{ route('parametres.notifications') }}" class="param-card">
             <div class="param-icon"><i class="fas fa-bell"></i></div>
             <div class="param-info">
@@ -40,7 +34,6 @@
             </div>
             <i class="fas fa-chevron-right param-arrow"></i>
         </a>
-
         <a href="{{ route('parametres.general') }}" class="param-card">
             <div class="param-icon"><i class="fas fa-cog"></i></div>
             <div class="param-info">

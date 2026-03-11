@@ -111,7 +111,7 @@
     <div class="section-grid-main">
 
         {{-- Projets récents — colonne gauche large --}}
-        <div class="form-card">
+        <div class="form-card me-4">
             <div class="form-card-header" style="justify-content:space-between;">
                 <span><i class="fas fa-clock"></i> Projets récents</span>
                 <a href="{{ route('porteur.projets.index') }}" class="dash-table-link">Voir tous →</a>
@@ -145,7 +145,7 @@
         <div class="side-col">
 
             {{-- Notifications --}}
-            <div class="form-card">
+            <div class="form-card m-3">
                 <div class="form-card-header" style="justify-content:space-between;">
                     <span><i class="fas fa-bell"></i> Notifications</span>
                     <a href="{{ route('porteur.notifications.index') }}" class="dash-table-link">Voir tout</a>
@@ -173,7 +173,7 @@
             </div>
 
             {{-- Résumé statuts --}}
-            <div class="form-card">
+            <div class="form-card m-3">
                 <div class="form-card-header" style="justify-content:space-between;">
                     <span><i class="fas fa-folder"></i> Mes projets</span>
                     <a href="{{ route('porteur.projets.index') }}" class="dash-table-link">Voir tous</a>

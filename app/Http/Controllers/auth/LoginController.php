@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -21,14 +21,12 @@ class LoginController extends Controller
             $permanentBlockKey = 'login_permanent_block_' . $blockEmail;
             $blockKey          = 'login_block_'           . $blockEmail;
 
-            // Vérifier si l'admin a réactivé le compte entre-temps
             $blockedUser = User::where('email', $blockEmail)->first();
             if ($blockedUser && $blockedUser->actif) {
-                // Compte réactivé → vider tout le cache et la session
                 Cache::forget($permanentBlockKey);
                 Cache::forget($blockKey);
-                Cache::forget('login_attempts_'  . $blockEmail);
-                Cache::forget('block_count_'     . $blockEmail);
+                Cache::forget('login_attempts_' . $blockEmail);
+                Cache::forget('block_count_'    . $blockEmail);
                 session()->forget(['blocked_email', 'block_expires_at', 'permanent_block']);
             } elseif (Cache::get($permanentBlockKey)) {
                 $permanentBlock = true;
@@ -51,7 +49,6 @@ class LoginController extends Controller
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required',
-            'role'     => 'required|in:admin,approbateur,validateur,porteur',
         ]);
 
         $email             = $request->email;
@@ -59,12 +56,10 @@ class LoginController extends Controller
         $blockKey          = 'login_block_'           . $email;
         $permanentBlockKey = 'login_permanent_block_' . $email;
 
-        // ── Récupérer l'utilisateur en BDD en premier ──
-        $user = User::where('email', $email)
-                    ->where('role', $request->role)
-                    ->first();
+        // ── Récupérer l'utilisateur par email uniquement (rôle caché) ──
+        $user = User::where('email', $email)->first();
 
-        // ── Si le compte existe et est réactivé → vider le cache de blocage ──
+        // ── Compte réactivé → vider le cache ──
         if ($user && $user->actif) {
             Cache::forget($permanentBlockKey);
             Cache::forget($blockKey);
@@ -73,7 +68,14 @@ class LoginController extends Controller
             session()->forget(['blocked_email', 'block_expires_at', 'permanent_block']);
         }
 
-        // ── Blocage définitif (compte désactivé en BDD) ──
+        // ── Blocage temporaire (vérifier avant tout le reste) ──
+        if (Cache::has($blockKey)) {
+            return back()->withErrors([
+                'email' => 'Compte temporairement suspendu. Attendez la fin du délai.',
+            ])->onlyInput('email');
+        }
+
+        // ── Compte désactivé ──
         if ($user && !$user->actif) {
             session(['permanent_block' => true, 'blocked_email' => $email]);
             return back()->withErrors([
@@ -81,26 +83,11 @@ class LoginController extends Controller
             ])->onlyInput('email');
         }
 
-        // ── Blocage temporaire ──
-        if (Cache::has($blockKey)) {
-            return back()->withErrors([
-                'email' => 'Compte temporairement suspendu. Attendez la fin du délai.',
-            ])->onlyInput('email');
-        }
-
-        // ── Utilisateur introuvable ──
-        if (!$user) {
+        // ── Utilisateur introuvable ou mot de passe incorrect ──
+        if (!$user || !Hash::check($request->password, $user->motDePasse)) {
             $this->incrementAttempts($cacheKey, $blockKey, $permanentBlockKey, $email);
             return back()->withErrors([
-                'email' => 'Email, mot de passe ou rôle incorrect.',
-            ])->onlyInput('email');
-        }
-
-        // ── Vérifier le mot de passe ──
-        if (!Hash::check($request->password, $user->motDePasse)) {
-            $this->incrementAttempts($cacheKey, $blockKey, $permanentBlockKey, $email);
-            return back()->withErrors([
-                'email' => 'Email, mot de passe ou rôle incorrect.',
+                'email' => 'Email ou mot de passe incorrect.',
             ])->onlyInput('email');
         }
 

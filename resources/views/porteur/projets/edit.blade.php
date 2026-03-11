@@ -46,23 +46,23 @@
                     <div class="form-col form-col-full">
                         <label class="field-label">Titre <span class="required">*</span></label>
                         <input type="text" name="titre"
-                               value="{{ old('titre', $projet->titre) }}"
-                               class="field-input @error('titre') is-invalid @enderror" required>
+                                value="{{ old('titre', $projet->titre) }}"
+                                class="field-input @error('titre') is-invalid @enderror" required>
                         @error('titre')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col form-col-full">
                         <label class="field-label">Description <span class="required">*</span></label>
                         <textarea name="description" rows="3"
-                                  class="field-input field-textarea @error('description') is-invalid @enderror"
-                                  required>{{ old('description', $projet->description) }}</textarea>
+                                    class="field-input field-textarea @error('description') is-invalid @enderror"
+                                    required>{{ old('description', $projet->description) }}</textarea>
                         @error('description')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col form-col-full">
                         <label class="field-label">Objectif</label>
                         <textarea name="objectif" rows="2"
-                                  class="field-input field-textarea @error('objectif') is-invalid @enderror">{{ old('objectif', $projet->objectif) }}</textarea>
+                                    class="field-input field-textarea @error('objectif') is-invalid @enderror">{{ old('objectif', $projet->objectif) }}</textarea>
                         @error('objectif')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
@@ -82,9 +82,9 @@
                     <div class="form-col">
                         <label class="field-label">Durée (mois)</label>
                         <input type="number" name="duree"
-                               value="{{ old('duree', $projet->duree) }}"
-                               class="field-input @error('duree') is-invalid @enderror"
-                               min="1">
+                                value="{{ old('duree', $projet->duree) }}"
+                                class="field-input @error('duree') is-invalid @enderror"
+                                min="1">
                         @error('duree')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
@@ -104,34 +104,34 @@
                     <div class="form-col">
                         <label class="field-label">Budget total (F CFA)</label>
                         <input type="number" name="budgetTotal"
-                               value="{{ old('budgetTotal', $projet->budgetTotal) }}"
-                               class="field-input @error('budgetTotal') is-invalid @enderror"
-                               min="0" step="1">
+                                value="{{ old('budgetTotal', $projet->budgetTotal) }}"
+                                class="field-input @error('budgetTotal') is-invalid @enderror"
+                                min="0" step="1">
                         @error('budgetTotal')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
                         <label class="field-label">Montant demandé (F CFA) <span class="required">*</span></label>
                         <input type="number" name="montantDemande"
-                               value="{{ old('montantDemande', $projet->montantDemande) }}"
-                               class="field-input @error('montantDemande') is-invalid @enderror"
-                               min="0" step="1" required>
+                                value="{{ old('montantDemande', $projet->montantDemande) }}"
+                                class="field-input @error('montantDemande') is-invalid @enderror"
+                                min="0" step="1" required>
                         @error('montantDemande')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
-                        <label class="field-label">Date de début</label>
+                        <label class="field-label">Date de début probable</label>
                         <input type="date" name="dateDebut"
-                               value="{{ old('dateDebut', optional($projet->dateDebut)->format('Y-m-d')) }}"
-                               class="field-input @error('dateDebut') is-invalid @enderror">
+                                value="{{ old('dateDebut', optional($projet->dateDebut)->format('Y-m-d')) }}"
+                                class="field-input @error('dateDebut') is-invalid @enderror">
                         @error('dateDebut')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
-                        <label class="field-label">Date de fin</label>
+                        <label class="field-label">Date de fin probable</label>
                         <input type="date" name="dateFin"
-                               value="{{ old('dateFin', optional($projet->dateFin)->format('Y-m-d')) }}"
-                               class="field-input @error('dateFin') is-invalid @enderror">
+                                value="{{ old('dateFin', optional($projet->dateFin)->format('Y-m-d')) }}"
+                                class="field-input @error('dateFin') is-invalid @enderror">
                         @error('dateFin')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
@@ -162,22 +162,22 @@
                 @php
                     $ext  = pathinfo($doc->nomFichier, PATHINFO_EXTENSION);
                     $icon = in_array($ext, ['pdf']) ? 'fa-file-pdf'
-                          : (in_array($ext, ['doc','docx']) ? 'fa-file-word'
-                          : (in_array($ext, ['xls','xlsx']) ? 'fa-file-excel'
-                          : (in_array($ext, ['jpg','jpeg','png']) ? 'fa-file-image'
-                          : 'fa-file-alt')));
+                            : (in_array($ext, ['doc','docx']) ? 'fa-file-word'
+                            : (in_array($ext, ['xls','xlsx']) ? 'fa-file-excel'
+                            : (in_array($ext, ['jpg','jpeg','png']) ? 'fa-file-image'
+                            : 'fa-file-alt')));
                 @endphp
                 <i class="fas {{ $icon }}"></i>
                 <span class="doc-file-name">{{ $doc->nomFichier }}</span>
                 <span class="doc-badge">{{ $doc->typeDocument }}</span>
                 <a href="{{ route('porteur.projets.documents.download', [$projet, $doc]) }}"
-                   class="doc-action-link" title="Télécharger">
+                    class="doc-action-link" title="Télécharger">
                     <i class="fas fa-download"></i>
                 </a>
                 <form method="POST"
-                      action="{{ route('porteur.projets.documents.destroy', [$projet, $doc]) }}"
-                      onsubmit="return confirm('Supprimer ce document ?')"
-                      style="display:inline;">
+                        action="{{ route('porteur.projets.documents.destroy', [$projet, $doc]) }}"
+                        onsubmit="return confirm('Supprimer ce document ?')"
+                        style="display:inline;">
                     @csrf @method('DELETE')
                     <button type="submit" class="doc-action-del" title="Supprimer">
                         <i class="fas fa-times"></i>
@@ -190,18 +190,18 @@
 
             {{-- Ajout de nouveaux documents --}}
             <form method="POST"
-                  action="{{ route('porteur.projets.documents.store', $projet) }}"
-                  enctype="multipart/form-data"
-                  class="mt-3"
-                  id="formAddDoc">
+                    action="{{ route('porteur.projets.documents.store', $projet) }}"
+                    enctype="multipart/form-data"
+                    class="mt-3"
+                    id="formAddDoc">
                 @csrf
 
                 <input type="file"
-                       id="newDocuments"
-                       name="documents[]"
-                       multiple
-                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                       style="display:none">
+                        id="newDocuments"
+                        name="documents[]"
+                        multiple
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                        style="display:none">
 
                 <div class="doc-toolbar">
                     <button type="button" class="btn-attach"

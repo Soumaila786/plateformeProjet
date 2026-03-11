@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SecteurController;
 use App\Http\Controllers\Admin\ProjetController;
 use App\Http\Controllers\Admin\PlanificationController;
+use App\Http\Controllers\ParametreController;
+
 
 // Porteur
 use App\Http\Controllers\Porteur\DashboardController      as PorteurDashboardController;
@@ -45,41 +47,17 @@ Route::post('/logout', [LoginController::class, 'logout'])
 Route::middleware(['auth'])->group(function () {
 
     // ── Paramètres communs à tous les rôles ──
-    Route::prefix('parametres')->name('parametres.')->group(function () {
-
-        Route::get('/', function () {
-            return view('parametres.index');
-        })->name('index');
-
-        Route::get('/profil', function () {
-            return view('parametres.profil');
-        })->name('profil');
-        Route::put('/profil', function () {
-            return redirect()->route('parametres.index')->with('success', 'Profil mis à jour');
-        })->name('profil.update');
-
-        Route::get('/securite', function () {
-            return view('parametres.securite');
-        })->name('securite');
-        Route::put('/securite', function () {
-            return redirect()->route('parametres.index')->with('success', 'Mot de passe mis à jour');
-        })->name('securite.update');
-
-        Route::get('/notifications', function () {
-            return view('parametres.notifications');
-        })->name('notifications');
-        Route::put('/notifications', function () {
-            return redirect()->route('parametres.index')->with('success', 'Préférences mises à jour');
-        })->name('notifications.update');
-
-        Route::get('/general', function () {
-            return view('parametres.general');
-        })->name('general');
-        Route::put('/general', function () {
-            return redirect()->route('parametres.index')->with('success', 'Paramètres généraux mis à jour');
-        })->name('general.update');
+    Route::middleware(['auth'])->prefix('parametres')->name('parametres.')->group(function () {
+        Route::get('/',             [ParametreController::class, 'index'])               ->name('index');
+        Route::get('/profil',       [ParametreController::class, 'profil'])              ->name('profil');
+        Route::put('/profil',       [ParametreController::class, 'profilUpdate'])        ->name('profil.update');
+        Route::get('/securite',     [ParametreController::class, 'securite'])            ->name('securite');
+        Route::put('/securite',     [ParametreController::class, 'securiteUpdate'])      ->name('securite.update');
+        Route::get('/notifications',[ParametreController::class, 'notifications'])       ->name('notifications');
+        Route::put('/notifications',[ParametreController::class, 'notificationsUpdate']) ->name('notifications.update');
+        Route::get('/general',      [ParametreController::class, 'general'])             ->name('general');
+        Route::put('/general',      [ParametreController::class, 'generalUpdate'])       ->name('general.update');
     });
-
     // ══════════════════════════════════════
     // ADMIN
     // ══════════════════════════════════════
