@@ -4,76 +4,114 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+<link rel="stylesheet" href="{{ asset('css/users.css') }}">
 @endpush
 
 @section('content')
 
 <div class="projets-page">
 
-    <div class="projets-header">
+    <div class="ulist-header">
         <div>
-            <h1 class="projets-title">Utilisateurs</h1>
-            <p class="projets-subtitle">{{ $users->total() }} utilisateur{{ $users->total() > 1 ? 's' : '' }}</p>
+            <h1 class="ulist-title">Utilisateurs</h1>
+            <p class="ulist-subtitle">{{ $users->total() }} utilisateur{{ $users->total() > 1 ? 's' : '' }}</p>
         </div>
-        <a href="{{ route('admin.users.create') }}" class="btn-add">
+        <a href="{{ route('admin.users.create') }}" class="ulist-btn-add">
             <i class="fas fa-plus"></i> Nouvel utilisateur
         </a>
     </div>
 
     {{-- Filtres --}}
-    <div class="projets-filters">
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" class="search-input"
-                   placeholder="Nom, email..." value="{{ request('search') }}">
+    <div class="ulist-filters">
+        <div class="ulist-search-wrapper">
+            <i class="fas fa-search ulist-search-icon"></i>
+            <input type="text" id="searchInput" class="ulist-search-input"
+                   placeholder="Rechercher par nom, email..." value="{{ request('search') }}">
         </div>
-        <div class="status-filters">
+        <div class="ulist-role-filters">
             @foreach(['' => 'Tous', 'admin' => 'Admin', 'porteur' => 'Porteur', 'approbateur' => 'Approbateur', 'validateur' => 'Validateur'] as $val => $label)
             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['role' => $val])) }}"
-               class="status-filter {{ request('role', '') === $val ? 'active' : '' }}">
+               class="ulist-role-pill {{ request('role', '') === $val ? 'active' : '' }}">
                 {{ $label }}
             </a>
             @endforeach
         </div>
     </div>
 
-    {{-- Cards Grid --}}
-    <div class="cards-grid">
+    {{-- Liste --}}
+    <div class="ulist-table">
+
+        {{-- Entête --}}
+        <div class="ulist-thead">
+            <div class="ulist-th ulist-col-user">Utilisateur</div>
+            <div class="ulist-th ulist-col-info">Informations</div>
+            <div class="ulist-th ulist-col-role">Rôle</div>
+            <div class="ulist-th ulist-col-statut">Statut</div>
+            <div class="ulist-th ulist-col-actions">Actions</div>
+        </div>
+
+        {{-- Lignes --}}
         @forelse($users as $user)
-        <div class="user-card">
-            <div class="user-card-top">
-                <div class="user-avatar role-avatar-{{ $user->role }}">
+        <div class="ulist-row">
+
+            {{-- Avatar + nom --}}
+            <div class="ulist-col-user">
+                <div class="ulist-avatar ulist-avatar-{{ $user->role }}">
                     {{ strtoupper(substr($user->nomComplet, 0, 1)) }}
                 </div>
-                <div class="user-card-actions">
-                    @if($user->actif)
-                        <span class="status-badge status-green" style="font-size:.68rem;">Actif</span>
-                    @else
-                        <span class="status-badge status-red" style="font-size:.68rem;">Inactif</span>
+                <div class="ulist-user-name-block">
+                    <a href="{{ route('admin.users.show', $user) }}" class="ulist-user-name">
+                        {{ $user->nomComplet }}
+                    </a>
+                    @if($user->organisation)
+                    <span class="ulist-user-org"><i class="fas fa-building"></i> {{ $user->organisation }}</span>
                     @endif
-                    <span class="role-badge role-{{ $user->role }}">{{ ucfirst($user->role) }}</span>
                 </div>
             </div>
 
-            <h3 class="user-card-nom">
-                <a href="{{ route('admin.users.show', $user) }}">{{ $user->nomComplet }}</a>
-            </h3>
-            <p class="user-card-email">{{ $user->email }}</p>
-            @if($user->organisation)
-            <p class="user-card-org"><i class="fas fa-building"></i> {{ $user->organisation }}</p>
-            @endif
+            {{-- Infos --}}
+            <div class="ulist-col-info">
+                <span class="ulist-info-item"><i class="fas fa-envelope"></i> {{ $user->email }}</span>
+                @if($user->contact)
+                <span class="ulist-info-item"><i class="fas fa-phone"></i> {{ $user->contact }}</span>
+                @endif
+                @if($user->fonction)
+                <span class="ulist-info-item"><i class="fas fa-briefcase"></i> {{ $user->fonction }}</span>
+                @endif
+            </div>
 
-            <div class="user-card-footer">
-                <a href="{{ route('admin.users.show', $user) }}" class="btn-icon" title="Voir">
+            {{-- Rôle --}}
+            <div class="ulist-col-role">
+                <span class="ulist-role-badge ulist-role-{{ $user->role }}">
+                    {{ ucfirst($user->role) }}
+                </span>
+            </div>
+
+            {{-- Statut --}}
+            <div class="ulist-col-statut">
+                @if($user->actif)
+                    <span class="ulist-status ulist-status-actif">
+                        <span class="ulist-status-dot"></span> Actif
+                    </span>
+                @else
+                    <span class="ulist-status ulist-status-inactif">
+                        <span class="ulist-status-dot"></span> Inactif
+                    </span>
+                @endif
+            </div>
+
+            {{-- Actions --}}
+            <div class="ulist-col-actions">
+                <a href="{{ route('admin.users.show', $user) }}" class="ulist-action-btn" title="Voir">
                     <i class="fas fa-eye"></i>
                 </a>
-                <a href="{{ route('admin.users.edit', $user) }}" class="btn-icon" title="Modifier">
+                <a href="{{ route('admin.users.edit', $user) }}" class="ulist-action-btn" title="Modifier">
                     <i class="fas fa-pencil-alt"></i>
                 </a>
                 <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}" style="display:inline;">
                     @csrf
                     <button type="submit"
-                            class="btn-icon {{ $user->actif ? 'btn-icon-warning' : 'btn-icon-success' }}"
+                            class="ulist-action-btn {{ $user->actif ? 'ulist-action-warn' : 'ulist-action-success' }}"
                             title="{{ $user->actif ? 'Désactiver' : 'Activer' }}">
                         <i class="fas {{ $user->actif ? 'fa-user-times' : 'fa-user-check' }}"></i>
                     </button>
@@ -81,18 +119,20 @@
                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
                       onsubmit="return confirm('Supprimer cet utilisateur ?')" style="display:inline;">
                     @csrf @method('DELETE')
-                    <button type="submit" class="btn-icon btn-icon-danger" title="Supprimer">
+                    <button type="submit" class="ulist-action-btn ulist-action-danger" title="Supprimer">
                         <i class="fas fa-trash"></i>
                     </button>
                 </form>
             </div>
+
         </div>
         @empty
-        <div class="cards-empty" style="grid-column:1/-1;">
+        <div class="ulist-empty">
             <i class="fas fa-users-slash"></i>
             <p>Aucun utilisateur trouvé.</p>
         </div>
         @endforelse
+
     </div>
 
     @if($users->hasPages())

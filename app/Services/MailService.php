@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Mail\CompteCreeMail;
 use App\Mail\CompteDesactiveMail;
 use App\Mail\ProjetApprouveMail;
+use App\Mail\ProjetRejetMail;
 use App\Mail\ProjetValideMail;
 use App\Models\Projet;
 use App\Models\Commentaire;
@@ -12,9 +13,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class MailService
-{
-    // ── Compte créé ────────────────────────────────────
+class MailService {
+
+    // ── Compte créé
     public function envoyerCompteCreee(User $user, $motDePasse){
         try {
             Mail::to($user->email)->send(new CompteCreeMail($user, $motDePasse));
@@ -23,7 +24,7 @@ class MailService
         }
     }
 
-    // ── Compte désactivé ───────────────────────────────
+    // ── Compte désactivé
     public function envoyerCompteDesactive(User $user){
         try {
             Mail::to($user->email)->send(new CompteDesactiveMail($user));
@@ -32,7 +33,7 @@ class MailService
         }
     }
 
-    // ── Projet approuvé ────────────────────────────────
+    // ── Projet approuvé
     public function envoyerProjetApprouve(Projet $projet){
         if (!$projet->porteur || !$projet->porteur->email) return;
 
@@ -43,7 +44,7 @@ class MailService
         }
     }
 
-    // ── Projet validé ──────────────────────────────────
+    // ── Projet validé 
     public function envoyerProjetValide(Projet $projet) {
         if (!$projet->porteur || !$projet->porteur->email) return;
 
@@ -54,13 +55,13 @@ class MailService
         }
     }
 
-    // ── Projet rejeté ─────────────────────────────────
+    // ── Projet rejeté 
     public function envoyerProjetRejete(Projet $projet, Commentaire $commentaire) {
         if (!$projet->porteur || !$projet->porteur->email) return;
 
         try {
             // Passage du commentaire au constructeur
-            Mail::to($projet->porteur->email)->send(new ProjetRejeteMail($projet, $commentaire));
+            Mail::to($projet->porteur->email)->send(new ProjetRejetMail($projet, $commentaire));
         } catch (\Exception $e) {
             Log::error('MailService::envoyerProjetRejete - ' . $e->getMessage());
         }

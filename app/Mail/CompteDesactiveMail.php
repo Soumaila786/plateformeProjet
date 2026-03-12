@@ -21,7 +21,7 @@ class CompteDesactiveMail extends Mailable
     public function build()
     {
         return $this
-            ->subject('Votre compte GesProjet a été desactiver')
+            ->subject('Votre compte GesProjet a été desactive.')
             ->view('emails.compte_desactive')
             ->with(['user' => $this->user]);
     }

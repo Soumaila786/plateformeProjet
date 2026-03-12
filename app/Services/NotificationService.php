@@ -8,9 +8,7 @@ use App\Models\User;
 
 class NotificationService
 {
-    /**
-     * Envoyer une notification à un utilisateur
-     */
+
     public static function envoyer($destinataireId, $message, $type = 'info', $projetId = null)
     {
         Notification::create([
@@ -23,9 +21,7 @@ class NotificationService
         ]);
     }
 
-    /**
-     * Notifier le porteur d'un projet
-     */
+
     public static function notifierPorteur(Projet $projet, $message, $type = 'info')
     {
         if ($projet->user_id) {
@@ -33,9 +29,7 @@ class NotificationService
         }
     }
 
-    /**
-     * Notifier tous les admins
-     */
+
     public static function notifierAdmins($message, $type = 'info', $projetId = null)
     {
         $admins = User::where('role', 'admin')->where('actif', true)->get();
@@ -44,9 +38,7 @@ class NotificationService
         }
     }
 
-    /**
-     * Notifier tous les approbateurs
-     */
+
     public static function notifierApprobateurs($message, $type = 'info', $projetId = null)
     {
         $approbateurs = User::where('role', 'approbateur')->where('actif', true)->get();
@@ -55,9 +47,7 @@ class NotificationService
         }
     }
 
-    /**
-     * Notifier tous les validateurs
-     */
+
     public static function notifierValidateurs($message, $type = 'info', $projetId = null)
     {
         $validateurs = User::where('role', 'validateur')->where('actif', true)->get();

@@ -3,11 +3,12 @@
 namespace App\Mail;
 
 use App\Models\Projet;
+use App\Models\Commentaire;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ProjetRejeteMail extends Mailable
+class ProjetRejetMail extends Mailable
 {
     use Queueable, SerializesModels;
 

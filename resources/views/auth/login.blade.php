@@ -66,10 +66,10 @@
                     <div class="input-wrapper">
                         <i class="fas fa-envelope input-icon"></i>
                         <input type="email" id="email" name="email"
-                               value="{{ old('email') }}"
-                               class="input-field @error('email') error @enderror"
-                               placeholder="exemple@domaine.com"
-                               required autofocus>
+                            value="{{ old('email') }}"
+                            class="input-field @error('email') error @enderror"
+                            placeholder="exemple@domaine.com"
+                            required autofocus>
                     </div>
                     @error('email')<span class="field-error">{{ $message }}</span>@enderror
                 </div>
@@ -80,8 +80,8 @@
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" id="password" name="password"
-                               class="input-field @error('password') error @enderror"
-                               placeholder="••••••••" required>
+                            class="input-field @error('password') error @enderror"
+                            placeholder="••••••••" required>
                         <button type="button" class="toggle-pwd" onclick="togglePassword()">
                             <i class="fas fa-eye" id="togglePasswordIcon"></i>
                         </button>
@@ -99,7 +99,7 @@
                 </div>
 
                 <button type="submit" class="btn-submit">
-                    Se connecter <i class="fas fa-arrow-right ms-2"></i>
+                    Se connecter
                 </button>
 
             </form>

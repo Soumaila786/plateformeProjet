@@ -51,8 +51,7 @@ class UserController extends Controller
     }
 
     // ── Enregistrer ──
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $request->validate([
             'nomComplet'  => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email',
@@ -78,26 +77,22 @@ class UserController extends Controller
         // ENVOI DE L'EMAIL - UNE SEULE LIGNE
         $this->mailService->envoyerCompteCreee($user, $motDePasse);
 
-        return redirect()->route('admin.users.index')
-                            ->with('success', 'Utilisateur créé avec succès.');
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
     }
 
     // ── Détail ──
-    public function show(User $user)
-    {
+    public function show(User $user){
         $user->load('projets');
         return view('admin.users.show', compact('user'));
     }
 
     // ── Formulaire édition ──
-    public function edit(User $user)
-    {
+    public function edit(User $user){
         return view('admin.users.edit', compact('user'));
     }
 
     // ── Mettre à jour ──
-    public function update(Request $request, User $user)
-    {
+    public function update(Request $request, User $user){
         $request->validate([
             'nomComplet'   => 'required|string|max:255',
             'email'        => 'required|email|unique:users,email,' . $user->id,
@@ -121,30 +116,25 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('admin.users.index')
-                         ->with('success', 'Utilisateur mis à jour avec succès.');
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
     // ── Supprimer ──
-    public function destroy(User $user)
-    {
+    public function destroy(User $user){
         if ($user->projets()->count() > 0) {
             return redirect()->route('admin.users.index')
-                             ->with('error', 'Impossible de supprimer un utilisateur ayant des projets.');
+                                ->with('error', 'Impossible de supprimer un utilisateur ayant des projets.');
         }
-
         $user->delete();
-
-        return redirect()->route('admin.users.index')
-                         ->with('success', 'Utilisateur supprimé.');
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé.');
     }
 
     // ── Activer / Désactiver ──
-    public function toggleStatus(User $user)
-    {
+    public function toggleStatus(User $user) {
         $user->update(['actif' => !$user->actif]);
-
         $msg = $user->actif ? 'Compte activé.' : 'Compte désactivé.';
+
+        $this->mailService->envoyerCompteDesactive($user);
 
         return back()->with('success', $msg);
     }

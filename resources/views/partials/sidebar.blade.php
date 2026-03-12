@@ -23,8 +23,8 @@
         <!-- Tableau de bord -->
         <li class="nav-item">
             <a href="{{ url($role . '/dashboard') }}"
-               class="nav-link {{ request()->is($role . '/dashboard') ? 'active' : '' }}"
-               data-tooltip="Tableau de bord">
+                class="nav-link {{ request()->is($role . '/dashboard') ? 'active' : '' }}"
+                data-tooltip="Tableau de bord">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Tableau de bord</span>
             </a>
@@ -34,24 +34,24 @@
         @if($role === 'admin')
             <li class="nav-item">
                 <a href="{{ route('admin.users.index') }}"
-                   class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                   data-tooltip="Utilisateurs">
+                    class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
+                    data-tooltip="Utilisateurs">
                     <i class="fas fa-users"></i>
                     <span>Utilisateurs</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.projets.index') }}"
-                   class="nav-link {{ request()->routeIs('admin.projets.*') ? 'active' : '' }}"
-                   data-tooltip="Projets">
+                    class="nav-link {{ request()->routeIs('admin.projets.*') ? 'active' : '' }}"
+                    data-tooltip="Projets">
                     <i class="fas fa-project-diagram"></i>
                     <span>Projets</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.secteurs.index') }}"
-                   class="nav-link {{ request()->routeIs('admin.secteurs.*') ? 'active' : '' }}"
-                   data-tooltip="Secteurs">
+                    class="nav-link {{ request()->routeIs('admin.secteurs.*') ? 'active' : '' }}"
+                    data-tooltip="Secteurs">
                     <i class="fas fa-building"></i>
                     <span>Secteurs</span>
                 </a>
@@ -62,16 +62,16 @@
         @if($role === 'porteur')
             <li class="nav-item">
                 <a href="{{ route('porteur.projets.index') }}"
-                   class="nav-link {{ request()->routeIs('porteur.projets.*') ? 'active' : '' }}"
-                   data-tooltip="Mes projets">
+                    class="nav-link {{ request()->routeIs('porteur.projets.*') ? 'active' : '' }}"
+                    data-tooltip="Mes projets">
                     <i class="fas fa-folder-open"></i>
                     <span>Mes projets</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{{ route('porteur.projets.create') }}"
-                   class="nav-link {{ request()->routeIs('porteur.projets.create') ? 'active' : '' }}"
-                   data-tooltip="Nouveau projet">
+                    class="nav-link {{ request()->routeIs('porteur.projets.create') ? 'active' : '' }}"
+                    data-tooltip="Nouveau projet">
                     <i class="fas fa-plus-circle"></i>
                     <span>Nouveau projet</span>
                 </a>
@@ -82,16 +82,16 @@
         @if($role === 'approbateur')
             <li class="nav-item">
                 <a href="{{ route('approbateur.projets.index') }}"
-                   class="nav-link {{ request()->routeIs('approbateur.projets.index') ? 'active' : '' }}"
-                   data-tooltip="À approuver">
+                    class="nav-link {{ request()->routeIs('approbateur.projets.index') ? 'active' : '' }}"
+                    data-tooltip="À approuver">
                     <i class="fas fa-tasks"></i>
                     <span>À approuver</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{{ route('approbateur.mes-projets') }}"
-                   class="nav-link {{ request()->routeIs('approbateur.mes-projets') ? 'active' : '' }}"
-                   data-tooltip="Mes projets">
+                    class="nav-link {{ request()->routeIs('approbateur.mes-projets') ? 'active' : '' }}"
+                    data-tooltip="Mes projets">
                     <i class="fas fa-folder-open"></i>
                     <span>Mes projets</span>
                 </a>
@@ -102,8 +102,8 @@
         @if($role === 'validateur')
             <li class="nav-item">
                 <a href="{{ route('validateur.projets.index') }}"
-                   class="nav-link {{ request()->routeIs('validateur.projets.*') ? 'active' : '' }}"
-                   data-tooltip="À valider">
+                    class="nav-link {{ request()->routeIs('validateur.projets.*') ? 'active' : '' }}"
+                    data-tooltip="À valider">
                     <i class="fas fa-check-double"></i>
                     <span>À valider</span>
                 </a>
