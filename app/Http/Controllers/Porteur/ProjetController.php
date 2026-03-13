@@ -13,12 +13,25 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjetController extends Controller
 {
-    public function index()
-    {
-        $projets = Projet::with('secteur')
-            ->where('user_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+    public function index(Request $request){
+        $query = Projet::with('secteur')
+            ->where('user_id', Auth::id());
+
+        // ── Filtre statut ──
+        if ($request->filled('statut')) {
+            $query->where('statutProjet', $request->statut);
+        }
+
+        // ── Recherche titre / code ──
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('titre', 'like', '%' . $search . '%')
+                    ->orWhere('codeProjet', 'like', '%' . $search . '%');
+            });
+        }
+
+        $projets = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('porteur.projets.index', compact('projets'));
     }

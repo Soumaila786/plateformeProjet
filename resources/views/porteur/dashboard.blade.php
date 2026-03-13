@@ -7,135 +7,219 @@
 @section('content')
 
 {{-- ── Welcome Banner ── --}}
-<div class="welcome-banner">
-    <div>
-        <div class="welcome-sub">Bienvenue,</div>
-        <h2 class="welcome-name">{{ Auth::user()->nomComplet }}</h2>
-        <div class="welcome-role">Porteur de projet · {{ now()->isoFormat('D MMMM YYYY') }}</div>
+<div class="pd-banner">
+    <div class="pd-banner-left">
+        <p class="pd-banner-sub">Tableau de bord</p>
+        <h2 class="pd-banner-name">{{ Auth::user()->nomComplet }}</h2>
+        <p class="pd-banner-role">Porteur de projet &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
     </div>
-    <div class="welcome-icon"><i class="fas fa-folder-open"></i></div>
+    <div class="pd-banner-icon"><i class="fas fa-folder-open"></i></div>
 </div>
 
-{{-- ── Stats 7 cards ── --}}
-<p class="pdash-section-label">Mes projets</p>
-<div class="pdash-stats-grid">
-    <div class="pdash-stat-card">
-        <div class="pdash-stat-top"><span class="pdash-stat-label">Total</span><div class="pdash-stat-icon icon-blue"><i class="fas fa-folder"></i></div></div>
-        <div class="pdash-stat-value">{{ $total }}</div>
+{{-- ── Zone top : Stats + Raccourcis ── --}}
+<div class="pd-top-grid">
+
+    {{-- Stats --}}
+    <div class="pd-card pd-stats-block">
+        <p class="pd-section-label">Mes statistiques des projets</p>
+        <div class="pd-stats-grid">
+            <div class="pd-stat-item">
+                <div class="pd-stat-icon icon-blue"><i class="fas fa-folder"></i></div>
+                <div>
+                    <div class="pd-stat-val">{{ $total }}</div>
+                    <div class="pd-stat-lbl">Total</div>
+                </div>
+            </div>
+            <div class="pd-stat-item">
+                <div class="pd-stat-icon icon-teal"><i class="fas fa-medal"></i></div>
+                <div>
+                    <div class="pd-stat-val">{{ $valide }}</div>
+                    <div class="pd-stat-lbl">Validés</div>
+                </div>
+            </div>
+            <div class="pd-stat-item">
+                <div class="pd-stat-icon icon-indigo"><i class="fas fa-paper-plane"></i></div>
+                <div>
+                    <div class="pd-stat-val">{{ $soumis }}</div>
+                    <div class="pd-stat-lbl">Soumis</div>
+                </div>
+            </div>
+            <div class="pd-stat-item">
+                <div class="pd-stat-icon icon-green"><i class="fas fa-check-circle"></i></div>
+                <div>
+                    <div class="pd-stat-val">{{ $approuve }}</div>
+                    <div class="pd-stat-lbl">Approuvés</div>
+                </div>
+            </div>
+            <div class="pd-stat-item">
+                <div class="pd-stat-icon icon-orange"><i class="fas fa-coins"></i></div>
+                <div>
+                    <div class="pd-stat-val">{{ $finance ?? 0 }}</div>
+                    <div class="pd-stat-lbl">Financés</div>
+                </div>
+            </div>
+            <div class="pd-stat-item">
+                <div class="pd-stat-icon icon-red"><i class="fas fa-times-circle"></i></div>
+                <div>
+                    <div class="pd-stat-val">{{ $rejete }}</div>
+                    <div class="pd-stat-lbl">Rejetés</div>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div class="pdash-stat-card">
-        <div class="pdash-stat-top"><span class="pdash-stat-label">Brouillon</span><div class="pdash-stat-icon icon-gray"><i class="fas fa-edit"></i></div></div>
-        <div class="pdash-stat-value">{{ $brouillon }}</div>
+
+    {{-- Raccourcis --}}
+    <div class="pd-card pd-raccourcis-block">
+        <p class="pd-section-label">Raccourcis</p>
+        <div class="pd-raccourcis-grid">
+            <a href="{{ route('porteur.projets.create') }}" class="pd-raccourci-card pd-rc-blue">
+                <div class="pd-rc-icon"><i class="fas fa-plus-circle"></i></div>
+                <span>Nouveau projet</span>
+            </a>
+            <a href="{{ route('porteur.projets.index') }}" class="pd-raccourci-card pd-rc-indigo">
+                <div class="pd-rc-icon"><i class="fas fa-folder-open"></i></div>
+                <span>Mes projets</span>
+            </a>
+            <a href="{{ route('porteur.notifications.index') }}" class="pd-raccourci-card pd-rc-orange">
+                <div class="pd-rc-icon"><i class="fas fa-bell"></i></div>
+                <span>Notifications</span>
+            </a>
+            <a href="{{ route('parametres.profil') }}" class="pd-raccourci-card pd-rc-teal">
+                <div class="pd-rc-icon"><i class="fas fa-user-cog"></i></div>
+                <span>Mon profil</span>
+            </a>
+        </div>
     </div>
-    <div class="pdash-stat-card">
-        <div class="pdash-stat-top"><span class="pdash-stat-label">Soumis</span><div class="pdash-stat-icon icon-indigo"><i class="fas fa-paper-plane"></i></div></div>
-        <div class="pdash-stat-value">{{ $soumis }}</div>
-    </div>
-    <div class="pdash-stat-card">
-        <div class="pdash-stat-top"><span class="pdash-stat-label">En examen</span><div class="pdash-stat-icon icon-yellow"><i class="fas fa-search"></i></div></div>
-        <div class="pdash-stat-value">{{ $enExamen }}</div>
-    </div>
-    <div class="pdash-stat-card">
-        <div class="pdash-stat-top"><span class="pdash-stat-label">Approuvés</span><div class="pdash-stat-icon icon-green"><i class="fas fa-check-circle"></i></div></div>
-        <div class="pdash-stat-value">{{ $approuve }}</div>
-    </div>
-    <div class="pdash-stat-card">
-        <div class="pdash-stat-top"><span class="pdash-stat-label">Validés</span><div class="pdash-stat-icon icon-teal"><i class="fas fa-medal"></i></div></div>
-        <div class="pdash-stat-value">{{ $valide }}</div>
-    </div>
-    <div class="pdash-stat-card">
-        <div class="pdash-stat-top"><span class="pdash-stat-label">Rejetés</span><div class="pdash-stat-icon icon-red"><i class="fas fa-times-circle"></i></div></div>
-        <div class="pdash-stat-value">{{ $rejete }}</div>
-    </div>
+
 </div>
 
-{{-- ── Budgets ── --}}
-<p class="pdash-section-label">Finances</p>
-<div class="pdash-budget-grid">
-    <div class="pdash-budget-card">
-        <div class="pdash-budget-top">
-            <div class="pdash-budget-icon" style="background:#eff6ff;color:#1d4ed8;"><i class="fas fa-wallet"></i></div>
-            <div>
-                <p class="pdash-budget-label">Budget total</p>
-                <p class="pdash-budget-amount">{{ number_format($budgetTotal, 0, ',', ' ') }} <span class="pdash-budget-unit">F CFA</span></p>
-                <p class="pdash-budget-sub">Tous projets confondus</p>
-            </div>
+{{-- ── Finances (4 cards) ── --}}
+<p class="pd-section-label">Finances</p>
+<div class="pd-finances-grid">
+
+    <div class="pd-finance-card">
+        <div class="pd-finance-icon" style="background:#eff6ff;color:#1d4ed8;">
+            <i class="fas fa-wallet"></i>
         </div>
-        <div class="pdash-budget-bar"><div class="pdash-budget-fill" style="width:100%;background:#1d4ed8;"></div></div>
-    </div>
-    <div class="pdash-budget-card">
-        <div class="pdash-budget-top">
-            <div class="pdash-budget-icon" style="background:#fffbeb;color:#d97706;"><i class="fas fa-hand-holding-usd"></i></div>
-            <div>
-                <p class="pdash-budget-label">Montant demandé</p>
-                <p class="pdash-budget-amount">{{ number_format($montantDemande, 0, ',', ' ') }} <span class="pdash-budget-unit">F CFA</span></p>
-                @php $pctDemande = $budgetTotal > 0 ? min(100, round($montantDemande / $budgetTotal * 100)) : 0; @endphp
-                <p class="pdash-budget-sub">{{ $pctDemande }}% du budget total</p>
-            </div>
+        <div>
+            <p class="pd-finance-label">Budget total</p>
+            <p class="pd-finance-amount">
+                {{ number_format($budgetTotal, 0, ',', ' ') }}&nbsp;<span>F CFA</span>
+            </p>
+            <p class="pd-finance-sub">Tous projets confondus</p>
+            <div class="pd-finance-bar"><div style="width:100%;background:#1d4ed8;"></div></div>
         </div>
-        <div class="pdash-budget-bar"><div class="pdash-budget-fill" style="width:{{ $pctDemande }}%;background:#d97706;"></div></div>
     </div>
-    <div class="pdash-budget-card">
-        <div class="pdash-budget-top">
-            <div class="pdash-budget-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-coins"></i></div>
-            <div>
-                <p class="pdash-budget-label">Montant financé</p>
-                <p class="pdash-budget-amount">{{ number_format($montantFinance, 0, ',', ' ') }} <span class="pdash-budget-unit">F CFA</span></p>
-                @php $pctFinance = $montantDemande > 0 ? min(100, round($montantFinance / $montantDemande * 100)) : 0; @endphp
-                <p class="pdash-budget-sub">{{ $pctFinance }}% du montant demandé</p>
-            </div>
+
+    <div class="pd-finance-card">
+        <div class="pd-finance-icon" style="background:#fffbeb;color:#d97706;">
+            <i class="fas fa-hand-holding-usd"></i>
         </div>
-        <div class="pdash-budget-bar"><div class="pdash-budget-fill" style="width:{{ $pctFinance }}%;background:#16a34a;"></div></div>
+        <div>
+            @php $pctD = $budgetTotal > 0 ? min(100, round($montantDemande / $budgetTotal * 100)) : 0; @endphp
+            <p class="pd-finance-label">Montant demandé</p>
+            <p class="pd-finance-amount">
+                {{ number_format($montantDemande, 0, ',', ' ') }}&nbsp;<span>F CFA</span>
+            </p>
+            <p class="pd-finance-sub">{{ $pctD }}% du budget total</p>
+            <div class="pd-finance-bar"><div style="width:{{ $pctD }}%;background:#d97706;"></div></div>
+        </div>
     </div>
+
+    <div class="pd-finance-card">
+        <div class="pd-finance-icon" style="background:#f0fdf4;color:#16a34a;">
+            <i class="fas fa-coins"></i>
+        </div>
+        <div>
+            @php $pctF = $montantDemande > 0 ? min(100, round($montantFinance / $montantDemande * 100)) : 0; @endphp
+            <p class="pd-finance-label">Montant financé</p>
+            <p class="pd-finance-amount">
+                {{ number_format($montantFinance, 0, ',', ' ') }}&nbsp;<span>F CFA</span>
+            </p>
+            <p class="pd-finance-sub">{{ $pctF }}% du montant demandé</p>
+            <div class="pd-finance-bar"><div style="width:{{ $pctF }}%;background:#16a34a;"></div></div>
+        </div>
+    </div>
+
+    <div class="pd-finance-card">
+        <div class="pd-finance-icon" style="background:#fef2f2;color:#dc2626;">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div>
+            @php
+                $restant = max(0, $montantDemande - $montantFinance);
+                $pctR    = $montantDemande > 0 ? min(100, round($restant / $montantDemande * 100)) : 0;
+            @endphp
+            <p class="pd-finance-label">Restant à financer</p>
+            <p class="pd-finance-amount">
+                {{ number_format($restant, 0, ',', ' ') }}&nbsp;<span>F CFA</span>
+            </p>
+            <p class="pd-finance-sub">{{ $pctR }}% non encore financé</p>
+            <div class="pd-finance-bar"><div style="width:{{ $pctR }}%;background:#dc2626;"></div></div>
+        </div>
+    </div>
+
 </div>
 
-{{-- ── Projets récents (pleine largeur, grid 3 col) ── --}}
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-    <p class="pdash-section-label" style="margin:0;">Projets récents</p>
-    <a href="{{ route('porteur.projets.index') }}" class="pdash-link">Voir tous →</a>
+{{-- ── Projets récents (scrollable max 4) ── --}}
+<div class="pd-section-header">
+    <p class="pd-section-label" style="margin:0;">Projets récents</p>
+    <a href="{{ route('porteur.projets.index') }}" class="pd-voir-tout">
+        Voir tout&nbsp;<i class="fas fa-arrow-right"></i>
+    </a>
 </div>
-<div class="pdash-projets-grid">
+
+<div class="pd-projets-scroll">
     @forelse($projetsRecents as $projet)
     @php
         $cfg = [
-            'brouillon' => ['border'=>'#9ca3af','cls'=>'pdash-badge-gray',  'icon'=>'fa-edit',        'lbl'=>'Brouillon'],
-            'soumis'    => ['border'=>'#6366f1','cls'=>'pdash-badge-indigo','icon'=>'fa-paper-plane', 'lbl'=>'Soumis'],
-            'en_examen' => ['border'=>'#f97316','cls'=>'pdash-badge-orange','icon'=>'fa-search',      'lbl'=>'En examen'],
-            'approuve'  => ['border'=>'#22c55e','cls'=>'pdash-badge-green', 'icon'=>'fa-check-circle','lbl'=>'Approuvé'],
-            'valide'    => ['border'=>'#0d9488','cls'=>'pdash-badge-teal',  'icon'=>'fa-medal',       'lbl'=>'Validé'],
-            'rejete'    => ['border'=>'#ef4444','cls'=>'pdash-badge-red',   'icon'=>'fa-times-circle','lbl'=>'Rejeté'],
+            'brouillon' => ['cls'=>'pd-badge-gray',  'icon'=>'fa-edit',        'lbl'=>'Brouillon','border'=>'#9ca3af'],
+            'soumis'    => ['cls'=>'pd-badge-indigo','icon'=>'fa-paper-plane', 'lbl'=>'Soumis',   'border'=>'#6366f1'],
+            'en_examen' => ['cls'=>'pd-badge-orange','icon'=>'fa-search',      'lbl'=>'En examen','border'=>'#f97316'],
+            'approuve'  => ['cls'=>'pd-badge-green', 'icon'=>'fa-check-circle','lbl'=>'Approuvé', 'border'=>'#22c55e'],
+            'valide'    => ['cls'=>'pd-badge-teal',  'icon'=>'fa-medal',       'lbl'=>'Validé',   'border'=>'#0d9488'],
+            'rejete'    => ['cls'=>'pd-badge-red',   'icon'=>'fa-times-circle','lbl'=>'Rejeté',   'border'=>'#ef4444'],
         ];
-        $c = $cfg[$projet->statutProjet] ?? $cfg['brouillon'];
+        $c         = $cfg[$projet->statutProjet] ?? $cfg['brouillon'];
+        $dateDebut = optional($projet->dateDebut)->format('d/m/Y') ?? '—';
+        $dateFin   = optional($projet->dateFin)->format('d/m/Y')   ?? '—';
     @endphp
-    <a href="{{ route('porteur.projets.show', $projet) }}" class="pdash-projet-card"
-        style="border-left:4px solid {{ $c['border'] }};">
-        <div class="pdash-projet-card-body">
-            <div class="pdash-projet-card-head">
-                <span class="pdash-projet-code">{{ $projet->codeProjet }}</span>
-                <span class="pdash-badge {{ $c['cls'] }}">
-                    <i class="fas {{ $c['icon'] }}"></i> {{ $c['lbl'] }}
-                </span>
+    <div class="pd-projet-card">
+        <div class="pd-projet-card-head">
+            <span class="pd-badge {{ $c['cls'] }}">
+                <i class="fas {{ $c['icon'] }}"></i>&nbsp;{{ $c['lbl'] }}
+            </span>
+            <a href="{{ route('porteur.projets.show', $projet) }}" class="pd-voir-btn" title="Voir détails">
+                <i class="fas fa-eye"></i>
+            </a>
+        </div>
+        <h3 class="pd-projet-titre">{{ Str::limit($projet->titre, 48) }}</h3>
+        <p class="pd-projet-objectif">{{ Str::limit($projet->objectif ?? '—', 70) }}</p>
+        <div class="pd-projet-details">
+            <div class="pd-projet-detail-item">
+                <i class="fas fa-wallet"></i>
+                <span>Budget&nbsp;: <strong>{{ number_format($projet->budgetTotal ?? 0, 0, ',', ' ') }} F CFA</strong></span>
             </div>
-            <p class="pdash-projet-titre">{{ Str::limit($projet->titre, 50) }}</p>
-            <div class="pdash-projet-meta">
-                <span><i class="fas fa-tag"></i> {{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
+            <div class="pd-projet-detail-item">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Demandé&nbsp;: <strong>{{ number_format($projet->montantDemande ?? 0, 0, ',', ' ') }} F CFA</strong></span>
             </div>
-            <div class="pdash-projet-footer">
-                <span class="pdash-projet-date">
-                    <i class="fas fa-calendar-alt"></i>
-                    {{ $projet->updated_at->format('d/m/Y') }}
-                </span>
-                <span class="pdash-voir-btn">Voir <i class="fas fa-arrow-right"></i></span>
+            <div class="pd-projet-detail-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>{{ $dateDebut }} → {{ $dateFin }}</span>
+            </div>
+            <div class="pd-projet-detail-item">
+                <i class="fas fa-tag"></i>
+                <span>{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
             </div>
         </div>
-    </a>
+    </div>
     @empty
-    <div class="pdash-empty" style="grid-column:1/-1;padding:40px;">
+    <div class="pd-empty">
         <i class="fas fa-folder-open"></i>
         <p>Aucun projet pour le moment.</p>
-        <a href="{{ route('porteur.projets.create') }}" class="pdash-btn-primary" style="margin-top:12px;">
-            <i class="fas fa-plus"></i> Créer mon premier projet
+        <a href="{{ route('porteur.projets.create') }}" class="pd-btn-primary">
+            <i class="fas fa-plus"></i>&nbsp;Créer mon premier projet
         </a>
     </div>
     @endforelse
