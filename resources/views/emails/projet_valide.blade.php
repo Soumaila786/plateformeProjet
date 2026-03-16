@@ -14,7 +14,7 @@
     <p class="greeting">Bonjour {{ $projet->porteur->nomComplet }},</p>
     <p class="text">
     Félicitations ! Votre projet a été <strong>validé</strong> avec succès.
-    Il est désormais officiellement accepté sur la plateforme <strong>ProjetGov</strong>.
+    Il est désormais officiellement accepté sur la plateforme <strong>GesProjet</strong>.
     </p>
 
     <div class="info-box">

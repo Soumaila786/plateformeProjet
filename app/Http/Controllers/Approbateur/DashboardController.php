@@ -9,40 +9,32 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $statuts = ['soumis', 'en_examen', 'approuve', 'rejete'];
-
-        // Requête de base incluant les brouillons retournés après rejet
-        $queryBase = Projet::where(function($q) use ($statuts) {
-            $q->whereIn('statutProjet', $statuts)
-              ->orWhere(function($q2) {
-                  $q2->where('statutProjet', 'brouillon')->whereNotNull('motifRejet');
-              });
-        });
-
-        $totalProjets = (clone $queryBase)->count();
+        $totalProjets = Projet::count();
         $soumis       = Projet::where('statutProjet', 'soumis')->count();
         $enExamen     = Projet::where('statutProjet', 'en_examen')->count();
-        $approuves    = Projet::where('statutProjet', 'approuve')->count();
-        $rejetes      = Projet::where('statutProjet', 'rejete')->count();
-        $retournes    = Projet::where('statutProjet', 'brouillon')->whereNotNull('motifRejet')->count();
-        $rejetes      = $rejetes + $retournes;
-        $enAttente    = $soumis + $enExamen;
+        $approuve     = Projet::where('statutProjet', 'approuve')->count();
+        $valide       = Projet::where('statutProjet', 'valide')->count();
+        $rejete       = Projet::where('statutProjet', 'rejete')->count();
+        $brouillon    = Projet::where('statutProjet', 'brouillon')->count();
 
-        $projetsRecents = (clone $queryBase)
-            ->with(['porteur', 'secteur'])
+        // Actions urgentes = soumis + en_examen
+        $enAttente = $soumis + $enExamen;
+
+        $projetsRecents = Projet::with(['secteur', 'porteur'])
+            ->whereIn('statutProjet', ['soumis', 'en_examen', 'approuve', 'rejete'])
             ->latest('updated_at')
-            ->take(5)
+            ->take(6)
             ->get();
 
-        $projetsUrgents = Projet::whereIn('statutProjet', ['soumis', 'en_examen'])
-            ->with(['porteur', 'secteur'])
+        $projetsUrgents = Projet::with(['porteur'])
+            ->whereIn('statutProjet', ['soumis', 'en_examen'])
             ->latest('dateSoumission')
-            ->take(5)
             ->get();
 
         return view('approbateur.dashboard', compact(
-            'totalProjets', 'soumis', 'enExamen', 'approuves',
-            'rejetes', 'enAttente', 'projetsRecents', 'projetsUrgents'
+            'totalProjets', 'soumis', 'enExamen', 'approuve',
+            'valide', 'rejete', 'brouillon', 'enAttente',
+            'projetsRecents', 'projetsUrgents'
         ));
     }
 }

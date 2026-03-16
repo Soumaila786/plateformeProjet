@@ -24,7 +24,7 @@ return new class extends Migration
             $table->enum('statutProjet', ['brouillon', 'soumis', 'en_examen', 'approuve', 'rejete', 'valide'])->default('brouillon');
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('secteur_id')->constrained()->restrictOnDelete();
+            $table->foreignId('secteur_id')->constrained('secteur_activites')->restrictOnDelete();
 
 
             $table->timestamps();

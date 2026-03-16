@@ -11,47 +11,43 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
+        $user = Auth::user();
 
-        // Stats projets
-        $projets      = Projet::where('user_id', $userId)->get();
-        $total        = $projets->count();
-        $brouillon    = $projets->where('statutProjet', 'brouillon')->count();
-        $soumis       = $projets->where('statutProjet', 'soumis')->count();
-        $enExamen     = $projets->where('statutProjet', 'en_examen')->count();
-        $approuve     = $projets->where('statutProjet', 'approuve')->count();
-        $valide       = $projets->where('statutProjet', 'valide')->count();
-        $rejete       = $projets->where('statutProjet', 'rejete')->count();
+        // ── Compteurs statuts ──
+        $base = Projet::where('user_id', $user->id);
 
-        // Budgets
-        $budgetTotal     = $projets->sum('budgetTotal');
-        $montantDemande  = $projets->sum('montantDemande');
+        $total     = (clone $base)->count();
+        $brouillon = (clone $base)->where('statutProjet', 'brouillon')->count();
+        $soumis    = (clone $base)->where('statutProjet', 'soumis')->count();
+        $enExamen  = (clone $base)->where('statutProjet', 'en_examen')->count();
+        $approuve  = (clone $base)->where('statutProjet', 'approuve')->count();
+        $valide    = (clone $base)->where('statutProjet', 'valide')->count();
+        $rejete    = (clone $base)->where('statutProjet', 'rejete')->count();
+        $finance   = (clone $base)->where('statutProjet', 'finance')->count();
 
-        // Montant financé = somme des activités financées sur les projets de ce porteur
-        $projetIds       = $projets->pluck('id');
-        $montantFinance  = \App\Models\Planification::whereIn('projet_id', $projetIds)
-            ->where('statutActivite', 'financee')
-            ->sum('montantDemande');
+        // ── Finances ──
+        $budgetTotal    = (clone $base)->sum('budgetTotal')    ?? 0;
+        $montantDemande = (clone $base)->sum('montantDemande') ?? 0;
+        $montantFinance = 0; // colonne non encore créée
 
-        // Notifications récentes non lues
-        $notifications = Notification::where('destinataire_id', $userId)
-            ->where('statut', 'non_lu')
-            ->with('projet')
-            ->orderBy('dateEnvoi', 'desc')
+        // ── Projets récents (max 5) ──
+        $projetsRecents = Projet::where('user_id', $user->id)
+            ->with('secteur')
+            ->latest('updated_at')
             ->take(5)
             ->get();
 
-        // Projets récents
-        $projetsRecents = Projet::with('secteur')
-            ->where('user_id', $userId)
+        // ── Notifications récentes (max 4) ──
+        $notifications = Notification::where('destinataire_id', $user->id)
             ->latest()
-            ->take(5)
+            ->take(4)
             ->get();
 
         return view('porteur.dashboard', compact(
-            'total', 'brouillon', 'soumis', 'enExamen', 'approuve', 'valide', 'rejete',
+            'total', 'brouillon', 'soumis', 'enExamen',
+            'approuve', 'valide', 'rejete', 'finance',
             'budgetTotal', 'montantDemande', 'montantFinance',
-            'notifications', 'projetsRecents'
+            'projetsRecents', 'notifications'
         ));
     }
 }

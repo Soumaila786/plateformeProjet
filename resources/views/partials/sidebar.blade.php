@@ -33,6 +33,14 @@
         {{-- ══ ADMIN ══ --}}
         @if($role === 'admin')
             <li class="nav-item">
+                <a href="{{ route('admin.analytique') }}"
+                    class="nav-link {{ request()->routeIs('admin.projets.*') ? 'active' : '' }}"
+                    data-tooltip="À valider">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Tableau Analytique</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('admin.users.index') }}"
                     class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
                     data-tooltip="Utilisateurs">
@@ -81,6 +89,14 @@
         {{-- ══ APPROBATEUR ══ --}}
         @if($role === 'approbateur')
             <li class="nav-item">
+                <a href="{{ route('approbateur.analytique') }}"
+                    class="nav-link {{ request()->routeIs('approbateur.projets.*') ? 'active' : '' }}"
+                    data-tooltip="À valider">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Tableau Analytique</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('approbateur.projets.index') }}"
                     class="nav-link {{ request()->routeIs('approbateur.projets.index') ? 'active' : '' }}"
                     data-tooltip="À approuver">
@@ -100,6 +116,15 @@
 
         {{-- ══ VALIDATEUR ══ --}}
         @if($role === 'validateur')
+
+            <li class="nav-item">
+                <a href="{{ route('validateur.analytique') }}"
+                    class="nav-link {{ request()->routeIs('validateur.projets.*') ? 'active' : '' }}"
+                    data-tooltip="À valider">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Tableau Analytique</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a href="{{ route('validateur.projets.index') }}"
                     class="nav-link {{ request()->routeIs('validateur.projets.*') ? 'active' : '' }}"
@@ -108,6 +133,7 @@
                     <span>À valider</span>
                 </a>
             </li>
+
         @endif
 
         {{-- ══ COMMUN ══ --}}
@@ -117,8 +143,8 @@
                     ->where('statut', 'non_lu')->count();
             @endphp
             <a href="{{ route($role . '.notifications.index') }}"
-               class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
-               data-tooltip="Notifications">
+                class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
+                data-tooltip="Notifications">
                 <i class="fas fa-bell"></i>
                 <span>Notifications</span>
                 @if($notifCount > 0)
@@ -129,8 +155,8 @@
 
         <li class="nav-item">
             <a href="{{ route('parametres.index') }}"
-               class="nav-link {{ request()->routeIs('parametres.*') ? 'active' : '' }}"
-               data-tooltip="Paramètres">
+                class="nav-link {{ request()->routeIs('parametres.*') ? 'active' : '' }}"
+                data-tooltip="Paramètres">
                 <i class="fas fa-cog"></i>
                 <span>Paramètres</span>
             </a>

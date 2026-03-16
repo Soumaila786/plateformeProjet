@@ -24,10 +24,10 @@
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text"
-                   id="searchInput"
-                   class="search-input"
-                   placeholder="Rechercher par titre ou code..."
-                   value="{{ request('search') }}">
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Rechercher par titre ou code..."
+                    value="{{ request('search') }}">
         </div>
 
         <div class="status-filters">
@@ -41,7 +41,7 @@
             @endphp
             @foreach($statuts as $val => $label)
             <a href="{{ route('approbateur.mes-projets', array_merge(request()->query(), ['statut' => $val, 'search' => request('search')])) }}"
-               class="status-filter {{ request('statut', '') === $val ? 'active' : '' }}">
+                class="status-filter {{ request('statut', '') === $val ? 'active' : '' }}">
                 {{ $label }}
             </a>
             @endforeach
@@ -100,7 +100,7 @@
                             @if($projet->statutProjet === 'rejete' && $projet->motifRejet)
                             <br>
                             <small data-bs-toggle="tooltip" title="{{ $projet->motifRejet }}"
-                                   style="color:#dc2626;cursor:pointer;font-size:.7rem;">
+                                    style="color:#dc2626;cursor:pointer;font-size:.7rem;">
                                 <i class="fas fa-info-circle"></i> Motif
                             </small>
                             @endif
@@ -116,7 +116,7 @@
                         <td>
                             <div class="td-actions">
                                 <a href="{{ route('approbateur.projets.show', $projet) }}"
-                                   class="btn-icon" title="Voir">
+                                    class="btn-icon" title="Voir">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </div>

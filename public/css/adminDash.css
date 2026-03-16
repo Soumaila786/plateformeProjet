@@ -1,166 +1,190 @@
-/*   ADMIN DASHBOARD CSS */
+/* adminDash.css — Dashboard Admin */
 
-/* ── Section label ── */
-.dash-section-label {
-    font-size: .72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: #9ca3af;
-    margin: 0 0 10px;
-}
+.adm-wrap { display:flex; flex-direction:column; gap:18px; }
 
-/* ── Stats grids ── */
-.admin-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+/* ── Banner ── */
+.adm-banner {
+    position:relative; overflow:hidden; border-radius:14px;
+    background:linear-gradient(135deg,#1e1b4b,#312e81);
+    padding:22px 28px; color:#fff;
+    box-shadow:0 4px 20px rgba(49,46,129,.35);
 }
-.admin-stats-grid-4 {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
+.adm-banner-sub  { font-size:.72rem; color:rgba(255,255,255,.6); margin:0 0 2px; }
+.adm-banner-name { font-size:1.35rem; font-weight:800; margin:0 0 3px; letter-spacing:-.02em; }
+.adm-banner-role { font-size:.74rem; color:rgba(255,255,255,.5); margin:0; }
+.adm-banner-icon {
+    position:absolute; right:24px; top:50%; transform:translateY(-50%);
+    width:52px; height:52px; border-radius:13px;
+    background:rgba(255,255,255,.12);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; color:rgba(255,255,255,.75);
 }
-@media(max-width:1100px) {
-    .admin-stats-grid   { grid-template-columns: repeat(3,1fr); }
-    .admin-stats-grid-4 { grid-template-columns: repeat(2,1fr); }
-}
-@media(max-width:600px) {
-    .admin-stats-grid   { grid-template-columns: repeat(2,1fr); }
-    .admin-stats-grid-4 { grid-template-columns: repeat(2,1fr); }
-}
+.adm-banner-circle { position:absolute; border-radius:50%; background:rgba(255,255,255,.05); pointer-events:none; }
+.adm-banner-circle.c1 { width:160px; height:160px; top:-50px; right:-40px; }
+.adm-banner-circle.c2 { width:100px; height:100px; bottom:-30px; right:80px; }
 
-/* ── Stat card ── */
-.stat-card {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.07);
-    padding: 14px 16px;
+/* ── Stats projets ── */
+.adm-stats {
+    display:grid; grid-template-columns:repeat(6,1fr); gap:12px;
 }
-.stat-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
+@media(max-width:1100px) { .adm-stats { grid-template-columns:repeat(3,1fr); } }
+@media(max-width:600px)  { .adm-stats { grid-template-columns:repeat(2,1fr); } }
+
+.adm-stat {
+    background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+    padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.06);
+    transition:box-shadow .15s;
 }
-.stat-label {
-    font-size: .72rem;
-    font-weight: 600;
-    color: #9ca3af;
-    text-transform: uppercase;
-    letter-spacing: .04em;
+.adm-stat:hover { box-shadow:0 4px 16px rgba(0,0,0,.1); }
+.adm-stat-top   { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.adm-stat-lbl   { font-size:.7rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.04em; }
+.adm-stat-ic    {
+    width:32px; height:32px; border-radius:8px;
+    background:#f5f3ff; color:#7c3aed;
+    display:flex; align-items:center; justify-content:center; font-size:.78rem;
 }
-.stat-value {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #111827;
-    letter-spacing: -.03em;
-    line-height: 1;
+.adm-stat-val  { font-size:1.7rem; font-weight:800; color:#111827; letter-spacing:-.03em; margin:0 0 2px; line-height:1; }
+.adm-stat-hint { font-size:.68rem; color:#9ca3af; margin:0; }
+
+/* ── Meta cards (users/secteurs) ── */
+.adm-meta-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
 }
-.stat-sub {
-    font-size: .75rem;
-    color: #9ca3af;
-    font-weight: 400;
-    margin-left: 2px;
+@media(max-width:900px)  { .adm-meta-grid { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:500px)  { .adm-meta-grid { grid-template-columns:1fr; } }
+
+.adm-meta-card {
+    background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+    padding:14px 16px; display:flex; align-items:center; gap:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05); transition:box-shadow .15s;
 }
-.stat-icon {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: .8rem;
+.adm-meta-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.09); }
+.adm-meta-warn { border-color:#fed7aa; background:#fff7ed; }
+
+.adm-meta-ic {
+    width:38px; height:38px; border-radius:10px; flex-shrink:0;
+    background:#f5f3ff; color:#7c3aed;
+    display:flex; align-items:center; justify-content:center; font-size:.9rem;
 }
-.icon-blue   { background:#eff6ff; color:#1d4ed8; }
-.icon-indigo { background:#eef2ff; color:#6366f1; }
-.icon-purple { background:#f5f3ff; color:#7c3aed; }
-.icon-yellow { background:#fffbeb; color:#d97706; }
-.icon-orange { background:#fff7ed; color:#ea580c; }
-.icon-green  { background:#f0fdf4; color:#16a34a; }
-.icon-teal   { background:#f0fdfa; color:#0d9488; }
-.icon-red    { background:#fef2f2; color:#dc2626; }
-.icon-gray   { background:#f9fafb; color:#6b7280; }
+.adm-meta-warn .adm-meta-ic { background:#fff7ed; color:#ea580c; }
+.adm-meta-lbl  { font-size:.68rem; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:.04em; margin:0 0 2px; }
+.adm-meta-val  { font-size:1.4rem; font-weight:800; color:#111827; margin:0 0 1px; letter-spacing:-.02em; line-height:1; }
+.adm-meta-hint { font-size:.68rem; color:#9ca3af; margin:0; }
+
+/* ── Lien analytique ── */
+.analytique-link {
+    display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(135deg,#f5f3ff,#ede9fe);
+    border:1px solid #c4b5fd; border-radius:12px;
+    padding:14px 20px; text-decoration:none !important;
+    transition:box-shadow .15s, transform .15s; gap:12px;
+}
+.analytique-link:hover { box-shadow:0 4px 16px rgba(124,58,237,.15); transform:translateY(-1px); }
+.analytique-link-left  { display:flex; align-items:center; gap:14px; }
+.analytique-link-ic {
+    width:42px; height:42px; border-radius:11px;
+    background:#7c3aed; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1rem; flex-shrink:0;
+}
+.analytique-link-title { font-size:.88rem; font-weight:800; color:#111827; margin:0 0 2px; }
+.analytique-link-sub   { font-size:.72rem; color:#6b7280; margin:0; }
+.analytique-link-cta   {
+    font-size:.78rem; font-weight:700; color:#7c3aed;
+    display:inline-flex; align-items:center; gap:6px;
+    white-space:nowrap; flex-shrink:0;
+}
 
 /* ── Layout principal ── */
-.admin-main-grid {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 20px;
-    align-items: start;
+.adm-main-grid {
+    display:grid; grid-template-columns:1fr 290px; gap:14px; align-items:start;
 }
-@media(max-width:1100px) { .admin-main-grid { grid-template-columns: 1fr; } }
+@media(max-width:960px) { .adm-main-grid { grid-template-columns:1fr; } }
 
-/* ── Tableau dashboard ── */
-.admindash-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .82rem;
-}
-.admindash-table thead tr {
-    background: #f9fafb;
-    border-bottom: 1.5px solid #f3f4f6;
-}
-.admindash-table th {
-    padding: 10px 16px;
-    font-size: .7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    color: #9ca3af;
-    text-align: left;
-    white-space: nowrap;
-}
-.admindash-table td {
-    padding: 11px 16px;
-    border-bottom: 1px solid #f3f4f6;
-    color: #374151;
-    vertical-align: middle;
-}
-.admindash-table tbody tr:last-child td { border-bottom: none; }
-.admindash-table tbody tr:hover { background: #fafafa; }
+.adm-aside { display:flex; flex-direction:column; gap:12px; }
 
-.admindash-link {
-    font-weight: 600;
-    color: #1d4ed8;
-    text-decoration: none;
-    font-size: .78rem;
+/* ── Cards communes ── */
+.card {
+    background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+    overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
-.admindash-link:hover { text-decoration: underline; }
-
-.admindash-titre { font-weight: 500; color: #111827; }
-.admindash-muted { color: #9ca3af; font-size: .78rem; }
-
-.admindash-empty {
-    text-align: center;
-    padding: 24px;
-    color: #9ca3af;
-    font-size: .82rem;
+.card-head {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:13px 16px; border-bottom:1px solid #f3f4f6;
 }
+.card-title { font-size:.85rem; font-weight:700; color:#111827; margin:0; }
+.link-more  {
+    font-size:.72rem; font-weight:600; color:#9ca3af;
+    text-decoration:none; display:inline-flex; align-items:center; gap:3px; transition:color .12s;
+}
+.link-more i { font-size:.55rem; }
+.link-more:hover { color:#7c3aed; }
+
+/* ── Projet row ── */
+.projet-row {
+    display:flex; align-items:center; gap:11px;
+    padding:11px 16px; border-bottom:1px solid #f9fafb;
+    text-decoration:none !important; transition:background .1s;
+}
+.projet-row:last-of-type { border-bottom:none; }
+.projet-row:hover { background:#fafafa; }
+.projet-avatar {
+    width:34px; height:34px; border-radius:8px;
+    background:#f3f4f6; border:1px solid #e5e7eb;
+    color:#6b7280; font-size:.78rem; font-weight:800;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.projet-info { flex:1; min-width:0; }
+.projet-name { font-size:.82rem; font-weight:600; color:#111827; margin:0 0 1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.projet-sub  { font-size:.7rem; color:#9ca3af; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── User row ── */
+.user-row {
+    display:flex; align-items:center; gap:11px;
+    padding:10px 16px; border-bottom:1px solid #f9fafb;
+    text-decoration:none !important; transition:background .1s;
+}
+.user-row:last-of-type { border-bottom:none; }
+.user-row:hover { background:#fafafa; }
+.user-avatar {
+    width:32px; height:32px; border-radius:8px; flex-shrink:0;
+    background:linear-gradient(135deg,#7c3aed,#6d28d9);
+    color:#fff; font-size:.78rem; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+}
+
+/* ── Badge statut ── */
+.status-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 9px; border-radius:20px; font-size:.7rem; font-weight:600;
+    white-space:nowrap; flex-shrink:0;
+}
+.dot { width:6px; height:6px; border-radius:50%; display:inline-block; }
 
 /* ── Raccourcis ── */
-.shortcut-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 14px;
-    border-radius: 8px;
-    font-size: .82rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: opacity .15s;
+.adm-shortcuts {
+    padding:10px 12px 12px;
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
 }
-.shortcut-btn:hover { opacity: .85; }
-.shortcut-btn i { font-size: .8rem; }
-
-.shortcut-blue   { background: #eff6ff; color: #1d4ed8; }
-.shortcut-indigo { background: #eef2ff; color: #6366f1; }
-.shortcut-teal   { background: #f0fdfa; color: #0d9488; }
-
-/* ── Liens ── */
-.dash-table-link {
-    font-size: .75rem;
-    font-weight: 600;
-    color: #1d4ed8;
-    text-decoration: none;
+.shortcut-item {
+    display:flex; align-items:center; gap:9px;
+    padding:10px 12px; border-radius:9px;
+    background:#f5f3ff; border:1px solid #ede9fe;
+    text-decoration:none !important; color:#4c1d95;
+    font-size:.76rem; font-weight:600; transition:all .15s;
 }
-.dash-table-link:hover { text-decoration: underline; }
+.shortcut-item:hover { background:#ede9fe; border-color:#c4b5fd; }
+.shortcut-ic {
+    width:28px; height:28px; border-radius:7px;
+    background:#7c3aed; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.72rem; flex-shrink:0;
+}
+
+/* ── Empty ── */
+.empty-state {
+    display:flex; flex-direction:column; align-items:center;
+    gap:8px; padding:28px 16px; color:#9ca3af; text-align:center;
+}
+.empty-state i { font-size:1.6rem; color:#e5e7eb; }
+.empty-state p { font-size:.8rem; margin:0; }

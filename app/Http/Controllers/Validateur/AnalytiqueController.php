@@ -1,0 +1,189 @@
+<?php
+
+namespace App\Http\Controllers\Validateur;
+
+use App\Http\Controllers\Controller;
+use App\Models\Projet;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
+class AnalytiqueController extends Controller
+{
+    public function index()
+    {
+        $now = Carbon::now();
+
+        //  1. ENTONNOIR
+        $entonnoir = [
+            'soumis'   => Projet::where('statutProjet', 'soumis')->count(),
+            'approuve' => Projet::where('statutProjet', 'approuve')->count(),
+            'valide'   => Projet::where('statutProjet', 'valide')->count(),
+            'rejete'   => Projet::where('statutProjet', 'rejete')->count(),
+        ];
+
+        //  2. JAUGE
+        $totalDemande  = Projet::sum('montantDemande') ?? 0;
+        $totalBudget   = Projet::sum('budgetTotal')    ?? 0;
+        $pctJauge      = $totalBudget > 0
+            ? min(100, round($totalDemande / $totalBudget * 100))
+            : 0;
+
+        //  3. DONUT statuts
+        $donut = Projet::select('statutProjet', DB::raw('count(*) as total'))
+            ->groupBy('statutProjet')
+            ->pluck('total', 'statutProjet')
+            ->toArray();
+
+        $statutLabels = [
+            'brouillon' => 'Brouillon',
+            'soumis'    => 'Soumis',
+            'en_examen' => 'En examen',
+            'approuve'  => 'Approuvé',
+            'valide'    => 'Validé',
+            'rejete'    => 'Rejeté',
+        ];
+        $donutLabels = [];
+        $donutValues = [];
+        foreach ($statutLabels as $key => $lbl) {
+            if (isset($donut[$key]) && $donut[$key] > 0) {
+                $donutLabels[] = $lbl;
+                $donutValues[] = $donut[$key];
+            }
+        }
+
+        //  4. DÉLAIS TRAITEMENT
+        // Temps moyen soumission → approbation (en jours)
+        $delaiAppro = Projet::whereNotNull('dateApprobation')
+            ->whereNotNull('dateSoumission')
+            ->select(DB::raw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy'))
+            ->value('moy');
+
+        // Temps moyen approbation → validation
+        $delaiValid = Projet::whereNotNull('validated_at')
+            ->whereNotNull('dateApprobation')
+            ->select(DB::raw('AVG(DATEDIFF(validated_at, dateApprobation)) as moy'))
+            ->value('moy');
+
+        // Temps moyen total soumission → validation
+        $delaiTotal = Projet::whereNotNull('validated_at')
+            ->whereNotNull('dateSoumission')
+            ->select(DB::raw('AVG(DATEDIFF(validated_at, dateSoumission)) as moy'))
+            ->value('moy');
+
+        $delais = [
+            'labels' => ['Soumission → Approbation', 'Approbation → Validation', 'Total du processus'],
+            'values' => [
+                round($delaiAppro ?? 0, 1),
+                round($delaiValid ?? 0, 1),
+                round($delaiTotal ?? 0, 1),
+            ],
+        ];
+
+        // Projets en retard (soumis depuis > 30 jours sans décision)
+        $retard = Projet::whereIn('statutProjet', ['soumis', 'en_examen', 'approuve'])
+            ->where('dateSoumission', '<', $now->copy()->subDays(30))
+            ->count();
+
+        //  5. ANALYSE FINANCIÈRE
+        // Montants demandés vs budget par secteur
+        $finParSecteur = Projet::with('secteur')
+            ->select('secteur_id',
+                DB::raw('SUM(budgetTotal) as total_budget'),
+                DB::raw('SUM(montantDemande) as total_demande'),
+                DB::raw('COUNT(*) as nb')
+            )
+            ->groupBy('secteur_id')
+            ->get();
+
+        $secteurLabels  = [];
+        $secteurBudget  = [];
+        $secteurDemande = [];
+        foreach ($finParSecteur as $row) {
+            $secteurLabels[]  = optional($row->secteur)->nomSecteur ?? 'Non défini';
+            $secteurBudget[]  = (int)$row->total_budget;
+            $secteurDemande[] = (int)$row->total_demande;
+        }
+
+        // Évolution cumulative montants demandés par mois (12 derniers mois)
+        $evolution = [];
+        $cumul = 0;
+        for ($i = 11; $i >= 0; $i--) {
+            $mois  = $now->copy()->subMonths($i);
+            $mois_total = Projet::whereYear('dateSoumission', $mois->year)
+                ->whereMonth('dateSoumission', $mois->month)
+                ->sum('montantDemande') ?? 0;
+            $cumul += $mois_total;
+            $evolution['labels'][] = $mois->format('M y');
+            $evolution['values'][] = (int)$cumul;
+        }
+
+        //  6. HEATMAP SECTEURS
+        $heatmap = Projet::with('secteur')
+            ->select('secteur_id', 'statutProjet', DB::raw('COUNT(*) as total'))
+            ->groupBy('secteur_id', 'statutProjet')
+            ->get()
+            ->groupBy('secteur_id');
+
+        $heatSecteurs = [];
+        $heatData     = [];
+        foreach ($heatmap as $secteurId => $rows) {
+            $nomSecteur     = optional($rows->first()->secteur)->nomSecteur ?? 'Non défini';
+            $heatSecteurs[] = $nomSecteur;
+            $heatData[]     = $rows->sum('total');
+        }
+
+        //  7. PERFORMANCE VALIDATEUR
+        $validateur = Auth::user();
+        $perfAujourdhui = Projet::whereNotNull('validated_at')
+            ->where('validated_by', $validateur->id)
+            ->whereDate('validated_at', $now->toDateString())
+            ->count();
+
+        $perfSemaine = Projet::whereNotNull('validated_at')
+            ->where('validated_by', $validateur->id)
+            ->whereBetween('validated_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
+            ->count();
+
+        $totalTraites = Projet::whereNotNull('validated_at')
+            ->where('validated_by', $validateur->id)
+            ->count();
+
+        $totalValides = Projet::where('statutProjet', 'valide')
+            ->where('validated_by', $validateur->id)
+            ->count();
+
+        $tauxValidation = $totalTraites > 0
+            ? round($totalValides / $totalTraites * 100)
+            : 0;
+
+        $enAttente = Projet::where('statutProjet', 'approuve')->count();
+
+        $perf = [
+            'aujourd_hui'    => $perfAujourdhui,
+            'semaine'        => $perfSemaine,
+            'total_traites'  => $totalTraites,
+            'taux_validation'=> $tauxValidation,
+            'en_attente'     => $enAttente,
+        ];
+
+        return view('validateur.analytique', compact(
+            'entonnoir',
+            'totalDemande',
+            'totalBudget',
+            'pctJauge',
+            'donutLabels',
+            'donutValues',
+            'delais',
+            'retard',
+            'secteurLabels',
+            'secteurBudget',
+            'secteurDemande',
+            'evolution',
+            'heatSecteurs',
+            'heatData',
+            'perf'
+        ));
+    }
+}

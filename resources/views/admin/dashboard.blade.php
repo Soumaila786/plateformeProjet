@@ -1,202 +1,197 @@
 @extends('layouts.app')
-@section('title', 'Tableau de bord — Admin')
-
+@section('title', 'Tableau de bord — Administration')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/adminDash.css') }}">
 @endpush
 
 @section('content')
+<div class="adm-wrap">
 
-{{-- ── Welcome Banner ── --}}
-<div class="welcome-banner mb-4">
+{{-- Banner --}}
+<div class="adm-banner">
     <div>
-        <div class="welcome-sub">Bienvenue,</div>
-        <h2 class="welcome-name">{{ auth()->user()->nomComplet }}</h2>
-        <div class="welcome-role">Administrateur · {{ now()->isoFormat('D MMMM YYYY') }}</div>
+        <p class="adm-banner-sub">Bienvenue,</p>
+        <h2 class="adm-banner-name">{{ Auth::user()->nomComplet }}</h2>
+        <p class="adm-banner-role">Administrateur &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
     </div>
-    <div class="welcome-icon">
-        <i class="fas fa-shield-alt"></i>
-    </div>
+    <div class="adm-banner-icon"><i class="fas fa-shield-alt"></i></div>
+    <div class="adm-banner-circle c1"></div>
+    <div class="adm-banner-circle c2"></div>
 </div>
 
-<div class="trait"></div>
-
-{{-- ── Stats Projets ── --}}
-<p class="dash-section-label">Projets</p>
-<div class="admin-stats-grid">
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Total</span><div class="stat-icon icon-blue"><i class="fas fa-folder"></i></div></div>
-        <div class="stat-value">{{ $totalProjets }}</div>
+{{-- Stats projets --}}
+<div class="adm-stats">
+    @php
+        $statItems = [
+            ['lbl'=>'Total projets', 'val'=>$totalProjets,     'icon'=>'fa-folder',       'hint'=>'Tous confondus'],
+            ['lbl'=>'Soumis',        'val'=>$projetsSoumis,    'icon'=>'fa-paper-plane',  'hint'=>'En attente'],
+            ['lbl'=>'En examen',     'val'=>$projetsEnExamen,  'icon'=>'fa-search',       'hint'=>'En cours'],
+            ['lbl'=>'Approuvés',     'val'=>$projetsApprouves, 'icon'=>'fa-check-circle', 'hint'=>'À valider'],
+            ['lbl'=>'Validés',       'val'=>$projetsValides,   'icon'=>'fa-medal',        'hint'=>'Finalisés'],
+            ['lbl'=>'Rejetés',       'val'=>$projetsRejetes,   'icon'=>'fa-times-circle', 'hint'=>'Non retenus'],
+        ];
+    @endphp
+    @foreach($statItems as $s)
+    <div class="adm-stat">
+        <div class="adm-stat-top">
+            <span class="adm-stat-lbl">{{ $s['lbl'] }}</span>
+            <div class="adm-stat-ic"><i class="fas {{ $s['icon'] }}"></i></div>
+        </div>
+        <p class="adm-stat-val">{{ $s['val'] }}</p>
+        <p class="adm-stat-hint">{{ $s['hint'] }}</p>
     </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Soumis</span><div class="stat-icon icon-indigo"><i class="fas fa-paper-plane"></i></div></div>
-        <div class="stat-value">{{ $projetsSoumis }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">En examen</span><div class="stat-icon icon-yellow"><i class="fas fa-search"></i></div></div>
-        <div class="stat-value">{{ $projetsEnExamen }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Approuvés</span><div class="stat-icon icon-green"><i class="fas fa-check-circle"></i></div></div>
-        <div class="stat-value">{{ $projetsApprouves }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Validés</span><div class="stat-icon icon-teal"><i class="fas fa-medal"></i></div></div>
-        <div class="stat-value">{{ $projetsValides }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Rejetés</span><div class="stat-icon icon-red"><i class="fas fa-times-circle"></i></div></div>
-        <div class="stat-value">{{ $projetsRejetes }}</div>
-    </div>
+    @endforeach
 </div>
 
-<div class="trait"></div>
-
-{{-- ── Stats Utilisateurs ── --}}
-<p class="dash-section-label" style="margin-top:24px;">Utilisateurs & Secteurs</p>
-<div class="admin-stats-grid-4">
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Total users</span><div class="stat-icon icon-purple"><i class="fas fa-users"></i></div></div>
-        <div class="stat-value">{{ $totalUsers }}</div>
+{{-- Stats users + secteurs --}}
+<div class="adm-meta-grid">
+    <div class="adm-meta-card">
+        <div class="adm-meta-ic"><i class="fas fa-users"></i></div>
+        <div>
+            <p class="adm-meta-lbl">Utilisateurs</p>
+            <p class="adm-meta-val">{{ $totalUsers }}</p>
+            <p class="adm-meta-hint">{{ $usersActifs }} actifs · {{ $usersInactifs }} inactifs</p>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Actifs</span><div class="stat-icon icon-green"><i class="fas fa-user-check"></i></div></div>
-        <div class="stat-value">{{ $usersActifs }}</div>
+    <div class="adm-meta-card">
+        <div class="adm-meta-ic"><i class="fas fa-tags"></i></div>
+        <div>
+            <p class="adm-meta-lbl">Secteurs</p>
+            <p class="adm-meta-val">{{ $totalSecteurs }}</p>
+            <p class="adm-meta-hint">{{ $secteursActifs }} actifs</p>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Inactifs</span><div class="stat-icon icon-red"><i class="fas fa-user-times"></i></div></div>
-        <div class="stat-value">{{ $usersInactifs }}</div>
+    <div class="adm-meta-card">
+        <div class="adm-meta-ic"><i class="fas fa-user-tie"></i></div>
+        <div>
+            <p class="adm-meta-lbl">Porteurs</p>
+            <p class="adm-meta-val">{{ $usersByRole->get('porteur', 0) }}</p>
+            <p class="adm-meta-hint">Porteurs de projet</p>
+        </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-top"><span class="stat-label">Secteurs actifs</span><div class="stat-icon icon-orange"><i class="fas fa-tags"></i></div></div>
-        <div class="stat-value">
-            {{ $secteursActifs }}<span class="stat-sub">/{{ $totalSecteurs }}</span>
+    <div class="adm-meta-card {{ $projetsBloquesCount > 0 ? 'adm-meta-warn' : '' }}">
+        <div class="adm-meta-ic"><i class="fas fa-exclamation-triangle"></i></div>
+        <div>
+            <p class="adm-meta-lbl">Bloqués</p>
+            <p class="adm-meta-val">{{ $projetsBloquesCount }}</p>
+            <p class="adm-meta-hint">Sans action depuis +10j</p>
         </div>
     </div>
 </div>
 
-<div class="trait"></div>
-
-{{-- ── Layout principal ── --}}
-<div class="admin-main-grid">
-
-    {{-- Colonne gauche ── --}}
-    <div style="display:flex;flex-direction:column;gap:16px;">
-
-        {{-- Projets récents --}}
-        <div class="form-card m-3">
-            <div class="form-card-header" style="justify-content:space-between;">
-                <span><i class="fas fa-folder-open"></i> Projets récents</span>
-                <a href="{{ route('admin.projets.index') }}" class="dash-table-link">Voir tout →</a>
-            </div>
-            <div class="form-card-body p-0">
-                <table class="admindash-table">
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Titre</th>
-                            <th>Porteur</th>
-                            <th>Statut</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($projetsRecents as $projet)
-                        @php
-                            $sc = ['brouillon'=>'status-gray','soumis'=>'status-blue','en_examen'=>'status-yellow','approuve'=>'status-green','valide'=>'status-teal','rejete'=>'status-red'];
-                            $sl = ['brouillon'=>'Brouillon','soumis'=>'Soumis','en_examen'=>'En examen','approuve'=>'Approuvé','valide'=>'Validé','rejete'=>'Rejeté'];
-                        @endphp
-                        <tr>
-                            <td>
-                                <a href="{{ route('admin.projets.show', $projet) }}" class="admindash-link">
-                                    {{ $projet->codeProjet }}
-                                </a>
-                            </td>
-                            <td class="admindash-titre">{{ Str::limit($projet->titre, 38) }}</td>
-                            <td class="admindash-muted">{{ optional($projet->porteur)->nomComplet ?? '—' }}</td>
-                            <td><span class="status-badge {{ $sc[$projet->statutProjet] ?? 'status-gray' }}">{{ $sl[$projet->statutProjet] ?? $projet->statutProjet }}</span></td>
-                            <td class="admindash-muted">{{ optional($projet->dateCreation)->format('d/m/Y') ?? '—' }}</td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="5" class="admindash-empty">Aucun projet.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+{{-- Lien analytique --}}
+<a href="{{ route('admin.analytique') }}" class="analytique-link">
+    <div class="analytique-link-left">
+        <div class="analytique-link-ic"><i class="fas fa-chart-bar"></i></div>
+        <div>
+            <p class="analytique-link-title">Tableau analytique complet</p>
+            <p class="analytique-link-sub">Entonnoir · Délais · Secteurs · Porteurs · Rejets · Projets bloqués · Charge équipes</p>
         </div>
+    </div>
+    <span class="analytique-link-cta">Accéder <i class="fas fa-arrow-right"></i></span>
+</a>
+
+{{-- Zone principale --}}
+<div class="adm-main-grid">
+
+    {{-- Projets récents --}}
+    <div class="card">
+        <div class="card-head">
+            <h3 class="card-title">Projets récents</h3>
+            <a href="{{ route('admin.projets.index') }}" class="link-more">Voir tous <i class="fas fa-arrow-right"></i></a>
+        </div>
+        @forelse($projetsRecents as $projet)
+        @php
+            $map = [
+                'brouillon' => ['lbl'=>'Brouillon', 'dot'=>'#9ca3af','bg'=>'#f3f4f6','color'=>'#6b7280'],
+                'soumis'    => ['lbl'=>'Soumis',    'dot'=>'#6366f1','bg'=>'#eef2ff','color'=>'#4338ca'],
+                'en_examen' => ['lbl'=>'En examen', 'dot'=>'#f97316','bg'=>'#fff7ed','color'=>'#c2410c'],
+                'approuve'  => ['lbl'=>'Approuvé',  'dot'=>'#22c55e','bg'=>'#f0fdf4','color'=>'#15803d'],
+                'valide'    => ['lbl'=>'Validé',    'dot'=>'#0d9488','bg'=>'#f0fdfa','color'=>'#0f766e'],
+                'rejete'    => ['lbl'=>'Rejeté',    'dot'=>'#ef4444','bg'=>'#fef2f2','color'=>'#b91c1c'],
+            ];
+            $s = $map[$projet->statutProjet] ?? $map['brouillon'];
+        @endphp
+        <a href="{{ route('admin.projets.show', $projet) }}" class="projet-row">
+            <div class="projet-avatar">
+                {{ strtoupper(substr(optional($projet->secteur)->nomSecteur ?? $projet->titre, 0, 1)) }}
+            </div>
+            <div class="projet-info">
+                <p class="projet-name">{{ $projet->titre }}</p>
+                <p class="projet-sub">
+                    {{ optional($projet->porteur)->nomComplet ?? '—' }}
+                    &middot; {{ optional($projet->updated_at)->translatedFormat('d F Y') }}
+                </p>
+            </div>
+            <span class="status-badge" style="background:{{ $s['bg'] }};color:{{ $s['color'] }};">
+                <span class="dot" style="background:{{ $s['dot'] }};"></span>{{ $s['lbl'] }}
+            </span>
+        </a>
+        @empty
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <p>Aucun projet pour le moment</p>
+        </div>
+        @endforelse
+    </div>
+
+    {{-- Colonne droite --}}
+    <div class="adm-aside">
 
         {{-- Utilisateurs récents --}}
-        <div class="form-card mt-3">
-            <div class="form-card-header" style="justify-content:space-between;">
-                <span><i class="fas fa-users"></i> Utilisateurs récents</span>
-                <a href="{{ route('admin.users.index') }}" class="dash-table-link">Voir tout →</a>
+        <div class="card">
+            <div class="card-head">
+                <h3 class="card-title">Utilisateurs récents</h3>
+                <a href="{{ route('admin.users.index') }}" class="link-more">Voir tous <i class="fas fa-arrow-right"></i></a>
             </div>
-            <div class="form-card-body p-0">
-                <table class="admindash-table">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Email</th>
-                            <th>Rôle</th>
-                            <th>Statut</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($usersRecents as $user)
-                        <tr>
-                            <td>
-                                <a href="{{ route('admin.users.show', $user) }}" class="admindash-link">
-                                    {{ $user->nomComplet }}
-                                </a>
-                            </td>
-                            <td class="admindash-muted">{{ $user->email }}</td>
-                            <td><span class="role-badge role-{{ $user->role }}">{{ ucfirst($user->role) }}</span></td>
-                            <td>
-                                <span class="status-badge {{ $user->actif ? 'status-green' : 'status-red' }}">
-                                    {{ $user->actif ? 'Actif' : 'Inactif' }}
-                                </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="4" class="admindash-empty">Aucun utilisateur.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
-
-    {{-- Colonne droite ── --}}
-    <div style="display:flex;flex-direction:column;gap:16px;">
-
-        {{-- Graphique statuts en barres --}}
-        <div class="form-card m-3" >
-            <div class="form-card-header">
-                <i class="fas fa-chart-bar"></i>
-                <span>Répartition par statut</span>
-            </div>
-            <div class="form-card-body" style="padding:16px;">
-                <canvas id="chartStatuts" height="220"></canvas>
-            </div>
+            @forelse($usersRecents as $user)
+            @php
+                $roleMap = [
+                    'admin'       => ['lbl'=>'Admin',      'bg'=>'#faf5ff','color'=>'#7e22ce'],
+                    'approbateur' => ['lbl'=>'Approbateur','bg'=>'#eef2ff','color'=>'#4338ca'],
+                    'validateur'  => ['lbl'=>'Validateur', 'bg'=>'#f0fdfa','color'=>'#0f766e'],
+                    'porteur'     => ['lbl'=>'Porteur',    'bg'=>'#f0fdf4','color'=>'#15803d'],
+                ];
+                $r = $roleMap[$user->role] ?? ['lbl'=>ucfirst($user->role),'bg'=>'#f3f4f6','color'=>'#6b7280'];
+            @endphp
+            <a href="{{ route('admin.users.show', $user) }}" class="user-row">
+                <div class="user-avatar">
+                    {{ strtoupper(substr($user->nomComplet ?? 'U', 0, 1)) }}
+                </div>
+                <div class="projet-info">
+                    <p class="projet-name">{{ $user->nomComplet }}</p>
+                    <p class="projet-sub">{{ $user->email }}</p>
+                </div>
+                <span class="status-badge" style="background:{{ $r['bg'] }};color:{{ $r['color'] }};">
+                    {{ $r['lbl'] }}
+                </span>
+            </a>
+            @empty
+            <div class="empty-state"><i class="fas fa-users"></i><p>Aucun utilisateur</p></div>
+            @endforelse
         </div>
 
         {{-- Raccourcis --}}
-        <div class="form-card m-3">
-            <div class="form-card-header">
-                <i class="fas fa-bolt"></i>
-                <span>Raccourcis</span>
+        <div class="card">
+            <div class="card-head" style="border-bottom:none;">
+                <h3 class="card-title">Raccourcis</h3>
             </div>
-            <div class="form-card-body" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
-                <a href="{{ route('admin.users.create') }}" class="shortcut-btn shortcut-blue">
-                    <i class="fas fa-user-plus"></i> Nouvel utilisateur
+            <div class="adm-shortcuts">
+                <a href="{{ route('admin.users.create') }}" class="shortcut-item">
+                    <div class="shortcut-ic"><i class="fas fa-user-plus"></i></div>
+                    <span>Nouvel utilisateur</span>
                 </a>
-                <a href="{{ route('admin.secteurs.create') }}" class="shortcut-btn shortcut-indigo">
-                    <i class="fas fa-plus"></i> Nouveau secteur
+                <a href="{{ route('admin.secteurs.create') }}" class="shortcut-item">
+                    <div class="shortcut-ic"><i class="fas fa-plus-circle"></i></div>
+                    <span>Nouveau secteur</span>
                 </a>
-                <a href="{{ route('admin.projets.index') }}" class="shortcut-btn shortcut-teal">
-                    <i class="fas fa-folder"></i> Tous les projets
+                <a href="{{ route('admin.projets.index') }}" class="shortcut-item">
+                    <div class="shortcut-ic"><i class="fas fa-folder-open"></i></div>
+                    <span>Tous les projets</span>
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="shortcut-item">
+                    <div class="shortcut-ic"><i class="fas fa-users-cog"></i></div>
+                    <span>Gérer les users</span>
                 </a>
             </div>
         </div>
@@ -204,48 +199,5 @@
     </div>
 </div>
 
+</div>
 @endsection
-
-@push('scripts')
-<script>
-new Chart(document.getElementById('chartStatuts'), {
-    type: 'bar',
-    data: {
-        labels: ['Brouillon','Soumis','En examen','Approuvé','Validé','Rejeté'],
-        datasets: [{
-            label: 'Projets',
-            data: [{{ $projetsBrouillon }},{{ $projetsSoumis }},{{ $projetsEnExamen }},{{ $projetsApprouves }},{{ $projetsValides }},{{ $projetsRejetes }}],
-            backgroundColor: [
-                'rgba(156,163,175,.5)',
-                'rgba(59,130,246,.5)',
-                'rgba(245,158,11,.5)',
-                'rgba(22,163,74,.5)',
-                'rgba(13,148,136,.5)',
-                'rgba(220,38,38,.5)',
-            ],
-            borderColor: ['#9ca3af','#3b82f6','#f59e0b','#16a34a','#0d9488','#dc2626'],
-            borderWidth: 2,
-            borderRadius: 6,
-            barPercentage: 0.55,
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1, font: { family: 'Outfit', size: 11 } },
-                grid: { color: '#f3f4f6' }
-            },
-            x: {
-                ticks: { font: { family: 'Outfit', size: 11 } },
-                grid: { display: false }
-            }
-        }
-    }
-});
-</script>
-@endpush

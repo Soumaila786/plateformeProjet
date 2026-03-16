@@ -36,14 +36,12 @@ class ProjetController extends Controller
         return view('porteur.projets.index', compact('projets'));
     }
 
-    public function create()
-    {
+    public function create(){
         $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
         return view('porteur.projets.create', compact('secteurs'));
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $request->validate([
             'titre'         => 'required|string|max:255',
             'description'   => 'required|string',

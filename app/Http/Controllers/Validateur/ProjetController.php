@@ -4,43 +4,53 @@ namespace App\Http\Controllers\Validateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
-use App\Models\Commentaire;
-use App\Models\DocumentProjet;
+use \App\Models\SecteurActivite;
+use App\Services\MailService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProjetController extends Controller
 {
+    protected $mailService;
+    protected $notifService;
+
+    public function __construct(MailService $mailService, NotificationService $notifService)
+    {
+        $this->mailService  = $mailService;
+        $this->notifService = $notifService;
+    }
+
+    // ── Liste projets approuvés (à valider) ──
     public function index(Request $request)
     {
         $query = Projet::with(['porteur', 'secteur'])
             ->where('statutProjet', 'approuve');
 
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('titre', 'like', "%{$search}%")
-                    ->orWhere('codeProjet', 'like', "%{$search}%");
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('titre', 'like', "%$s%")
+                    ->orWhere('codeProjet', 'like', "%$s%");
             });
         }
 
-        $projets = $query->latest()->paginate(10);
-        return view('validateur.projets.index', compact('projets'));
+        if ($request->filled('secteur')) {
+            $query->where('secteur_id', $request->secteur);
+        }
+
+        $projets  = $query->orderBy('updated_at', 'desc')->paginate(12);
+        $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
+
+
+        return view('validateur.projets.index', compact('projets', 'secteurs'));
     }
 
+    // ── Détail projet ──
     public function show(Projet $projet)
     {
-        $projet->load(['porteur', 'secteur', 'planifications', 'documents.uploader', 'commentaires.utilisateur']);
+        $projet->load(['secteur', 'porteur', 'documents', 'commentaires.utilisateur', 'planifications']);
         return view('validateur.projets.show', compact('projet'));
-    }
-
-    public function mesProjets(Request $request)
-    {
-        $projets = Projet::with(['porteur', 'secteur'])
-            ->whereIn('statutProjet', ['valide', 'rejete', 'approuve'])
-            ->latest()->paginate(10);
-        return view('validateur.projets.mes-projets', compact('projets'));
     }
 
     // ── Valider ──
@@ -50,14 +60,18 @@ class ProjetController extends Controller
             'commentaire' => 'nullable|string|max:1000',
         ]);
 
-        $projet->update([
-            'statutProjet'   => 'valide',
-            'dateValidation' => now(),
-        ]);
+        if ($projet->statutProjet !== 'approuve') {
+            return back()->with('error', 'Ce projet ne peut pas être validé dans son état actuel.');
+        }
 
-        // Commentaire si observation
+        $projet->statutProjet  = 'valide';
+        $projet->validated_at  = now();
+        $projet->validated_by  = Auth::id();
+        $projet->save();
+
+        // Commentaire validateur
         if ($request->filled('commentaire')) {
-            Commentaire::create([
+            $projet->Commentaire()->create([
                 'message'         => $request->commentaire,
                 'typeCommentaire' => 'approbation',
                 'dateEnvoi'       => now(),
@@ -66,83 +80,62 @@ class ProjetController extends Controller
             ]);
         }
 
-        // Notification au porteur
-        NotificationService::notifierPorteur(
+        // Notifications
+        try {
+            $this->mailService->envoyerProjetValide($projet);
+        } catch (\Exception $e) {}
+
+        try {
+            NotificationService::notifierPorteur(
             $projet,
-            'Félicitations ! Votre projet « ' . $projet->titre . ' » a été validé définitivement.',
-            'validation'
+            'Félicitations ! Votre projet « ' . $projet->titre . ' » a été valider.',
+            'Validateur'
         );
+        } catch (\Exception $e) {}
 
-        // Notification aux admins
-        NotificationService::notifierAdmins(
-            'Le projet « ' . $projet->titre . ' » (' . $projet->codeProjet . ') a été validé par le validateur ' . Auth::user()->nomComplet . '.',
-            'validation',
-            $projet->id
-        );
-
-        return redirect()->route('validateur.projets.show', $projet)
-                            ->with('success', 'Projet validé avec succès.');
+        return redirect()
+            ->route('validateur.projets.index')
+            ->with('success', 'Le projet « ' . $projet->titre . ' » a été validé avec succès.');
     }
 
     // ── Rejeter ──
-    public function rejeter(Request $request, Projet $projet)
-    {
+    public function rejeter(Request $request, Projet $projet){
         $request->validate([
-            'motifRejet'          => 'required|string|max:1000',
-            'messageModification' => 'nullable|string|max:1000',
+            'motif_rejet' => 'required|string|min:10|max:1000',
         ]);
 
-        $statutFinal = $request->filled('messageModification') ? 'brouillon' : 'rejete';
+        if ($projet->statutProjet !== 'approuve') {
+            return back()->with('error', 'Ce projet ne peut pas être rejeté dans son état actuel.');
+        }
 
-        $projet->update([
-            'statutProjet'        => $statutFinal,
-            'motifRejet'          => $request->motifRejet,
-            'messageModification' => $request->messageModification,
-        ]);
+        $projet->statutProjet  = 'rejete';
+        $projet->motifRejet    = $request->motif_rejet;
+        $projet->validated_at  = now();
+        $projet->validated_by  = Auth::id();
+        $projet->save();
 
-        // Commentaire de rejet (observation)
-        Commentaire::create([
-            'message'         => 'Rejet validation : ' . $request->motifRejet,
-            'typeCommentaire' => 'rejet',
-            'dateEnvoi'       => now(),
-            'projet_id'       => $projet->id,
-            'utilisateur_id'  => Auth::id(),
-        ]);
-
-        if ($request->filled('messageModification')) {
-            Commentaire::create([
-                'message'         => 'Demande de modification : ' . $request->messageModification,
-                'typeCommentaire' => 'demande',
+        // Commentaire rejet
+        $projet->Commentaire()->create([
+                'message'         => $request->commentaire,
+                'typeCommentaire' => 'approbation',
                 'dateEnvoi'       => now(),
                 'projet_id'       => $projet->id,
                 'utilisateur_id'  => Auth::id(),
             ]);
-        }
 
-        // Notification au porteur
-        $msgPorteur = $statutFinal === 'brouillon'
-            ? 'Votre projet « ' . $projet->titre . ' » a été retourné pour modification après examen de validation. Motif : ' . $request->motifRejet
-            : 'Votre projet « ' . $projet->titre . ' » a été rejeté lors de la validation. Motif : ' . $request->motifRejet;
+        // Notifications
+        try {
+            $this->notifService->notifier(
+                $projet->porteur,
+                'Projet rejeté',
+                'Votre projet « ' . $projet->titre . ' » a été rejeté lors de la validation finale.',
+                'rejete',
+                route('porteur.projets.show', $projet)
+            );
+        } catch (\Exception $e) {}
 
-        NotificationService::notifierPorteur($projet, $msgPorteur, 'rejet');
-
-        // Notification aux approbateurs
-        NotificationService::notifierApprobateurs(
-            'Le projet « ' . $projet->titre . ' » a été rejeté lors de la validation par ' . Auth::user()->nomComplet . '.',
-            'rejet',
-            $projet->id
-        );
-
-        return redirect()->route('validateur.projets.show', $projet)
-                            ->with('success', 'Projet rejeté.');
-    }
-
-    public function downloadDocument(Projet $projet, DocumentProjet $document)
-    {
-        $path = storage_path('app/public/' . $document->cheminFichier);
-        if (!file_exists($path)) {
-            return back()->with('error', 'Fichier introuvable.');
-        }
-        return response()->download($path, $document->nomFichier);
+        return redirect()
+            ->route('validateur.projets.index')
+            ->with('success', 'Le projet « ' . $projet->titre . ' » a été rejeté.');
     }
 }

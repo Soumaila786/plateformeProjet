@@ -28,9 +28,8 @@ use App\Http\Controllers\Validateur\ProjetController      as ValidateurProjetCon
 // Notifications (partagé)
 use App\Http\Controllers\NotificationController;
 
-// ══════════════════════════════════════
-// ROUTES PUBLIQUES (non connecté)
-// ══════════════════════════════════════
+// ============================================================== ROUTES PUBLIQUES (non connecté)==============================================================
+
 Route::middleware('guest')->group(function () {
     Route::get('/',       [LoginController::class, 'showLoginForm']);
     Route::get('/login',  [LoginController::class, 'showLoginForm'])->name('login');
@@ -41,9 +40,8 @@ Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
-// ══════════════════════════════════════
-// ROUTES PROTÉGÉES
-// ══════════════════════════════════════
+//  ============================================================== ROUTES PROTÉGÉES ==============================================================
+
 Route::middleware(['auth'])->group(function () {
 
     // ── Paramètres communs à tous les rôles ──
@@ -58,12 +56,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/general',      [ParametreController::class, 'general'])             ->name('general');
         Route::put('/general',      [ParametreController::class, 'generalUpdate'])       ->name('general.update');
     });
-    // ══════════════════════════════════════
-    // ADMIN
-    // ══════════════════════════════════════
+
+
+    // =========================================================== ADMINISTRATEUR ==============================================================
+
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/analytique',  [App\Http\Controllers\Admin\AnalytiqueController::class, 'index'])->name('analytique');
+
 
         // Utilisateurs
         Route::resource('users', UserController::class);
@@ -99,9 +100,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
-    // ══════════════════════════════════════
-    // PORTEUR
-    // ══════════════════════════════════════
+    // ========================================================== PORTEUR ==============================================================
+
     Route::middleware('role:porteur')->prefix('porteur')->name('porteur.')->group(function () {
 
         Route::get('/dashboard', [PorteurDashboardController::class, 'index'])->name('dashboard');
@@ -140,12 +140,12 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
-    // ══════════════════════════════════════
-    // APPROBATEUR
-    // ══════════════════════════════════════
+    // ============================================================== APPROBATEUR ==============================================================
+
     Route::middleware('role:approbateur')->prefix('approbateur')->name('approbateur.')->group(function () {
 
         Route::get('/dashboard', [ApprobateurDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/analytique', [App\Http\Controllers\Approbateur\AnalytiqueController::class, 'index'])->name('analytique');
 
         // Projets à examiner/approuver/rejeter
         Route::get('projets',              [ApprobateurProjetController::class, 'index'])->name('projets.index');
@@ -170,32 +170,29 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
-    // ══════════════════════════════════════
-    // VALIDATEUR
-    // ══════════════════════════════════════
-    Route::middleware('role:validateur')->prefix('validateur')->name('validateur.')->group(function () {
+    
+    // ============================================================== VALIDATEUR ==============================================================
 
-        Route::get('/dashboard', [ValidateurDashboardController::class, 'index'])->name('dashboard');
+    Route::prefix('validateur')->name('validateur.')->middleware(['auth', 'role:validateur'])->group(function () {
 
-        // Projets à valider
-        Route::get('projets',          [ValidateurProjetController::class, 'index'])->name('projets.index');
-        Route::get('projets/{projet}', [ValidateurProjetController::class, 'show'])->name('projets.show');
-        Route::post('projets/{projet}/valider', [ValidateurProjetController::class, 'valider'])->name('projets.valider');
-        Route::post('projets/{projet}/rejeter', [ValidateurProjetController::class, 'rejeter'])->name('projets.rejeter');
+        Route::get('/dashboard', [App\Http\Controllers\Validateur\DashboardController::class, 'index'])->name('dashboard');
 
-        // Documents (lecture + téléchargement)
-        Route::get('projets/{projet}/documents/{document}/download', [ValidateurProjetController::class, 'downloadDocument'])
-            ->name('projets.documents.download');
+        Route::get('/analytique',  [App\Http\Controllers\Validateur\AnalytiqueController::class, 'index'])->name('analytique');
 
-        // Mes projets traités
-        Route::get('mes-projets', [ValidateurProjetController::class, 'mesProjets'])
-            ->name('mes-projets');
+        Route::get('/chart/bar',   [App\Http\Controllers\Validateur\DashboardController::class, 'chartBar'])->name('chart.bar');
+        Route::get('/chart/line',  [App\Http\Controllers\Validateur\DashboardController::class, 'chartLine'])->name('chart.line');
+
+        // Projets
+        Route::get('/projets',                    [App\Http\Controllers\Validateur\ProjetController::class, 'index'])->name('projets.index');
+        Route::get('/projets/{projet}',           [App\Http\Controllers\Validateur\ProjetController::class, 'show'])->name('projets.show');
+        Route::post('/projets/{projet}/valider',  [App\Http\Controllers\Validateur\ProjetController::class, 'valider'])->name('projets.valider');
+        Route::post('/projets/{projet}/rejeter',  [App\Http\Controllers\Validateur\ProjetController::class, 'rejeter'])->name('projets.rejeter');
 
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/toutes-lues', [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');
         Route::delete('/notifications/lues',      [NotificationController::class, 'destroyLues'])->name('notifications.destroy-lues');
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
-    });
 
+    });
 });

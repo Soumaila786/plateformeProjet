@@ -6,12 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateNotificationsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-   // database/migrations/xxxx_xx_xx_xxxxxx_create_notifications_table.php
+    
     public function up()
     {
         Schema::create('notifications', function (Blueprint $table) {
