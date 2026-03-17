@@ -23,10 +23,11 @@ class Projet extends Model
         'statutProjet',
         'user_id',
         'secteur_id',
-        'motifRejet',
         'messageModification',
         'dateApprobation',
         'dateValidation',
+        'approbateur_id',
+        'commentaire_id',
     ];
 
     protected $casts = [
@@ -48,6 +49,10 @@ class Projet extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function approbateur(){
+    return $this->belongsTo(User::class, 'approbateur_id');
+}
+
     // Alias pour compatibilité
     public function user()
     {
@@ -64,16 +69,14 @@ class Projet extends Model
         return $this->hasMany(Planification::class);
     }
 
-    public function documents()
-    {
+    public function documents(){
         return $this->hasMany(DocumentProjet::class);
     }
 
-    public function commentaires()
-    {
-        return $this->hasMany(Commentaire::class);
-    }
+    public function commentaires() {
 
+        return $this->hasMany(Commentaire::class, 'projet_id');
+    }
     // ── Accesseurs utiles ──
 
     public function isEditable()

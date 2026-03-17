@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Models\Projet;
 
 class Commentaire extends Model
 {
@@ -20,20 +21,17 @@ class Commentaire extends Model
 
     // ── Relations ──
 
-    public function projet()
-    {
+    public function projet(){
         return $this->belongsTo(Projet::class, 'projet_id');
     }
 
-    public function utilisateur()
-    {
+    public function utilisateur(){
         return $this->belongsTo(User::class, 'utilisateur_id');
     }
 
     // ── Helpers ──
 
-    public function icone()
-    {
+    public function icone(){
         $icons = [
             'approbation' => 'fa-check-circle',
             'rejet'       => 'fa-times-circle',
@@ -43,8 +41,7 @@ class Commentaire extends Model
         return $icons[$this->typeCommentaire] ?? 'fa-comment';
     }
 
-    public function couleur()
-    {
+    public function couleur(){
         $colors = [
             'approbation' => '#16a34a',
             'rejet'       => '#dc2626',
@@ -53,4 +50,5 @@ class Commentaire extends Model
         ];
         return $colors[$this->typeCommentaire] ?? '#6b7280';
     }
+    
 }

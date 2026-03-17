@@ -24,10 +24,12 @@
 
     {{-- ── Alerte modification demandée ── --}}
     @php
-        $nbModif = $projets->getCollection()
-            ->filter(fn($p) => $p->messageModification && $p->statutProjet === 'brouillon')
-            ->count();
+        $nbModif = $projets->getCollection()->filter(function($p) {
+                return $p->statutProjet === 'brouillon' && 
+                    $p->commentaires->where('typeCommentaire', 'rejet')->isNotEmpty();
+            })->count();
     @endphp
+
     @if($nbModif > 0)
     <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
         <i class="fas fa-exclamation-triangle me-2"></i>

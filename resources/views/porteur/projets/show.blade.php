@@ -60,25 +60,34 @@
     </div>
 
     {{-- ── Alerte motif rejet + modification ── --}}
-    @if($projet->motifRejet)
-    <div class="rejet-banner">
-        <div class="rejet-banner-block rejet-block-rouge">
-            <i class="fas fa-times-circle"></i>
-            <div>
-                <p class="rejet-banner-label">Motif du rejet</p>
-                <p class="rejet-banner-text">{{ $projet->motifRejet }}</p>
+    @php
+        $dernierRejet = $projet->commentaires->where('typeCommentaire', 'rejet')->last();
+        // Si vous utilisez un type différent pour les modifs, adaptez le nom ci-dessous
+        $derniereModif = $projet->commentaires->where('typeCommentaire', 'demande')->last();
+    @endphp
+
+    @if($dernierRejet)
+        <div class="rejet-banner">
+            {{-- Bloc Rouge : Motif du Rejet --}}
+            <div class="rejet-banner-block rejet-block-rouge">
+                <i class="fas fa-times-circle"></i>
+                <div>
+                    <p class="rejet-banner-label">Motif du rejet</p>
+                    <p class="rejet-banner-text">{{ $dernierRejet->message }}</p>
+                </div>
             </div>
-        </div>
-        @if($projet->messageModification)
-        <div class="rejet-banner-block rejet-block-jaune">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div>
-                <p class="rejet-banner-label">Modifications demandées par l'approbateur</p>
-                <p class="rejet-banner-text">{{ $projet->messageModification }}</p>
+
+            {{-- Bloc Jaune : Si un commentaire de type modification existe aussi --}}
+            @if($derniereModif)
+            <div class="rejet-banner-block rejet-block-jaune">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <p class="rejet-banner-label">Modifications demandées par l'approbateur</p>
+                    <p class="rejet-banner-text">{{ $derniereModif->message }}</p>
+                </div>
             </div>
+            @endif
         </div>
-        @endif
-    </div>
     @endif
 
     {{-- ══ BARRE D'ACTIONS ══ --}}
@@ -412,14 +421,14 @@
 
                 <div class="modal-row">
                     <div class="form-col">
-                        <label class="field-label">Date de début <span class="required">*</span></label>
+                        <label class="field-label">Date de début probale <span class="required">*</span></label>
                         <input type="date" name="dateDebut"
                                 value="{{ old('dateDebut') }}"
                                 class="field-input @error('dateDebut') is-invalid @enderror" required>
                         @error('dateDebut')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-col">
-                        <label class="field-label">Date de fin <span class="required">*</span></label>
+                        <label class="field-label">Date de fin probale <span class="required">*</span></label>
                         <input type="date" name="dateFin"
                                 value="{{ old('dateFin') }}"
                                 class="field-input @error('dateFin') is-invalid @enderror" required>
@@ -440,8 +449,6 @@
                         <label class="field-label">Statut</label>
                         <select name="statutActivite" class="field-input">
                             <option value="en_attente" {{ old('statutActivite','en_attente') == 'en_attente' ? 'selected' : '' }}>En attente</option>
-                            <option value="en_cours"   {{ old('statutActivite') == 'en_cours'   ? 'selected' : '' }}>En cours</option>
-                            <option value="termine"    {{ old('statutActivite') == 'termine'    ? 'selected' : '' }}>Terminé</option>
                             <option value="annule"     {{ old('statutActivite') == 'annule'     ? 'selected' : '' }}>Annulé</option>
                         </select>
                     </div>
@@ -465,16 +472,31 @@
 <div class="form-card" style="margin-top:16px;">
     <div class="form-card-header">
         <i class="fas fa-comments"></i>
-        <span>Historique des actions ({{ $projet->commentaires->count() }})</span>
+        <span>Historique des commenataires ({{ $projet->commentaires->count() }})</span>
     </div>
+    
     <div class="form-card-body">
         <div class="timeline">
             @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $commentaire)
             @php
-                $icons  = ['approbation'=>'fa-check-circle','rejet'=>'fa-times-circle','demande'=>'fa-exclamation-circle','info'=>'fa-info-circle'];
-                $colors = ['approbation'=>'#16a34a','rejet'=>'#dc2626','demande'=>'#d97706','info'=>'#2563eb'];
+                $icons  = [
+                    'approbation'=>'fa-check-circle',
+                    'rejet'=>'fa-times-circle',
+                    'demande'=>'fa-exclamation-circle',
+                    'info'=>'fa-info-circle'
+                ];
+
+                $colors = [
+                    'approbation'=>'#16a34a',
+                    'rejet'=>'#dc2626',
+                    'demande'=>'#d97706',
+                    'info'=>'#2563eb'
+                ];
+
+                # En cas de type different on utilise par defaut
                 $icon   = $icons[$commentaire->typeCommentaire]  ?? 'fa-comment';
                 $color  = $colors[$commentaire->typeCommentaire] ?? '#6b7280';
+                
             @endphp
             <div class="timeline-item">
                 <div class="timeline-icon" style="background:{{ $color }}15;color:{{ $color }};">
@@ -493,7 +515,6 @@
     </div>
 </div>
 @endif
-
 </div>{{-- fin .projets-page --}}
 
 @push('scripts')

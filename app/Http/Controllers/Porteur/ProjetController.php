@@ -11,9 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class ProjetController extends Controller
-{
+class ProjetController extends Controller {
+
     public function index(Request $request){
+
         $query = Projet::with('secteur')
             ->where('user_id', Auth::id());
 
@@ -37,11 +38,13 @@ class ProjetController extends Controller
     }
 
     public function create(){
+
         $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
         return view('porteur.projets.create', compact('secteurs'));
     }
 
     public function store(Request $request){
+
         $request->validate([
             'titre'         => 'required|string|max:255',
             'description'   => 'required|string',
@@ -92,22 +95,22 @@ class ProjetController extends Controller
                             ->with('success', 'Projet créé avec succès.');
     }
 
-    public function show(Projet $projet)
-    {
+    public function show(Projet $projet){
+
         $this->authorize('view', $projet);
         $projet->load(['secteur', 'planifications', 'documents.uploader', 'commentaires.utilisateur']);
         return view('porteur.projets.show', compact('projet'));
     }
 
-    public function edit(Projet $projet)
-    {
+    public function edit(Projet $projet){
+
         $this->authorize('update', $projet);
         $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
         return view('porteur.projets.edit', compact('projet', 'secteurs'));
     }
 
-    public function update(Request $request, Projet $projet)
-    {
+    public function update(Request $request, Projet $projet){
+
         $this->authorize('update', $projet);
 
         $request->validate([
@@ -138,8 +141,7 @@ class ProjetController extends Controller
                             ->with('success', 'Projet mis à jour.');
     }
 
-    public function destroy(Projet $projet)
-    {
+    public function destroy(Projet $projet) {
         $this->authorize('delete', $projet);
 
         foreach ($projet->documents as $doc) {
@@ -151,8 +153,7 @@ class ProjetController extends Controller
                             ->with('success', 'Projet supprimé.');
     }
 
-    public function soumettre(Projet $projet)
-    {
+    public function soumettre(Projet $projet){
         $this->authorize('soumettre', $projet);
 
         $projet->update([
@@ -178,8 +179,7 @@ class ProjetController extends Controller
                             ->with('success', 'Projet soumis avec succès.');
     }
 
-    public function storeDocument(Request $request, Projet $projet)
-    {
+    public function storeDocument(Request $request, Projet $projet) {
         $this->authorize('update', $projet);
 
         $request->validate([
@@ -202,16 +202,16 @@ class ProjetController extends Controller
         return back()->with('success', 'Documents ajoutés.');
     }
 
-    public function destroyDocument(Projet $projet, DocumentProjet $document)
-    {
+    public function destroyDocument(Projet $projet, DocumentProjet $document){
+
         $this->authorize('update', $projet);
         Storage::disk('public')->delete($document->cheminFichier);
         $document->delete();
         return back()->with('success', 'Document supprimé.');
     }
 
-    public function downloadDocument(Projet $projet, DocumentProjet $document)
-    {
+    public function downloadDocument(Projet $projet, DocumentProjet $document) {
+
         $path = storage_path('app/public/' . $document->cheminFichier);
         if (!file_exists($path)) {
             return back()->with('error', 'Fichier introuvable.');

@@ -16,7 +16,9 @@
         </div>
     </div>
 
-    @php $role = Auth::user()->role; @endphp
+    @php
+        $role = Auth::user()->role;
+    @endphp
 
     <ul class="nav-menu flex-grow-1">
 
@@ -25,13 +27,14 @@
             <a href="{{ url($role . '/dashboard') }}"
                 class="nav-link {{ request()->is($role . '/dashboard') ? 'active' : '' }}"
                 data-tooltip="Tableau de bord">
-                <i class="fas fa-tachometer-alt"></i>
+                <i class="fas fa-home"></i>
                 <span>Tableau de bord</span>
             </a>
         </li>
 
         {{-- ══ ADMIN ══ --}}
         @if($role === 'admin')
+
             <li class="nav-item">
                 <a href="{{ route('admin.analytique') }}"
                     class="nav-link {{ request()->routeIs('admin.projets.*') ? 'active' : '' }}"
@@ -105,8 +108,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('approbateur.mes-projets') }}"
-                    class="nav-link {{ request()->routeIs('approbateur.mes-projets') ? 'active' : '' }}"
+                <a href="{{ route('approbateur.projets.mes_projets') }}"
+                    class="nav-link {{ request()->routeIs('approbateur.projets.mes_projets') ? 'active' : '' }}"
                     data-tooltip="Mes projets">
                     <i class="fas fa-folder-open"></i>
                     <span>Mes projets</span>
@@ -143,7 +146,7 @@
                     ->where('statut', 'non_lu')->count();
             @endphp
             <a href="{{ route($role . '.notifications.index') }}"
-                class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
+                class="nav-link  {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
                 data-tooltip="Notifications">
                 <i class="fas fa-bell"></i>
                 <span>Notifications</span>
@@ -162,7 +165,7 @@
             </a>
         </li>
 
-        <li class="nav-separator" style="flex: 1; border-top: 1px solid #e2e8f0; margin: 0.5rem 0.3rem;"></li>
+        <div class="trait"></div>
 
         <!-- Déconnexion -->
         <li class="nav-item">
@@ -185,7 +188,7 @@
             </button>
         </li>
 
-        <li class="nav-separator" style="border-top: 1px solid #e2e8f0; margin: 0.5rem 0.3rem;"></li>
+        <div class="trait"></div>
 
         <!-- Utilisateur connecté -->
         <li class="nav-item" id="userInfo" data-tooltip="{{ Auth::user()->nomComplet }}">

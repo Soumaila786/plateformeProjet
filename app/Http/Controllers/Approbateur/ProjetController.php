@@ -45,15 +45,33 @@ class ProjetController extends Controller{
     }
 
     public function mesProjets(Request $request){
-        $projets = Projet::with(['porteur', 'secteur'])
-            ->whereIn('statutProjet', ['approuve', 'rejete', 'en_examen', 'valide'])
-            ->latest()->paginate(10);
-        return view('approbateur.projets.mes-projets', compact('projets'));
+
+        $query = Projet::with(['secteur', 'porteur'])
+            ->where('approbateur_id', Auth::id());
+
+        if ($request->filled('statut')) {
+            $query->where('statutProjet', $request->statut);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function($q) use ($s) {
+                $q->where('titre', 'like', '%'.$s.'%')
+                    ->orWhere('codeProjet', 'like', '%'.$s.'%');
+            });
+        }
+
+        $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
+
+        return view('approbateur.projets.mes_projets', compact('projets'));
     }
 
     // ── Mettre en examen ──
     public function examiner(Projet $projet){
-        $projet->update(['statutProjet' => 'en_examen']);
+        $projet->update([
+            'statutProjet' => 'en_examen',
+            'approbateur_id' => Auth::id()
+            ]);
 
         NotificationService::notifierPorteur(
             $projet,
@@ -67,6 +85,7 @@ class ProjetController extends Controller{
 
     // ── Approuver ──
     public function approuver(Request $request, Projet $projet){
+        
         $request->validate([
             'commentaire' => 'nullable|string|max:1000',
         ]);
@@ -74,6 +93,7 @@ class ProjetController extends Controller{
         $projet->update([
             'statutProjet'    => 'approuve',
             'dateApprobation' => now(),
+            'approbateur_id' => Auth::id()
         ]);
 
         if ($request->filled('commentaire')) {
@@ -114,12 +134,6 @@ class ProjetController extends Controller{
 
         $statutFinal = $request->filled('messageModification') ? 'brouillon' : 'rejete';
 
-        $projet->update([
-            'statutProjet'        => $statutFinal,
-            'motifRejet'          => $request->motifRejet,
-            'messageModification' => $request->messageModification,
-        ]);
-
         $commentaire = Commentaire::create([
             'message'         => 'Rejet : ' . $request->motifRejet,
             'typeCommentaire' => 'rejet',
@@ -127,6 +141,15 @@ class ProjetController extends Controller{
             'projet_id'       => $projet->id,
             'utilisateur_id'  => Auth::id(),
         ]);
+        
+        $projet->update([
+            'statutProjet'        => $statutFinal,
+            'messageModification' => $request->messageModification,
+            'approbateur_id'      => Auth::id(),
+            'commentaire_id'      => $commentaire->id
+        ]);
+
+        
 
         if ($request->filled('messageModification')) {
             Commentaire::create([
@@ -159,7 +182,9 @@ class ProjetController extends Controller{
         ]);
 
         $ancienStatut = $planification->statutActivite;
-        $planification->update(['statutActivite' => $request->statutActivite]);
+        $planification->update([
+            'statutActivite' => $request->statutActivite
+            ]);
 
         $labels = [
             'en_attente' => 'En attente',

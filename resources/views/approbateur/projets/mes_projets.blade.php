@@ -40,7 +40,7 @@
                 ];
             @endphp
             @foreach($statuts as $val => $label)
-            <a href="{{ route('approbateur.mes-projets', array_merge(request()->query(), ['statut' => $val, 'search' => request('search')])) }}"
+            <a href="{{ route('approbateur.projets.mes_projets', array_merge(request()->query(), ['statut' => $val, 'search' => request('search')])) }}"
                 class="status-filter {{ request('statut', '') === $val ? 'active' : '' }}">
                 {{ $label }}
             </a>

@@ -147,6 +147,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [ApprobateurDashboardController::class, 'index'])->name('dashboard');
         Route::get('/analytique', [App\Http\Controllers\Approbateur\AnalytiqueController::class, 'index'])->name('analytique');
 
+        // Mes projets traités
+        Route::get('projets/mes_projets', [ApprobateurProjetController::class, 'mesProjets'])->name('projets.mes_projets');
+
         // Projets à examiner/approuver/rejeter
         Route::get('projets',              [ApprobateurProjetController::class, 'index'])->name('projets.index');
         Route::get('projets/{projet}',     [ApprobateurProjetController::class, 'show'])->name('projets.show');
@@ -158,10 +161,6 @@ Route::middleware(['auth'])->group(function () {
         // Documents (lecture + téléchargement)
         Route::get('projets/{projet}/documents/{document}/download', [ApprobateurProjetController::class, 'downloadDocument'])
             ->name('projets.documents.download');
-
-        // Mes projets traités
-        Route::get('mes-projets', [ApprobateurProjetController::class, 'mesProjets'])
-            ->name('mes-projets');
 
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');

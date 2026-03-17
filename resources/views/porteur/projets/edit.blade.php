@@ -20,16 +20,6 @@
         </div>
     </div>
 
-    {{-- ── Message de modification demandée ── --}}
-    @if($projet->messageModification)
-    <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <strong>Modification demandée par l'approbateur :</strong>
-        <p class="mb-0 mt-1" style="font-size:.88rem;">{{ $projet->messageModification }}</p>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
     <form action="{{ route('porteur.projets.update', $projet) }}" method="POST" class="projet-form">
         @csrf
         @method('PUT')

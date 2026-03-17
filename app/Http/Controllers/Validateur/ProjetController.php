@@ -22,8 +22,7 @@ class ProjetController extends Controller
     }
 
     // ── Liste projets approuvés (à valider) ──
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $query = Projet::with(['porteur', 'secteur'])
             ->where('statutProjet', 'approuve');
 
@@ -47,15 +46,13 @@ class ProjetController extends Controller
     }
 
     // ── Détail projet ──
-    public function show(Projet $projet)
-    {
+    public function show(Projet $projet){
         $projet->load(['secteur', 'porteur', 'documents', 'commentaires.utilisateur', 'planifications']);
         return view('validateur.projets.show', compact('projet'));
     }
 
     // ── Valider ──
-    public function valider(Request $request, Projet $projet)
-    {
+    public function valider(Request $request, Projet $projet){
         $request->validate([
             'commentaire' => 'nullable|string|max:1000',
         ]);
@@ -67,6 +64,7 @@ class ProjetController extends Controller
         $projet->statutProjet  = 'valide';
         $projet->validated_at  = now();
         $projet->validated_by  = Auth::id();
+        $projet->dateValidation= now();
         $projet->save();
 
         // Commentaire validateur
