@@ -64,9 +64,9 @@ class Projet extends Model
         return $this->belongsTo(SecteurActivite::class, 'secteur_id');
     }
 
-    public function planifications()
+    public function activites()
     {
-        return $this->hasMany(Planification::class);
+        return $this->hasMany(Activite::class);
     }
 
     public function documents(){

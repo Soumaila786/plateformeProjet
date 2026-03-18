@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Approbateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
-use App\Models\Planification;
+use App\Models\Activite;
 use App\Models\Commentaire;
 use App\Models\DocumentProjet;
 use App\Services\NotificationService;
@@ -40,7 +40,7 @@ class ProjetController extends Controller{
     }
 
     public function show(Projet $projet){
-        $projet->load(['porteur', 'secteur', 'planifications', 'documents.uploader', 'commentaires.utilisateur']);
+        $projet->load(['porteur', 'secteur', 'activites', 'documents.uploader', 'commentaires.utilisateur']);
         return view('approbateur.projets.show', compact('projet'));
     }
 
@@ -176,13 +176,13 @@ class ProjetController extends Controller{
     }
 
     // ── Changer statut d'une activité planifiée ──
-    public function changerStatutActivite(Request $request, Projet $projet, Planification $planification){
+    public function changerStatutActivite(Request $request, Projet $projet, Activite $activites){
         $request->validate([
             'statutActivite' => 'required|in:en_attente,financee,en_cours,termine,annule',
         ]);
 
-        $ancienStatut = $planification->statutActivite;
-        $planification->update([
+        $ancienStatut = $activites->statutActivite;
+        $activites->update([
             'statutActivite' => $request->statutActivite
             ]);
 
@@ -198,7 +198,7 @@ class ProjetController extends Controller{
         if ($request->statutActivite === 'financee') {
             NotificationService::notifierPorteur(
                 $projet,
-                'L\'activité « ' . $planification->activite . ' » de votre projet « ' . $projet->titre . ' » a été marquée comme financée.',
+                'L\'activité « ' . $activites->activite . ' » de votre projet « ' . $projet->titre . ' » a été marquée comme financée.',
                 'approbation'
             );
         }

@@ -9,8 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class AnalytiqueController extends Controller
-{
+class AnalytiqueController extends Controller {
     public function index()
     {
         $now = Carbon::now();
@@ -134,15 +133,24 @@ class AnalytiqueController extends Controller
         $motifsValues = array_fill(0, count($motifsCles), 0);
         $motifsKeys   = array_keys($motifsCles);
 
-        Projet::where('statutProjet','rejete')
-            ->whereNotNull('motifRejet')
-            ->pluck('motifRejet')
+        Projet::where('statutProjet', 'rejete')
+            ->with(['commentaires' => function ($q) {
+                $q->whereNotNull('message');
+            }])
+            ->get()
+            ->pluck('commentaires')
+            ->flatten()
+            ->pluck('message')
             ->each(function ($motif) use (&$motifsValues, $motifsCles, $motifsKeys) {
+
                 $lower = mb_strtolower($motif);
                 $found = false;
+
                 foreach ($motifsCles as $i => $mots) {
                     $idx = array_search($i, $motifsKeys);
+
                     if ($i === 'Autre') break;
+
                     foreach ($mots as $mot) {
                         if (str_contains($lower, mb_strtolower($mot))) {
                             $motifsValues[$idx]++;
@@ -151,7 +159,10 @@ class AnalytiqueController extends Controller
                         }
                     }
                 }
-                if (!$found) $motifsValues[count($motifsValues)-1]++;
+
+                if (!$found) {
+                    $motifsValues[count($motifsValues) - 1]++;
+                }
             });
 
         // ════════ 9. PROJETS EN ATTENTE CRITIQUE (> 10 jours) ════════

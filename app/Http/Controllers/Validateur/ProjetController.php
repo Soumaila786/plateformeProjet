@@ -47,7 +47,7 @@ class ProjetController extends Controller
 
     // ── Détail projet ──
     public function show(Projet $projet){
-        $projet->load(['secteur', 'porteur', 'documents', 'commentaires.utilisateur', 'planifications']);
+        $projet->load(['secteur', 'porteur', 'documents', 'commentaires.utilisateur', 'activites']);
         return view('validateur.projets.show', compact('projet'));
     }
 

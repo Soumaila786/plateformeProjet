@@ -143,18 +143,18 @@
                 </div>
             </div>
 
-            {{-- Planifications --}}
+            {{-- activites --}}
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-tasks"></i>
-                    <span>Planification ({{ $projet->planifications->count() }})</span>
+                    <span>Planification ({{ $projet->activites->count() }})</span>
                 </div>
-                @if($projet->planifications->count())
+                @if($projet->activites->count())
                 <div class="form-card-body p-0">
                     @php
-                        $totalActivites  = $projet->planifications->sum('montantDemande');
-                        $totalFinancees  = $projet->planifications->where('statutActivite','financee')->sum('montantDemande');
-                        $nbFinancees     = $projet->planifications->where('statutActivite','financee')->count();
+                        $totalActivites  = $projet->activites->sum('montantDemande');
+                        $totalFinancees  = $projet->activites->where('statutActivite','financee')->sum('montantDemande');
+                        $nbFinancees     = $projet->activites->where('statutActivite','financee')->count();
                         $pctFinance      = $totalActivites > 0 ? round($totalFinancees / $totalActivites * 100) : 0;
                     @endphp
 
@@ -192,7 +192,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($projet->planifications as $plan)
+                            @foreach($projet->activites as $plan)
                             @php
                                 $planStatutClass = ['en_attente'=>'status-gray','financee'=>'status-green','en_cours'=>'status-blue','termine'=>'status-teal','annule'=>'status-red'][$plan->statutActivite] ?? 'status-gray';
                                 $planStatutLabel = ['en_attente'=>'En attente','financee'=>'Financée','en_cours'=>'En cours','termine'=>'Terminée','annule'=>'Annulée'][$plan->statutActivite] ?? $plan->statutActivite;
@@ -255,11 +255,11 @@
                         <span class="budget-value-sm">{{ number_format($projet->montantDemande, 0, ',', ' ') }} F CFA</span>
                     </div>
                     @endif
-                    @if($projet->planifications->count())
+                    @if($projet->activites->count())
                     <div class="budget-display">
                         <span class="budget-label-sm">Total planifié</span>
                         <span class="budget-value-sm">
-                            {{ number_format($projet->planifications->sum('montantDemande'), 0, ',', ' ') }} F CFA
+                            {{ number_format($projet->activites->sum('montantDemande'), 0, ',', ' ') }} F CFA
                         </span>
                     </div>
                     @endif
@@ -438,7 +438,7 @@ function openActiviteModal(planId, currentStatut, activiteNom) {
     document.getElementById('activiteNomLabel').textContent = activiteNom;
     document.getElementById('selectStatutActivite').value = currentStatut;
     document.getElementById('formActiviteStatut').action =
-        '{{ url("approbateur/projets/" . $projet->id . "/planifications") }}/' + planId + '/statut';
+        '{{ url("approbateur/projets/" . $projet->id . "/activites") }}/' + planId + '/statut';
     openModal('modalActivite');
 }
 </script>

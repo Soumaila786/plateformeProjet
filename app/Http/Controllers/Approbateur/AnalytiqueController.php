@@ -114,9 +114,14 @@ class AnalytiqueController extends Controller
         $motifsLabels = ['Budget','Dossier incomplet','Non-éligibilité','Délai dépassé','Autre'];
         $motifsValues = array_fill(0, 5, 0);
 
-        $rejets = Projet::where('statutProjet','rejete')
-            ->whereNotNull('motifRejet')
-            ->pluck('motifRejet');
+        $rejets = Projet::where('statutProjet', 'rejete')
+                            ->with(['commentaires' => function ($q) {
+                                $q->whereNotNull('message');
+                            }])
+                            ->get()
+                            ->pluck('commentaires')
+                            ->flatten()
+                            ->pluck('message');
 
         foreach ($rejets as $motif) {
             $motifLower = mb_strtolower($motif);

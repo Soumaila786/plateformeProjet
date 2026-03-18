@@ -8,14 +8,14 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SecteurController;
 use App\Http\Controllers\Admin\ProjetController;
-use App\Http\Controllers\Admin\PlanificationController;
+use App\Http\Controllers\Admin\ActiviteController;
 use App\Http\Controllers\ParametreController;
 
 
 // Porteur
 use App\Http\Controllers\Porteur\DashboardController      as PorteurDashboardController;
 use App\Http\Controllers\Porteur\ProjetController         as PorteurProjetController;
-use App\Http\Controllers\Porteur\PlanificationController  as PorteurPlanificationController;
+use App\Http\Controllers\Porteur\ActiviteController  as PorteurActiviteController;
 
 // Approbateur
 use App\Http\Controllers\Approbateur\DashboardController  as ApprobateurDashboardController;
@@ -87,11 +87,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('projets/{projet}/documents/{document}/download', [ProjetController::class, 'downloadDocument'])
             ->name('projets.documents.download');
 
-        // Planifications
-        Route::post('projets/{projet}/planifications', [PlanificationController::class, 'store'])
-            ->name('projets.planifications.store');
-        Route::delete('projets/{projet}/planifications/{planification}', [PlanificationController::class, 'destroy'])
-            ->name('projets.planifications.destroy');
+        // activites
+        Route::post('projets/{projet}/activites', [ActiviteController::class, 'store'])
+            ->name('projets.activites.store');
+        Route::delete('projets/{projet}/activites/{activite}', [ActiviteController::class, 'destroy'])
+            ->name('projets.activites.destroy');
 
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
@@ -119,6 +119,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('projets/{projet}/soumettre', [PorteurProjetController::class, 'soumettre'])
             ->name('projets.soumettre');
 
+        // Demande de planification
+        Route::post('/projet/{id}/planification', [PorteurProjetController::class, 'demanderPlanification'])
+            ->name('demande.planification');
+
         // Documents
         Route::post('projets/{projet}/documents', [PorteurProjetController::class, 'storeDocument'])
             ->name('projets.documents.store');
@@ -127,11 +131,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('projets/{projet}/documents/{document}/download', [PorteurProjetController::class, 'downloadDocument'])
             ->name('projets.documents.download');
 
-        // Planifications
-        Route::post('projets/{projet}/planifications', [PorteurPlanificationController::class, 'store'])
-            ->name('projets.planifications.store');
-        Route::delete('projets/{projet}/planifications/{planification}', [PorteurPlanificationController::class, 'destroy'])
-            ->name('projets.planifications.destroy');
+        // activites
+        Route::post('projets/{projet}/activites', [PorteurActiviteController::class, 'store'])
+            ->name('projets.activites.store');
+        Route::delete('projets/{projet}/activites/{activite}', [PorteurActiviteController::class, 'destroy'])
+            ->name('projets.activites.destroy');
 
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
@@ -156,7 +160,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('projets/{projet}/examiner',  [ApprobateurProjetController::class, 'examiner'])->name('projets.examiner');
         Route::post('projets/{projet}/approuver', [ApprobateurProjetController::class, 'approuver'])->name('projets.approuver');
         Route::post('projets/{projet}/rejeter',   [ApprobateurProjetController::class, 'rejeter'])->name('projets.rejeter');
-        Route::post('projets/{projet}/planifications/{planification}/statut', [ApprobateurProjetController::class, 'changerStatutActivite'])->name('projets.activite.statut');
+        Route::post('projets/{projet}/activites/{activite}/statut', [ApprobateurProjetController::class, 'changerStatutActivite'])->name('projets.activite.statut');
 
         // Documents (lecture + téléchargement)
         Route::get('projets/{projet}/documents/{document}/download', [ApprobateurProjetController::class, 'downloadDocument'])
@@ -169,7 +173,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
-    
+
     // ============================================================== VALIDATEUR ==============================================================
 
     Route::prefix('validateur')->name('validateur.')->middleware(['auth', 'role:validateur'])->group(function () {

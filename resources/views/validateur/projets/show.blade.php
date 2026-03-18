@@ -66,12 +66,12 @@
             </div>
             @endif
 
-            {{-- Planification --}}
-            @if($projet->planifications && $projet->planifications->count())
+            {{-- activites --}}
+            @if($projet->activites && $projet->activites->count())
             <div class="info-card">
                 <h4 class="info-title"><i class="fas fa-tasks"></i> Planification</h4>
                 <div class="planif-list">
-                    @foreach($projet->planifications as $pl)
+                    @foreach($projet->activites as $pl)
                     <div class="planif-item">
                         <div class="planif-dot"></div>
                         <div>

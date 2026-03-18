@@ -4,13 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
-use App\Models\Planification;
+use App\Models\Activite;
 use Illuminate\Http\Request;
 
-class PlanificationController extends Controller
+class ActiviteController extends Controller
 {
-    public function store(Request $request, Projet $projet)
-    {
+    public function store(Request $request, Projet $projet){
         $request->validate([
             'activite'            => 'required|string|max:255',
             'descriptionActivite' => 'nullable|string',
@@ -20,7 +19,7 @@ class PlanificationController extends Controller
             'statutActivite'      => 'required|in:en_attente,en_cours,termine,annule',
         ]);
 
-        $projet->planifications()->create([
+        $projet->activites()->create([
             'activite'            => $request->activite,
             'descriptionActivite' => $request->descriptionActivite,
             'dateDebut'           => $request->dateDebut,
@@ -33,9 +32,8 @@ class PlanificationController extends Controller
                             ->with('success', 'Activité ajoutée avec succès.');
     }
 
-    public function destroy(Projet $projet, Planification $planification)
-    {
-        $planification->delete();
+    public function destroy(Projet $projet, Activite $activite){
+        $activite->delete();
 
         return redirect()->route('projets.show', $projet)
                             ->with('success', 'Activité supprimée.');

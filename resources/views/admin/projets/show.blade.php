@@ -32,7 +32,7 @@
                     <i class="fas fa-exchange-alt"></i> Changer le statut
                 </button>
                 <form method="POST" action="{{ route('admin.projets.destroy', $projet) }}"
-                      onsubmit="return confirm('Supprimer définitivement ce projet ?')" style="display:inline;">
+                        onsubmit="return confirm('Supprimer définitivement ce projet ?')" style="display:inline;">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn-danger btn-sm">
                         <i class="fas fa-trash"></i>
@@ -122,14 +122,14 @@
         </div>
     </div>
 
-    {{-- ── Planifications ── --}}
+    {{-- ── activites ── --}}
     <div class="form-card">
         <div class="form-card-header">
             <i class="fas fa-tasks"></i>
-            <span>Planification ({{ $projet->planifications->count() }})</span>
+            <span>Planification ({{ $projet->activites->count() }})</span>
         </div>
         <div class="form-card-body">
-            @forelse($projet->planifications as $plan)
+            @forelse($projet->activites as $plan)
             <div class="plan-item">
                 <div class="plan-info">
                     <span class="plan-titre">{{ $plan->activite }}</span>

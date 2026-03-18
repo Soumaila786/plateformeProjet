@@ -93,12 +93,28 @@
     {{-- ══ BARRE D'ACTIONS ══ --}}
     <div class="projet-actions-bar">
 
-        {{-- Planifier --}}
+        {{-- creation d'activité --}}
         <button type="button" class="action-btn action-btn-blue"
                 onclick="openModal('modalPlanifier')">
-            <i class="fas fa-calendar-plus"></i>
-            Planifier le projet
+            <i class="fas fa-plus"></i>
+            Créer activité
         </button>
+
+        @if(!$projet->planification_demandee)
+
+            <form action="{{ route('porteur.demande.planification', $projet->id) }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-calendar-plus"></i>
+                    Demander planification
+                </button>
+            </form>
+        @else
+            <button class="btn btn-secondary" disabled>
+                Demande planification envoyée
+            </button>
+        @endif
+
 
         {{-- Brouillon → Soumettre --}}
         @if($projet->isSubmittable())
@@ -182,20 +198,20 @@
                 </div>
             </div>
 
-            {{-- Planifications --}}
+            {{-- activites --}}
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-tasks"></i>
-                    <span>Planification ({{ $projet->planifications->count() }})</span>
+                    <span>Les activites du projet ({{ $projet->activites->count() }})</span>
                     <button type="button" class="card-header-btn"
                             onclick="openModal('modalPlanifier')">
                         <i class="fas fa-plus"></i> Ajouter
                     </button>
                 </div>
-                @if($projet->planifications->count())
+                @if($projet->activites->count())
                 <div class="form-card-body">
                     <div class="plan-cards-grid">
-                        @foreach($projet->planifications as $plan)
+                        @foreach($projet->activites as $plan)
                         @php
                             $planStatutClass = ['en_attente'=>'status-gray',
                                                 'financee'=>'status-green',
@@ -223,7 +239,7 @@
                                 </span>
                                 @if($projet->isEditable())
                                 <form method="POST"
-                                        action="{{ route('porteur.projets.planifications.destroy', [$projet, $plan]) }}"
+                                        action="{{ route('porteur.projets.activites.destroy', [$projet, $plan]) }}"
                                         onsubmit="return confirm('Supprimer cette activité ?')"
                                         style="margin-left:auto;">
                                     @csrf @method('DELETE')
@@ -262,7 +278,7 @@
                 <div class="form-card-body">
                     <div class="doc-empty-state">
                         <i class="fas fa-calendar"></i>
-                        <span>Aucune activité planifiée.</span>
+                        <span>Aucune activité crée.</span>
                     </div>
                 </div>
                 @endif
@@ -292,11 +308,11 @@
                         <span class="budget-value-sm">{{ number_format($projet->montantDemande, 0, ',', ' ') }} F CFA</span>
                     </div>
                     @endif
-                    @if($projet->planifications->count())
+                    @if($projet->activites->count())
                     <div class="budget-display">
                         <span class="budget-label-sm">Total planifié</span>
                         <span class="budget-value-sm">
-                            {{ number_format($projet->planifications->sum('montantDemande'), 0, ',', ' ') }} F CFA
+                            {{ number_format($projet->activites->sum('montantDemande'), 0, ',', ' ') }} F CFA
                         </span>
                     </div>
                     @endif
@@ -385,7 +401,7 @@
     </div>
 </div>
 
-{{-- ══ MODAL PLANIFICATION ══ --}}
+{{-- ══ MODAL ACTIVITE ══ --}}
 <div id="modalPlanifier" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
@@ -398,7 +414,7 @@
             </button>
         </div>
 
-        <form method="POST" action="{{ route('porteur.projets.planifications.store', $projet) }}">
+        <form method="POST" action="{{ route('porteur.projets.activites.store', $projet) }}">
             @csrf
 
             <div class="modal-body">
@@ -474,7 +490,7 @@
         <i class="fas fa-comments"></i>
         <span>Historique des commenataires ({{ $projet->commentaires->count() }})</span>
     </div>
-    
+
     <div class="form-card-body">
         <div class="timeline">
             @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $commentaire)
@@ -496,7 +512,7 @@
                 # En cas de type different on utilise par defaut
                 $icon   = $icons[$commentaire->typeCommentaire]  ?? 'fa-comment';
                 $color  = $colors[$commentaire->typeCommentaire] ?? '#6b7280';
-                
+
             @endphp
             <div class="timeline-item">
                 <div class="timeline-icon" style="background:{{ $color }}15;color:{{ $color }};">
@@ -583,6 +599,7 @@ function formatDocSize(b) {
     if (b < 1048576) return (b / 1024).toFixed(1) + ' Ko';
     return (b / 1048576).toFixed(1) + ' Mo';
 }
+
 </script>
 @endpush
 

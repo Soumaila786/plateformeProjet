@@ -60,11 +60,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'documents.delete-own',
             'documents.download',
 
-            // Planification
-            'planifications.view',
-            'planifications.create',
-            'planifications.edit',
-            'planifications.delete',
+            // Activite
+            'activites.view',
+            'activites.create',
+            'activites.edit',
+            'activites.delete',
 
             // Dashboard
             'dashboard.admin',
@@ -92,7 +92,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'secteurs.view', 'secteurs.create', 'secteurs.edit', 'secteurs.delete', 'secteurs.toggle-status',
             'projets.view', 'projets.view-all',
             'documents.view', 'documents.download',
-            'planifications.view',
+            'activites.view',
             'dashboard.admin',
             'parametres.system', 'parametres.profil',
         ]);
@@ -104,7 +104,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'projets.create', 'projets.edit-own', 'projets.delete-own',
             'projets.soumettre',
             'documents.view', 'documents.upload', 'documents.delete-own', 'documents.download',
-            'planifications.view', 'planifications.create', 'planifications.delete',
+            'activites.view', 'activites.create', 'activites.delete',
             'dashboard.porteur',
             'parametres.profil',
         ]);
@@ -120,7 +120,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'projets.examiner', 'projets.approuver', 'projets.rejeter',
             'projets.demande-modification',
             'documents.view', 'documents.upload', 'documents.delete-own', 'documents.download',
-            'planifications.view', 'planifications.create', 'planifications.edit', 'planifications.delete',
+            'activites.view', 'activites.create', 'activites.edit', 'activites.delete',
             'dashboard.approbateur',
             'parametres.profil',
         ]);
@@ -131,7 +131,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'projets.view', 'projets.view-all',
             'projets.valider', 'projets.rejeter',
             'documents.view', 'documents.download',
-            'planifications.view',
+            'activites.view',
             'dashboard.validateur',
             'parametres.profil',
         ]);

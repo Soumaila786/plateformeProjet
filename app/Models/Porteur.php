@@ -26,8 +26,8 @@ class Porteur extends Model
         return $this->hasMany(Projet::class, 'porteur_id');
     }
 
-    public function planifications()
+    public function activite()
     {
-        return $this->hasMany(Planification::class, 'porteur_id');
+        return $this->hasMany(Activite::class, 'porteur_id');
     }
 }

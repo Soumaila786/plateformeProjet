@@ -98,7 +98,7 @@ class ProjetController extends Controller {
     public function show(Projet $projet){
 
         $this->authorize('view', $projet);
-        $projet->load(['secteur', 'planifications', 'documents.uploader', 'commentaires.utilisateur']);
+        $projet->load(['secteur', 'activites', 'documents.uploader', 'commentaires.utilisateur']);
         return view('porteur.projets.show', compact('projet'));
     }
 
@@ -217,5 +217,27 @@ class ProjetController extends Controller {
             return back()->with('error', 'Fichier introuvable.');
         }
         return response()->download($path, $document->nomFichier);
+    }
+
+
+    public function demanderPlanification($id){
+
+        $projet = Projet::findOrFail($id);
+        $projet->update([
+            'planification_demandee' => True
+        ]);
+
+        // Notifier les approbateurs
+        NotificationService::notifierApprobateurs(
+            'Un nouveau projet « ' . $projet->titre . ' » ('. $projet->codeProjet .') besoin de planification.',
+            'soumission',
+            $projet->id
+        );
+
+        return back()->with('success', 'Demande envoyée');
+    }
+
+    public function changerDemandePlanification($id){
+
     }
 }
