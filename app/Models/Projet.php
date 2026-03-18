@@ -26,37 +26,44 @@ class Projet extends Model
         'messageModification',
         'dateApprobation',
         'dateValidation',
+        'validated_at',      // ← ajouté
+        'validated_by',      // ← ajouté
         'approbateur_id',
-        'commentaire_id',
+        'planification_demandee',
     ];
 
     protected $casts = [
-        'dateCreation'    => 'datetime',
-        'dateSoumission'  => 'datetime',
-        'dateApprobation' => 'datetime',
-        'dateValidation'  => 'datetime',
-        'dateDebut'       => 'date',
-        'dateFin'         => 'date',
-        'budgetTotal'     => 'decimal:2',
-        'montantDemande'  => 'decimal:2',
+        'dateCreation'          => 'datetime',
+        'dateSoumission'        => 'datetime',
+        'dateApprobation'       => 'datetime',
+        'dateValidation'        => 'datetime',
+        'validated_at'          => 'datetime',   // ← ajouté
+        'dateDebut'             => 'date',
+        'dateFin'               => 'date',
+        'budgetTotal'           => 'decimal:2',
+        'montantDemande'        => 'decimal:2',
+        'planification_demandee'=> 'boolean',
     ];
 
     // ── Relations ──
-
-    // Le porteur du projet (user_id)
     public function porteur()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function approbateur(){
-    return $this->belongsTo(User::class, 'approbateur_id');
-}
-
-    // Alias pour compatibilité
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function approbateur()
+    {
+        return $this->belongsTo(User::class, 'approbateur_id');
+    }
+
+    public function validateur()
+    {
+        return $this->belongsTo(User::class, 'validated_by');
     }
 
     public function secteur()
@@ -69,16 +76,22 @@ class Projet extends Model
         return $this->hasMany(Activite::class);
     }
 
-    public function documents(){
+    public function documents()
+    {
         return $this->hasMany(DocumentProjet::class);
     }
 
-    public function commentaires() {
-
+    public function commentaires()
+    {
         return $this->hasMany(Commentaire::class, 'projet_id');
     }
-    // ── Accesseurs utiles ──
 
+    public function planification()
+    {
+        return $this->hasOne(Planification::class, 'projet_id');
+    }
+
+    // ── Accesseurs ──
     public function isEditable()
     {
         return in_array($this->statutProjet, ['brouillon', 'soumis']);
@@ -92,5 +105,10 @@ class Projet extends Model
     public function isSubmittable()
     {
         return $this->statutProjet === 'brouillon';
+    }
+
+    public function isApprouveAndValide()
+    {
+        return in_array($this->statutProjet, ['approuve', 'valide']);
     }
 }

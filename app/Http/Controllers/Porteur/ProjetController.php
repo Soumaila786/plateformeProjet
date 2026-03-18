@@ -95,13 +95,20 @@ class ProjetController extends Controller {
                             ->with('success', 'Projet créé avec succès.');
     }
 
-    public function show(Projet $projet){
+    public function show(Projet $projet)
+{
+    $this->authorize('view', $projet);
 
-        $this->authorize('view', $projet);
-        $projet->load(['secteur', 'activites', 'documents.uploader', 'commentaires.utilisateur']);
-        return view('porteur.projets.show', compact('projet'));
-    }
+    $projet->load([
+        'secteur',
+        'activites',
+        'documents',
+        'commentaires.utilisateur',
+        'planification',
+    ]);
 
+    return view('porteur.projets.show', compact('projet'));
+}
     public function edit(Projet $projet){
 
         $this->authorize('update', $projet);
@@ -135,6 +142,8 @@ class ProjetController extends Controller {
             'budgetTotal'    => $request->budgetTotal,
             'montantDemande' => $request->montantDemande,
             'secteur_id'     => $request->secteur_id,
+            'planification_demandee' => False,
+
         ]);
 
         return redirect()->route('porteur.projets.show', $projet)
@@ -224,20 +233,15 @@ class ProjetController extends Controller {
 
         $projet = Projet::findOrFail($id);
         $projet->update([
-            'planification_demandee' => True
+            'planification_demandee' => 1 // True
         ]);
-
         // Notifier les approbateurs
         NotificationService::notifierApprobateurs(
             'Un nouveau projet « ' . $projet->titre . ' » ('. $projet->codeProjet .') besoin de planification.',
             'soumission',
             $projet->id
         );
-
         return back()->with('success', 'Demande envoyée');
     }
 
-    public function changerDemandePlanification($id){
-
-    }
 }

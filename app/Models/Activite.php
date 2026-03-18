@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Activite extends Model
 {
-    protected $table = 'planifications';
+    protected $table = 'activites';
 
     protected $fillable = [
         'activite',

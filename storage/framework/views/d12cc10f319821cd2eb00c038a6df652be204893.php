@@ -1,26 +1,24 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', $projet->titre); ?>
 
-@section('title', $projet->titre)
+<?php $__env->startPush('styles'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/admin.css')); ?>">
+<?php $__env->stopPush(); ?>
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-@endpush
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="projets-page">
 
-    {{-- ── Header ── --}}
+    
     <div class="page-header">
-        <a href="{{ route('porteur.projets.index') }}" class="btn-back">
+        <a href="<?php echo e(route('porteur.projets.index')); ?>" class="btn-back">
             <i class="fas fa-arrow-left"></i>
         </a>
         <div class="page-header-info">
             <div>
-                <h1 class="projets-title">{{ $projet->titre }}</h1>
-                <p class="projets-subtitle">{{ $projet->codeProjet }}</p>
+                <h1 class="projets-title"><?php echo e($projet->titre); ?></h1>
+                <p class="projets-subtitle"><?php echo e($projet->codeProjet); ?></p>
             </div>
-            @php
+            <?php
                 $statusClass = [
                     'brouillon' => 'status-gray',
                     'soumis'    => 'status-blue',
@@ -37,106 +35,104 @@
                     'valide'    => 'Validé',
                     'rejete'    => 'Rejeté',
                 ][$projet->statutProjet] ?? $projet->statutProjet;
-            @endphp
-            <span class="status-badge {{ $statusClass }} status-lg">{{ $statusLabel }}</span>
+            ?>
+            <span class="status-badge <?php echo e($statusClass); ?> status-lg"><?php echo e($statusLabel); ?></span>
         </div>
         <div class="page-header-actions">
-            @if($projet->isEditable())
-            <a href="{{ route('porteur.projets.edit', $projet) }}" class="btn-edit-main">
+            <?php if($projet->isEditable()): ?>
+            <a href="<?php echo e(route('porteur.projets.edit', $projet)); ?>" class="btn-edit-main">
                 <i class="fas fa-pencil-alt"></i> Modifier
             </a>
-            @endif
+            <?php endif; ?>
 
-            @if($projet->isDeletable())
-            <form method="POST" action="{{ route('porteur.projets.destroy', $projet) }}"
+            <?php if($projet->isDeletable()): ?>
+            <form method="POST" action="<?php echo e(route('porteur.projets.destroy', $projet)); ?>"
                     onsubmit="return confirm('Supprimer définitivement ce projet ?')">
-                @csrf @method('DELETE')
+                <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                 <button type="submit" class="btn-delete-main" title="Supprimer">
                     <i class="fas fa-trash"></i>
                 </button>
             </form>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 
-    {{-- ── Alerte motif rejet + modification ── --}}
-    @php
+    
+    <?php
         $dernierRejet = $projet->commentaires->where('typeCommentaire', 'rejet')->last();
         // Si vous utilisez un type différent pour les modifs, adaptez le nom ci-dessous
         $derniereModif = $projet->commentaires->where('typeCommentaire', 'demande')->last();
-    @endphp
+    ?>
 
-    @if($dernierRejet)
+    <?php if($dernierRejet): ?>
         <div class="rejet-banner">
-            {{-- Bloc Rouge : Motif du Rejet --}}
+            
             <div class="rejet-banner-block rejet-block-rouge">
                 <i class="fas fa-times-circle"></i>
                 <div>
                     <p class="rejet-banner-label">Motif du rejet</p>
-                    <p class="rejet-banner-text">{{ $dernierRejet->message }}</p>
+                    <p class="rejet-banner-text"><?php echo e($dernierRejet->message); ?></p>
                 </div>
             </div>
 
-            {{-- Bloc Jaune : Si un commentaire de type modification existe aussi --}}
-            @if($derniereModif)
+            
+            <?php if($derniereModif): ?>
             <div class="rejet-banner-block rejet-block-jaune">
                 <i class="fas fa-exclamation-triangle"></i>
                 <div>
                     <p class="rejet-banner-label">Modifications demandées par l'approbateur</p>
-                    <p class="rejet-banner-text">{{ $derniereModif->message }}</p>
+                    <p class="rejet-banner-text"><?php echo e($derniereModif->message); ?></p>
                 </div>
             </div>
-            @endif
+            <?php endif; ?>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- ══ BARRE D'ACTIONS ══ --}}
+    
     <div class="projet-actions-bar">
 
-        {{-- creation d'activité --}}
+        
         <button type="button" class="action-btn action-btn-blue"
                 onclick="openModal('modalPlanifier')">
             <i class="fas fa-plus"></i>
             Créer activité
         </button>
 
-        @if(!$projet->planification_demandee && !in_array($projet->statutProjet, ['approuve', 'valide']))
+        <?php if(!$projet->planification_demandee && !in_array($projet->statutProjet, ['approuve', 'valide'])): ?>
 
-            <form action="{{ route('porteur.demande.planification', $projet->id) }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('porteur.demande.planification', $projet->id)); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-calendar-plus"></i>
                     Demander planification
                 </button>
             </form>
-        @else
-            {{-- <button class="btn btn-secondary" disabled>
-                Demande planification envoyée
-            </button> --}}
-        @endif
+        <?php else: ?>
+            
+        <?php endif; ?>
 
 
-        {{-- Brouillon → Soumettre --}}
-        @if($projet->isSubmittable())
-        <form method="POST" action="{{ route('porteur.projets.soumettre', $projet) }}">
-            @csrf
+        
+        <?php if($projet->isSubmittable()): ?>
+        <form method="POST" action="<?php echo e(route('porteur.projets.soumettre', $projet)); ?>">
+            <?php echo csrf_field(); ?>
             <button type="submit" class="action-btn action-btn-indigo"
                     onclick="return confirm('Soumettre ce projet pour approbation ? Vous ne pourrez plus le modifier.')">
                 <i class="fas fa-paper-plane"></i>
                 Soumettre le projet
             </button>
         </form>
-        @endif
+        <?php endif; ?>
 
     </div>
 
-    {{-- ══ CONTENU PRINCIPAL ══ --}}
+    
     <div class="show-grid">
 
-        {{-- ── Colonne gauche ── --}}
+        
         <div class="show-col-main">
 
-            {{-- Infos générales --}}
+            
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-info-circle"></i>
@@ -146,73 +142,73 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Secteur</span>
-                            <span class="info-value">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
+                            <span class="info-value"><?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Durée</span>
-                            <span class="info-value">{{ $projet->duree ? $projet->duree . ' mois' : '—' }}</span>
+                            <span class="info-value"><?php echo e($projet->duree ? $projet->duree . ' mois' : '—'); ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de création</span>
-                            <span class="info-value">{{ optional($projet->dateCreation)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value"><?php echo e(optional($projet->dateCreation)->format('d/m/Y') ?? '—'); ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de soumission</span>
-                            <span class="info-value">{{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value"><?php echo e(optional($projet->dateSoumission)->format('d/m/Y') ?? '—'); ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de début probable</span>
-                            <span class="info-value">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value"><?php echo e(optional($projet->dateDebut)->format('d/m/Y') ?? '—'); ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de fin probable</span>
-                            <span class="info-value">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value"><?php echo e(optional($projet->dateFin)->format('d/m/Y') ?? '—'); ?></span>
                         </div>
-                        @if($projet->dateApprobation)
+                        <?php if($projet->dateApprobation): ?>
                         <div class="info-item">
                             <span class="info-label">Date d'approbation</span>
-                            <span class="info-value">{{ $projet->dateApprobation->format('d/m/Y') }}</span>
+                            <span class="info-value"><?php echo e($projet->dateApprobation->format('d/m/Y')); ?></span>
                         </div>
-                        @endif
-                        @if($projet->dateValidation)
+                        <?php endif; ?>
+                        <?php if($projet->dateValidation): ?>
                         <div class="info-item">
                             <span class="info-label">Date de validation</span>
-                            <span class="info-value">{{ $projet->dateValidation->format('d/m/Y') }}</span>
+                            <span class="info-value"><?php echo e($projet->dateValidation->format('d/m/Y')); ?></span>
                         </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
 
-                    @if($projet->description)
+                    <?php if($projet->description): ?>
                     <div class="info-block">
                         <span class="info-label">Description</span>
-                        <p class="info-text">{{ $projet->description }}</p>
+                        <p class="info-text"><?php echo e($projet->description); ?></p>
                     </div>
-                    @endif
+                    <?php endif; ?>
 
-                    @if($projet->objectif)
+                    <?php if($projet->objectif): ?>
                     <div class="info-block">
                         <span class="info-label">Objectif</span>
-                        <p class="info-text">{{ $projet->objectif }}</p>
+                        <p class="info-text"><?php echo e($projet->objectif); ?></p>
                     </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
-            {{-- activites --}}
+            
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-tasks"></i>
-                    <span>Les activites du projet ({{ $projet->activites->count() }})</span>
+                    <span>Les activites du projet (<?php echo e($projet->activites->count()); ?>)</span>
                     <button type="button" class="card-header-btn"
                             onclick="openModal('modalPlanifier')">
                         <i class="fas fa-plus"></i> Ajouter
                     </button>
                 </div>
-                @if($projet->activites->count())
+                <?php if($projet->activites->count()): ?>
                 <div class="form-card-body">
                     <div class="plan-cards-grid">
-                        @foreach($projet->activites as $plan)
-                        @php
+                        <?php $__currentLoopData = $projet->activites; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $plan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
                             $planStatutClass = ['en_attente'=>'status-gray',
                                                 'financee'=>'status-green',
                                                 'en_cours'=>'status-blue',
@@ -229,67 +225,70 @@
                                         'termine'=>'fa-check-circle',
                                         'annule'=>'fa-times-circle'];
                             $planIcon  = $planIcons[$plan->statutActivite] ?? 'fa-circle';
-                        @endphp
+                        ?>
                         <div class="plan-act-card">
                             <div class="plan-act-top">
-                                <div class="plan-act-num">{{ $loop->iteration }}</div>
-                                <span class="status-badge {{ $planStatutClass }}">
-                                    <i class="fas {{ $planIcon }}"></i>
-                                    {{ $planStatutLabel }}
+                                <div class="plan-act-num"><?php echo e($loop->iteration); ?></div>
+                                <span class="status-badge <?php echo e($planStatutClass); ?>">
+                                    <i class="fas <?php echo e($planIcon); ?>"></i>
+                                    <?php echo e($planStatutLabel); ?>
+
                                 </span>
-                                @if($projet->isEditable())
+                                <?php if($projet->isEditable()): ?>
                                 <form method="POST"
-                                        action="{{ route('porteur.projets.activites.destroy', [$projet, $plan]) }}"
+                                        action="<?php echo e(route('porteur.projets.activites.destroy', [$projet, $plan])); ?>"
                                         onsubmit="return confirm('Supprimer cette activité ?')"
                                         style="margin-left:auto;">
-                                    @csrf @method('DELETE')
+                                    <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                                     <button type="submit" class="btn-icon btn-icon-danger" title="Supprimer">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
-                            <h4 class="plan-act-titre">{{ $plan->activite }}</h4>
+                            <h4 class="plan-act-titre"><?php echo e($plan->activite); ?></h4>
 
-                            @if($plan->descriptionActivite)
-                            <p class="plan-act-desc">{{ $plan->descriptionActivite }}</p>
-                            @endif
+                            <?php if($plan->descriptionActivite): ?>
+                            <p class="plan-act-desc"><?php echo e($plan->descriptionActivite); ?></p>
+                            <?php endif; ?>
 
                             <div class="plan-act-footer">
                                 <span class="plan-act-info">
                                     <i class="fas fa-calendar-alt"></i>
-                                    {{ optional($plan->dateDebut)->format('d/m/Y') ?? '—' }}
+                                    <?php echo e(optional($plan->dateDebut)->format('d/m/Y') ?? '—'); ?>
+
                                     →
-                                    {{ optional($plan->dateFin)->format('d/m/Y') ?? '—' }}
+                                    <?php echo e(optional($plan->dateFin)->format('d/m/Y') ?? '—'); ?>
+
                                 </span>
-                                @if($plan->montantDemande)
+                                <?php if($plan->montantDemande): ?>
                                 <span class="plan-act-budget">
                                     <i class="fas fa-coins"></i>
-                                    {{ number_format($plan->montantDemande, 0, ',', ' ') }} F CFA
+                                    <?php echo e(number_format($plan->montantDemande, 0, ',', ' ')); ?> F CFA
                                 </span>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
-                @else
+                <?php else: ?>
                 <div class="form-card-body">
                     <div class="doc-empty-state">
                         <i class="fas fa-calendar"></i>
                         <span>Aucune activité crée.</span>
                     </div>
                 </div>
-                @endif
+                <?php endif; ?>
             </div>
 
         </div>
 
-        {{-- ── Colonne droite ── --}}
+        
         <div class="show-col-side">
 
-            {{-- Budget --}}
+            
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-coins"></i>
@@ -299,73 +298,74 @@
                     <div class="budget-display">
                         <span class="budget-label-sm">Budget total</span>
                         <span class="budget-value">
-                            {{ $projet->budgetTotal ? number_format($projet->budgetTotal, 0, ',', ' ') . ' F CFA' : '—' }}
+                            <?php echo e($projet->budgetTotal ? number_format($projet->budgetTotal, 0, ',', ' ') . ' F CFA' : '—'); ?>
+
                         </span>
                     </div>
-                    @if($projet->montantDemande)
+                    <?php if($projet->montantDemande): ?>
                     <div class="budget-display">
                         <span class="budget-label-sm">Montant demandé</span>
-                        <span class="budget-value-sm">{{ number_format($projet->montantDemande, 0, ',', ' ') }} F CFA</span>
+                        <span class="budget-value-sm"><?php echo e(number_format($projet->montantDemande, 0, ',', ' ')); ?> F CFA</span>
                     </div>
-                    @endif
-                    @if($projet->activites->count())
+                    <?php endif; ?>
+                    <?php if($projet->activites->count()): ?>
                     <div class="budget-display">
                         <span class="budget-label-sm">Total planifié</span>
                         <span class="budget-value-sm">
-                            {{ number_format($projet->activites->sum('montantDemande'), 0, ',', ' ') }} F CFA
+                            <?php echo e(number_format($projet->activites->sum('montantDemande'), 0, ',', ' ')); ?> F CFA
                         </span>
                     </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
-            {{-- Documents --}}
+            
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-paperclip"></i>
-                    <span>Documents ({{ $projet->documents->count() }})</span>
+                    <span>Documents (<?php echo e($projet->documents->count()); ?>)</span>
                 </div>
                 <div class="form-card-body">
 
-                    {{-- Documents existants --}}
-                    @forelse($projet->documents as $doc)
+                    
+                    <?php $__empty_1 = true; $__currentLoopData = $projet->documents; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $doc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <div class="doc-existing-item">
-                        @php
+                        <?php
                             $ext  = pathinfo($doc->nomFichier, PATHINFO_EXTENSION);
                             $icon = in_array($ext, ['pdf']) ? 'fa-file-pdf'
                                     : (in_array($ext, ['doc','docx']) ? 'fa-file-word'
                                     : (in_array($ext, ['xls','xlsx']) ? 'fa-file-excel'
                                     : (in_array($ext, ['jpg','jpeg','png']) ? 'fa-file-image'
                                     : 'fa-file-alt')));
-                        @endphp
-                        <i class="fas {{ $icon }}"></i>
-                        <span class="doc-file-name">{{ $doc->nomFichier }}</span>
-                        <span class="doc-badge">{{ $doc->typeDocument }}</span>
-                        <a href="{{ route('porteur.projets.documents.download', [$projet, $doc]) }}"
+                        ?>
+                        <i class="fas <?php echo e($icon); ?>"></i>
+                        <span class="doc-file-name"><?php echo e($doc->nomFichier); ?></span>
+                        <span class="doc-badge"><?php echo e($doc->typeDocument); ?></span>
+                        <a href="<?php echo e(route('porteur.projets.documents.download', [$projet, $doc])); ?>"
                             class="doc-action-link" title="Télécharger">
                             <i class="fas fa-download"></i>
                         </a>
                         <form method="POST"
-                                action="{{ route('porteur.projets.documents.destroy', [$projet, $doc]) }}"
+                                action="<?php echo e(route('porteur.projets.documents.destroy', [$projet, $doc])); ?>"
                                 onsubmit="return confirm('Supprimer ce document ?')"
                                 style="display:inline;">
-                            @csrf @method('DELETE')
+                            <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                             <button type="submit" class="doc-action-del" title="Supprimer">
                                 <i class="fas fa-times"></i>
                             </button>
                         </form>
                     </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <p class="info-empty">Aucun document joint.</p>
-                    @endforelse
+                    <?php endif; ?>
 
-                    {{-- Formulaire ajout document --}}
+                    
                     <form method="POST"
-                            action="{{ route('porteur.projets.documents.store', $projet) }}"
+                            action="<?php echo e(route('porteur.projets.documents.store', $projet)); ?>"
                             enctype="multipart/form-data"
                             class="mt-3"
                             id="formAddDoc">
-                        @csrf
+                        <?php echo csrf_field(); ?>
 
                         <input type="file"
                                 id="newDocuments"
@@ -401,8 +401,8 @@
     </div>
 
 
-    {{-- Phase de la planification --}}
-    @if($projet->planification)
+    
+    <?php if($projet->planification): ?>
 
         <div class="form-card" style="margin-top:16px;">
             <div class="form-card-header">
@@ -416,39 +416,39 @@
 
                     <div class="info-item">
                         <span class="info-label">Activité</span>
-                        <span class="info-value">{{ $projet->planification->activitePlanification }}</span>
+                        <span class="info-value"><?php echo e($projet->planification->activitePlanification); ?></span>
                     </div>
 
                     <div class="info-item">
                         <span class="info-label">Référence</span>
-                        <span class="info-value">{{ $projet->planification->reference }}</span>
+                        <span class="info-value"><?php echo e($projet->planification->reference); ?></span>
                     </div>
 
                     <div class="info-item">
                         <span class="info-label">Indicateur</span>
-                        <span class="info-value">{{ $projet->planification->indicateur }}</span>
+                        <span class="info-value"><?php echo e($projet->planification->indicateur); ?></span>
                     </div>
 
                     <div class="info-item">
                         <span class="info-label">Unité</span>
-                        <span class="info-value">{{ $projet->planification->uniteIndicateur }}</span>
+                        <span class="info-value"><?php echo e($projet->planification->uniteIndicateur); ?></span>
                     </div>
 
                     <div class="info-item">
                         <span class="info-label">Résultats attendus</span>
-                        <span class="info-value">{{ $projet->planification->resultatsAttendues }}</span>
+                        <span class="info-value"><?php echo e($projet->planification->resultatsAttendues); ?></span>
                     </div>
 
                     <div class="info-item">
                         <span class="info-label">Coût estimatif</span>
                         <span class="info-value">
-                            {{ number_format($projet->planification->coutEstimatif, 0, ',', ' ') }} F CFA
+                            <?php echo e(number_format($projet->planification->coutEstimatif, 0, ',', ' ')); ?> F CFA
                         </span>
                     </div>
 
                     <div class="info-item">
                         <span class="info-label">Période</span>
-                        <span class="info-value">{{ $projet->planification->periode }}</span>
+                        <span class="info-value"><?php echo e($projet->planification->periode); ?></span>
                     </div>
 
                 </div>
@@ -456,10 +456,10 @@
             </div>
         </div>
 
-        @endif
+        <?php endif; ?>
 </div>
 
-{{-- ══ MODAL ACTIVITE ══ --}}
+
 <div id="modalPlanifier" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
@@ -472,41 +472,83 @@
             </button>
         </div>
 
-        <form method="POST" action="{{ route('porteur.projets.activites.store', $projet) }}">
-            @csrf
+        <form method="POST" action="<?php echo e(route('porteur.projets.activites.store', $projet)); ?>">
+            <?php echo csrf_field(); ?>
 
             <div class="modal-body">
 
                 <div class="form-col form-col-full">
                     <label class="field-label">Activité <span class="required">*</span></label>
                     <input type="text" name="activite"
-                            value="{{ old('activite') }}"
-                            class="field-input @error('activite') is-invalid @enderror"
+                            value="<?php echo e(old('activite')); ?>"
+                            class="field-input <?php $__errorArgs = ['activite'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                             placeholder="Ex : Analyse des besoins" required>
-                    @error('activite')<span class="field-error">{{ $message }}</span>@enderror
+                    <?php $__errorArgs = ['activite'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div class="form-col form-col-full">
                     <label class="field-label">Description</label>
                     <textarea name="descriptionActivite" rows="2"
                                 class="field-input field-textarea"
-                                placeholder="Détails de l'activité...">{{ old('descriptionActivite') }}</textarea>
+                                placeholder="Détails de l'activité..."><?php echo e(old('descriptionActivite')); ?></textarea>
                 </div>
 
                 <div class="modal-row">
                     <div class="form-col">
                         <label class="field-label">Date de début probale <span class="required">*</span></label>
                         <input type="date" name="dateDebut"
-                                value="{{ old('dateDebut') }}"
-                                class="field-input @error('dateDebut') is-invalid @enderror" required>
-                        @error('dateDebut')<span class="field-error">{{ $message }}</span>@enderror
+                                value="<?php echo e(old('dateDebut')); ?>"
+                                class="field-input <?php $__errorArgs = ['dateDebut'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" required>
+                        <?php $__errorArgs = ['dateDebut'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div class="form-col">
                         <label class="field-label">Date de fin probale <span class="required">*</span></label>
                         <input type="date" name="dateFin"
-                                value="{{ old('dateFin') }}"
-                                class="field-input @error('dateFin') is-invalid @enderror" required>
-                        @error('dateFin')<span class="field-error">{{ $message }}</span>@enderror
+                                value="<?php echo e(old('dateFin')); ?>"
+                                class="field-input <?php $__errorArgs = ['dateFin'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" required>
+                        <?php $__errorArgs = ['dateFin'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
@@ -514,16 +556,30 @@
                     <div class="form-col">
                         <label class="field-label">Montant demandé (F CFA)</label>
                         <input type="number" name="montantDemande"
-                                value="{{ old('montantDemande') }}"
-                                class="field-input @error('montantDemande') is-invalid @enderror"
+                                value="<?php echo e(old('montantDemande')); ?>"
+                                class="field-input <?php $__errorArgs = ['montantDemande'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                 placeholder="0" min="0" step="1">
-                        @error('montantDemande')<span class="field-error">{{ $message }}</span>@enderror
+                        <?php $__errorArgs = ['montantDemande'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     <div class="form-col">
                         <label class="field-label">Statut</label>
                         <select name="statutActivite" class="field-input">
-                            <option value="en_attente" {{ old('statutActivite','en_attente') == 'en_attente' ? 'selected' : '' }}>En attente</option>
-                            <option value="annule"     {{ old('statutActivite') == 'annule'     ? 'selected' : '' }}>Annulé</option>
+                            <option value="en_attente" <?php echo e(old('statutActivite','en_attente') == 'en_attente' ? 'selected' : ''); ?>>En attente</option>
+                            <option value="annule"     <?php echo e(old('statutActivite') == 'annule'     ? 'selected' : ''); ?>>Annulé</option>
                         </select>
                     </div>
                 </div>
@@ -541,18 +597,18 @@
     </div>
 </div>
 
-{{-- ══ TIMELINE COMMENTAIRES ══ --}}
-@if($projet->commentaires->count() > 0)
+
+<?php if($projet->commentaires->count() > 0): ?>
 <div class="form-card" style="margin-top:16px;">
     <div class="form-card-header">
         <i class="fas fa-comments"></i>
-        <span>Historique des commenataires ({{ $projet->commentaires->count() }})</span>
+        <span>Historique des commenataires (<?php echo e($projet->commentaires->count()); ?>)</span>
     </div>
 
     <div class="form-card-body">
         <div class="timeline">
-            @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $commentaire)
-            @php
+            <?php $__currentLoopData = $projet->commentaires->sortByDesc('dateEnvoi'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $commentaire): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $icons  = [
                     'approbation'=>'fa-check-circle',
                     'rejet'=>'fa-times-circle',
@@ -571,27 +627,27 @@
                 $icon   = $icons[$commentaire->typeCommentaire]  ?? 'fa-comment';
                 $color  = $colors[$commentaire->typeCommentaire] ?? '#6b7280';
 
-            @endphp
+            ?>
             <div class="timeline-item">
-                <div class="timeline-icon" style="background:{{ $color }}15;color:{{ $color }};">
-                    <i class="fas {{ $icon }}"></i>
+                <div class="timeline-icon" style="background:<?php echo e($color); ?>15;color:<?php echo e($color); ?>;">
+                    <i class="fas <?php echo e($icon); ?>"></i>
                 </div>
                 <div class="timeline-content">
                     <div class="timeline-header">
-                        <span class="timeline-author">{{ optional($commentaire->utilisateur)->role ?? '—' }}</span>
-                        <span class="timeline-date">{{ $commentaire->dateEnvoi->format('d/m/Y à H:i') }}</span>
+                        <span class="timeline-author"><?php echo e(optional($commentaire->utilisateur)->role ?? '—'); ?></span>
+                        <span class="timeline-date"><?php echo e($commentaire->dateEnvoi->format('d/m/Y à H:i')); ?></span>
                     </div>
-                    <p class="timeline-message">{{ $commentaire->message }}</p>
+                    <p class="timeline-message"><?php echo e($commentaire->message); ?></p>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </div>
-@endif
-</div>{{-- fin .projets-page --}}
+<?php endif; ?>
+</div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function openModal(id) {
     document.getElementById(id).classList.add('active');
@@ -607,9 +663,9 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
     });
 });
 
-@if($errors->any())
+<?php if($errors->any()): ?>
     openModal('modalPlanifier');
-@endif
+<?php endif; ?>
 
 // ── Gestion ajout documents ──
 const newDocInput  = document.getElementById('newDocuments');
@@ -659,6 +715,8 @@ function formatDocSize(b) {
 }
 
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/porteur/projets/show.blade.php ENDPATH**/ ?>

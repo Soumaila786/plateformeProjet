@@ -20,6 +20,7 @@ use App\Http\Controllers\Porteur\ActiviteController  as PorteurActiviteControlle
 // Approbateur
 use App\Http\Controllers\Approbateur\DashboardController  as ApprobateurDashboardController;
 use App\Http\Controllers\Approbateur\ProjetController     as ApprobateurProjetController;
+use App\Http\Controllers\Approbateur\PlanificationController     as ApprobateurPlanificationController;
 
 // Validateur
 use App\Http\Controllers\Validateur\DashboardController   as ValidateurDashboardController;
@@ -165,6 +166,22 @@ Route::middleware(['auth'])->group(function () {
         // Documents (lecture + téléchargement)
         Route::get('projets/{projet}/documents/{document}/download', [ApprobateurProjetController::class, 'downloadDocument'])
             ->name('projets.documents.download');
+
+        // Planification
+        Route::get('/projets/{projet}/planification/creer', [ApprobateurPlanificationController::class, 'create'])
+            ->name('planification.create');
+
+        Route::post('/projets/{projet}/planification', [ApprobateurPlanificationController::class, 'store'])
+            ->name('planification.store');
+
+        Route::get('/projets/{projet}/planification/{planification}/modifier', [ApprobateurPlanificationController::class, 'edit'])
+            ->name('planification.edit');
+
+        Route::put('/projets/{projet}/planification/{planification}', [ApprobateurPlanificationController::class, 'update'])
+            ->name('planification.update');
+
+        Route::delete('/projets/{projet}/planification/{planification}', [ApprobateurPlanificationController::class, 'destroy'])
+            ->name('planification.destroy');
 
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');

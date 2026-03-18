@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class ActiviteController extends Controller
 {
     public function store(Request $request, Projet $projet){
+        
         $this->authorize('gererActivite', $projet);
 
         $request->validate([

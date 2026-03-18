@@ -35,8 +35,7 @@ class UserPolicy
         return $user->role === 'admin' && $user->id !== $target->id;
     }
 
-    public function toggleStatus(User $user, User $target)
-    {
+    public function toggleStatus(User $user, User $target) {
         return $user->role === 'admin' && $user->id !== $target->id;
     }
 }
