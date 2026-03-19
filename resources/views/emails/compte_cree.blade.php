@@ -2,7 +2,7 @@
 
 @section('status_band')
 <div class="status-band blue">
-    <div class="status-icon blue">👤</div>
+    <div class="status-icon blue"></div>
     <div>
         <div class="status-label">Compte créé avec succès</div>
         <div class="status-sub">Bienvenue sur GesProjet</div>

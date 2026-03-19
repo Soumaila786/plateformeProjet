@@ -100,10 +100,9 @@ class ProjetController extends Controller {
 
         $projet->load([
             'secteur',
-            'activites',
             'documents',
             'commentaires.utilisateur',
-            'planification',
+            'planifications',
         ]);
 
         return view('porteur.projets.show', compact('projet'));

@@ -24,7 +24,7 @@ class ExportController extends Controller
             'secteur',
             'porteur',
             'activites',
-            'planification',
+            'planifications',
             'commentaires.utilisateur',
         ]);
 

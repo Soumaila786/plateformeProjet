@@ -7,10 +7,9 @@
 @endpush
 
 @section('content')
-
 <div class="projets-page">
 
-    {{-- ── Header ── --}}
+    {{-- Header --}}
     <div class="page-header">
         <a href="{{ route('porteur.projets.index') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i>
@@ -46,7 +45,6 @@
                 <i class="fas fa-pencil-alt"></i> Modifier
             </a>
             @endif
-
             @if($projet->isDeletable())
             <form method="POST" action="{{ route('porteur.projets.destroy', $projet) }}"
                     onsubmit="return confirm('Supprimer définitivement ce projet ?')">
@@ -58,53 +56,94 @@
             @endif
         </div>
     </div>
-    
 
+    {{-- ══ BANNIÈRE REJET ══ --}}
+    @php
+        $dernierRejet  = $projet->commentaires->where('typeCommentaire', 'rejet')->sortByDesc('dateEnvoi')->first();
+        $derniereModif = $projet->commentaires->where('typeCommentaire', 'demande')->sortByDesc('dateEnvoi')->first();
+    @endphp
+
+    @if($projet->statutProjet === 'brouillon' && $dernierRejet)
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;
+                    background:#fef2f2;border:1px solid #fecaca;border-radius:10px;">
+            <i class="fas fa-times-circle" style="color:#dc2626;font-size:1rem;margin-top:2px;flex-shrink:0;"></i>
+            <div>
+                <p style="font-size:.73rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#b91c1c;margin:0 0 4px;">
+                    Projet rejeté — Motif
+                </p>
+                <p style="font-size:.82rem;color:#374151;margin:0 0 3px;line-height:1.5;">{{ $dernierRejet->message }}</p>
+                <p style="font-size:.7rem;color:#9ca3af;margin:0;">
+                    Par {{ optional($dernierRejet->utilisateur)->nomComplet ?? 'Approbateur' }}
+                    le {{ optional($dernierRejet->dateEnvoi)->format('d/m/Y à H:i') }}
+                </p>
+            </div>
+        </div>
+
+        @if($derniereModif)
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;
+                    background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;">
+            <i class="fas fa-exclamation-triangle" style="color:#ea580c;font-size:1rem;margin-top:2px;flex-shrink:0;"></i>
+            <div>
+                <p style="font-size:.73rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#c2410c;margin:0 0 4px;">
+                    Modifications demandées
+                </p>
+                <p style="font-size:.82rem;color:#374151;margin:0;line-height:1.5;">{{ $derniereModif->message }}</p>
+            </div>
+        </div>
+        @endif
+
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;
+                    background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;">
+            <i class="fas fa-info-circle" style="color:#2563eb;font-size:1rem;margin-top:2px;flex-shrink:0;"></i>
+            <div style="flex:1;">
+                <p style="font-size:.73rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#1d4ed8;margin:0 0 4px;">
+                    Comment procéder ?
+                </p>
+                <p style="font-size:.82rem;color:#374151;margin:0 0 10px;line-height:1.5;">
+                    Corrigez votre projet puis resoumettez-le pour une nouvelle approbation.
+                </p>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <a href="{{ route('porteur.projets.edit', $projet) }}"
+                       style="display:inline-flex;align-items:center;gap:6px;background:#fff;
+                              border:1.5px solid #1d4ed8;color:#1d4ed8;border-radius:8px;
+                              padding:7px 14px;font-size:.78rem;font-weight:700;text-decoration:none;">
+                        <i class="fas fa-pencil-alt"></i> Corriger le projet
+                    </a>
+                    <form method="POST" action="{{ route('porteur.projets.soumettre', $projet) }}"
+                          onsubmit="return confirm('Resoumettre pour une nouvelle approbation ?')">
+                        @csrf
+                        <button type="submit"
+                                style="display:inline-flex;align-items:center;gap:6px;background:#1d4ed8;
+                                       color:#fff;border:none;border-radius:8px;padding:7px 14px;
+                                       font-size:.78rem;font-weight:700;cursor:pointer;">
+                            <i class="fas fa-paper-plane"></i> Resoumettre le projet
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     {{-- ══ BARRE D'ACTIONS ══ --}}
     <div class="projet-actions-bar">
-
-        {{-- creation d'activité --}}
-        <button type="button" class="action-btn action-btn-blue"
-                onclick="openModal('modalPlanifier')">
-            <i class="fas fa-plus"></i>
-            Créer activité
-        </button>
-
-        @if(!$projet->planification_demandee && !in_array($projet->statutProjet, ['approuve', 'valide']))
-
-            <form action="{{ route('porteur.demande.planification', $projet->id) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-calendar-plus"></i>
-                    Demander planification
-                </button>
-            </form>
-        @else
-            {{-- <button class="btn btn-secondary" disabled>
-                Demande planification envoyée
-            </button> --}}
-        @endif
-
-
-        {{-- Brouillon → Soumettre --}}
-        @if($projet->isSubmittable())
+        {{-- Soumettre (seulement si brouillon sans rejet en attente) --}}
+        @if($projet->isSubmittable() && !$dernierRejet)
         <form method="POST" action="{{ route('porteur.projets.soumettre', $projet) }}">
             @csrf
             <button type="submit" class="action-btn action-btn-indigo"
-                    onclick="return confirm('Soumettre ce projet pour approbation ? Vous ne pourrez plus le modifier.')">
-                <i class="fas fa-paper-plane"></i>
-                Soumettre le projet
+                    onclick="return confirm('Soumettre ce projet pour approbation ?')">
+                <i class="fas fa-paper-plane"></i> Soumettre le projet
             </button>
         </form>
         @endif
-
     </div>
 
     {{-- ══ CONTENU PRINCIPAL ══ --}}
     <div class="show-grid">
 
-        {{-- ── Colonne gauche ── --}}
+        {{-- Colonne gauche --}}
         <div class="show-col-main">
 
             {{-- Infos générales --}}
@@ -142,24 +181,16 @@
                         @if($projet->dateApprobation)
                         <div class="info-item">
                             <span class="info-label">Date d'approbation</span>
-                            <span class="info-value">{{ $projet->dateApprobation->format('d/m/Y') }}</span>
-                        </div>
-                        @endif
-                        @if($projet->dateValidation)
-                        <div class="info-item">
-                            <span class="info-label">Date de validation</span>
-                            <span class="info-value">{{ $projet->dateValidation->format('d/m/Y') }}</span>
+                            <span class="info-value">{{ optional($projet->dateApprobation)->format('d/m/Y') }}</span>
                         </div>
                         @endif
                     </div>
-
                     @if($projet->description)
                     <div class="info-block">
                         <span class="info-label">Description</span>
                         <p class="info-text">{{ $projet->description }}</p>
                     </div>
                     @endif
-
                     @if($projet->objectif)
                     <div class="info-block">
                         <span class="info-label">Objectif</span>
@@ -169,95 +200,53 @@
                 </div>
             </div>
 
-            {{-- activites --}}
+            {{-- Planifications (lecture seule pour le porteur) --}}
+            @if($projet->planifications->count())
             <div class="form-card">
                 <div class="form-card-header">
-                    <i class="fas fa-tasks"></i>
-                    <span>Les activites du projet ({{ $projet->activites->count() }})</span>
-                    <button type="button" class="card-header-btn"
-                            onclick="openModal('modalPlanifier')">
-                        Ajouter
-                    </button>
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Planification du projet ({{ $projet->planifications->count() }} activité(s))</span>
                 </div>
-                @if($projet->activites->count())
                 <div class="form-card-body">
                     <div class="plan-cards-grid">
-                        @foreach($projet->activites as $plan)
-                        @php
-                            $planStatutClass = ['en_attente'=>'status-gray',
-                                                'financee'=>'status-green',
-                                                'en_cours'=>'status-blue',
-                                                'termine'=>'status-teal',
-                                                'annule'=>'status-red'][$plan->statutActivite] ?? 'status-gray';
-                            $planStatutLabel = ['en_attente'=>'En attente',
-                                                'financee'=>'Financée',
-                                                'en_cours'=>'En cours',
-                                                'termine'=>'Terminée',
-                                                'annule'=>'Annulée'][$plan->statutActivite] ?? $plan->statutActivite;
-                            $planIcons = ['en_attente'=>'fa-clock',
-                                        'financee'=>'fa-coins',
-                                        'en_cours'=>'fa-spinner',
-                                        'termine'=>'fa-check-circle',
-                                        'annule'=>'fa-times-circle'];
-                            $planIcon  = $planIcons[$plan->statutActivite] ?? 'fa-circle';
-                        @endphp
+                        @foreach($projet->planifications as $plan)
                         <div class="plan-act-card">
                             <div class="plan-act-top">
                                 <div class="plan-act-num">{{ $loop->iteration }}</div>
-                                <span class="status-badge {{ $planStatutClass }}">
-                                    <i class="fas {{ $planIcon }}"></i>
-                                    {{ $planStatutLabel }}
-                                </span>
-                                @if($projet->isEditable())
-                                <form method="POST"
-                                        action="{{ route('porteur.projets.activites.destroy', [$projet, $plan]) }}"
-                                        onsubmit="return confirm('Supprimer cette activité ?')"
-                                        style="margin-left:auto;">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn-icon btn-icon-danger" title="Supprimer">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                                @endif
                             </div>
-
-                            <h4 class="plan-act-titre">{{ $plan->activite }}</h4>
-
-                            @if($plan->descriptionActivite)
-                            <p class="plan-act-desc">{{ $plan->descriptionActivite }}</p>
-                            @endif
-
+                            <h4 class="plan-act-titre">{{ $plan->activitePlanification }}</h4>
                             <div class="plan-act-footer">
+                                @if($plan->periode)
                                 <span class="plan-act-info">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    {{ optional($plan->dateDebut)->format('d/m/Y') ?? '—' }}
-                                    →
-                                    {{ optional($plan->dateFin)->format('d/m/Y') ?? '—' }}
+                                    <i class="fas fa-clock"></i> {{ $plan->periode }}
                                 </span>
-                                @if($plan->montantDemande)
+                                @endif
+                                @if($plan->coutEstimatif)
                                 <span class="plan-act-budget">
                                     <i class="fas fa-coins"></i>
-                                    {{ number_format($plan->montantDemande, 0, ',', ' ') }} F CFA
+                                    {{ number_format($plan->coutEstimatif, 0, ',', ' ') }} F CFA
                                 </span>
                                 @endif
                             </div>
+                            @if($plan->indicateur)
+                            <p class="plan-act-desc">
+                                Indicateur : {{ $plan->indicateur }}
+                                @if($plan->uniteIndicateur) ({{ $plan->uniteIndicateur }}) @endif
+                            </p>
+                            @endif
+                            @if($plan->resultatsAttendues)
+                            <p class="plan-act-desc">Résultats : {{ $plan->resultatsAttendues }}</p>
+                            @endif
                         </div>
                         @endforeach
                     </div>
                 </div>
-                @else
-                <div class="form-card-body">
-                    <div class="doc-empty-state">
-                        <i class="fas fa-calendar"></i>
-                        <span>Aucune activité crée.</span>
-                    </div>
-                </div>
-                @endif
             </div>
+            @endif
 
         </div>
 
-        {{-- ── Colonne droite ── --}}
+        {{-- Colonne droite --}}
         <div class="show-col-side">
 
             {{-- Budget --}}
@@ -279,11 +268,11 @@
                         <span class="budget-value-sm">{{ number_format($projet->montantDemande, 0, ',', ' ') }} F CFA</span>
                     </div>
                     @endif
-                    @if($projet->activites->count())
+                    @if($projet->planifications->count())
                     <div class="budget-display">
-                        <span class="budget-label-sm">Total planifié</span>
+                        <span class="budget-label-sm">Coût planifié total</span>
                         <span class="budget-value-sm">
-                            {{ number_format($projet->activites->sum('montantDemande'), 0, ',', ' ') }} F CFA
+                            {{ number_format($projet->planifications->sum('coutEstimatif'), 0, ',', ' ') }} F CFA
                         </span>
                     </div>
                     @endif
@@ -297,8 +286,6 @@
                     <span>Documents ({{ $projet->documents->count() }})</span>
                 </div>
                 <div class="form-card-body">
-
-                    {{-- Documents existants --}}
                     @forelse($projet->documents as $doc)
                     <div class="doc-existing-item">
                         @php
@@ -316,9 +303,6 @@
                             class="doc-action-link" title="Télécharger">
                             <i class="fas fa-download"></i>
                         </a>
-
-                        @if (!in_array($projet->statutProjet, ['approuve', 'valide']))
-                            
                         <form method="POST"
                                 action="{{ route('porteur.projets.documents.destroy', [$projet, $doc]) }}"
                                 onsubmit="return confirm('Supprimer ce document ?')"
@@ -328,309 +312,117 @@
                                 <i class="fas fa-times"></i>
                             </button>
                         </form>
-                        @endif
                     </div>
                     @empty
                     <p class="info-empty">Aucun document joint.</p>
                     @endforelse
 
-                    {{-- Formulaire ajout document --}}
-                    @if (!in_array($projet->statutProjet , ['approuve', 'valide']))
-                        
-                    
                     <form method="POST"
                             action="{{ route('porteur.projets.documents.store', $projet) }}"
-                            enctype="multipart/form-data"
-                            class="mt-3"
-                            id="formAddDoc">
+                            enctype="multipart/form-data" class="mt-3" id="formAddDoc">
                         @csrf
-
-                        <input type="file"
-                                id="newDocuments"
-                                name="documents[]"
-                                multiple
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
-                                style="display:none">
-
+                        <input type="file" id="newDocuments" name="documents[]" multiple
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" style="display:none">
                         <div class="doc-toolbar">
                             <button type="button" class="btn-attach"
                                     onclick="document.getElementById('newDocuments').click()">
                                 <i class="fas fa-plus"></i> Ajouter des fichiers
                             </button>
                         </div>
-
                         <p class="doc-hint">PDF, Word, Excel, images — Max 10 Mo par fichier</p>
-
                         <div id="newFileList" class="doc-file-list" style="display:none"></div>
-
                         <div id="submitDocBtn" style="display:none; margin-top:10px;">
                             <button type="submit" class="btn-save btn-sm">
-                                <i class="fas fa-upload"></i> Enregistrer les fichiers
+                                <i class="fas fa-upload"></i> Enregistrer
                             </button>
                             <button type="button" class="btn-cancel btn-sm ms-2"
                                     onclick="resetDocForm()">Annuler</button>
                         </div>
                     </form>
-                    @endif
-
                 </div>
             </div>
 
         </div>
     </div>
 
-
-    {{-- Phase de la planification --}}
-    @if($projet->planification)
-        <div class="form-card" style="margin-top:16px;">
-            <div class="form-card-header">
-                <i class="fas fa-calendar-check"></i>
-                <span>Planification du projet</span>
-            </div>
-
-            <div class="form-card-body">
-
-                <div class="info-grid">
-
-                    <div class="info-item">
-                        <span class="info-label">Activité</span>
-                        <span class="info-value">{{ $projet->planification->activitePlanification }}</span>
+    {{-- Timeline commentaires --}}
+    @if($projet->commentaires->count() > 0)
+    <div class="form-card" style="margin-top:16px;">
+        <div class="form-card-header">
+            <i class="fas fa-comments"></i>
+            <span>Historique des commentaires ({{ $projet->commentaires->count() }})</span>
+        </div>
+        <div class="form-card-body">
+            <div class="timeline">
+                @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $commentaire)
+                @php
+                    $icons  = ['approbation'=>'fa-check-circle','rejet'=>'fa-times-circle','demande'=>'fa-exclamation-circle','info'=>'fa-info-circle'];
+                    $colors = ['approbation'=>'#16a34a','rejet'=>'#dc2626','demande'=>'#d97706','info'=>'#2563eb'];
+                    $icon   = $icons[$commentaire->typeCommentaire]  ?? 'fa-comment';
+                    $color  = $colors[$commentaire->typeCommentaire] ?? '#6b7280';
+                @endphp
+                <div class="timeline-item">
+                    <div class="timeline-icon" style="background:{{ $color }}15;color:{{ $color }};">
+                        <i class="fas {{ $icon }}"></i>
                     </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Indicateur</span>
-                        <span class="info-value">{{ $projet->planification->indicateur }}</span>
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-author">{{ optional($commentaire->utilisateur)->role ?? '—' }}</span>
+                            <span class="timeline-date">{{ optional($commentaire->dateEnvoi)->format('d/m/Y à H:i') }}</span>
+                        </div>
+                        <p class="timeline-message">{{ $commentaire->message }}</p>
                     </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Unité</span>
-                        <span class="info-value">{{ $projet->planification->uniteIndicateur }}</span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Résultats attendus</span>
-                        <span class="info-value">{{ $projet->planification->resultatsAttendues }}</span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Coût estimatif</span>
-                        <span class="info-value">
-                            {{ number_format($projet->planification->coutEstimatif, 0, ',', ' ') }} F CFA
-                        </span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Période</span>
-                        <span class="info-value">{{ $projet->planification->periode }}</span>
-                    </div>
-
                 </div>
-
+                @endforeach
             </div>
         </div>
+    </div>
     @endif
+
 </div>
-
-{{-- ══ MODAL ACTIVITE ══ --}}
-<div id="modalPlanifier" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h2 class="modal-title">
-                <i class="fas fa-calendar-plus"></i>
-                Ajouter une activité
-            </h2>
-            <button type="button" class="modal-close" onclick="closeModal('modalPlanifier')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <form method="POST" action="{{ route('porteur.projets.activites.store', $projet) }}">
-            @csrf
-
-            <div class="modal-body">
-
-                <div class="form-col form-col-full">
-                    <label class="field-label">Activité <span class="required">*</span></label>
-                    <input type="text" name="activite"
-                            value="{{ old('activite') }}"
-                            class="field-input @error('activite') is-invalid @enderror"
-                            placeholder="Ex : Analyse des besoins" required>
-                    @error('activite')<span class="field-error">{{ $message }}</span>@enderror
-                </div>
-
-                <div class="form-col form-col-full">
-                    <label class="field-label">Description</label>
-                    <textarea name="descriptionActivite" rows="2"
-                                class="field-input field-textarea"
-                                placeholder="Détails de l'activité...">{{ old('descriptionActivite') }}</textarea>
-                </div>
-
-                <div class="modal-row">
-                    <div class="form-col">
-                        <label class="field-label">Date de début probale <span class="required">*</span></label>
-                        <input type="date" name="dateDebut"
-                                value="{{ old('dateDebut') }}"
-                                class="field-input @error('dateDebut') is-invalid @enderror" required>
-                        @error('dateDebut')<span class="field-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-col">
-                        <label class="field-label">Date de fin probale <span class="required">*</span></label>
-                        <input type="date" name="dateFin"
-                                value="{{ old('dateFin') }}"
-                                class="field-input @error('dateFin') is-invalid @enderror" required>
-                        @error('dateFin')<span class="field-error">{{ $message }}</span>@enderror
-                    </div>
-                </div>
-
-                <div class="modal-row">
-                    <div class="form-col">
-                        <label class="field-label">Montant demandé (F CFA)</label>
-                        <input type="number" name="montantDemande"
-                                value="{{ old('montantDemande') }}"
-                                class="field-input @error('montantDemande') is-invalid @enderror"
-                                placeholder="0" min="0" step="1">
-                        @error('montantDemande')<span class="field-error">{{ $message }}</span>@enderror
-                    </div>
-                    <div class="form-col">
-                        <label class="field-label">Statut</label>
-                        <select name="statutActivite" class="field-input">
-                            <option value="en_attente" {{ old('statutActivite','en_attente') == 'en_attente' ? 'selected' : '' }}>En attente</option>
-                            <option value="annule"     {{ old('statutActivite') == 'annule'     ? 'selected' : '' }}>Annulé</option>
-                        </select>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel"
-                        onclick="closeModal('modalPlanifier')">Annuler</button>
-                <button type="submit" class="btn-save">
-                    <i class="fas fa-save"></i> Enregistrer
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-{{-- ══ TIMELINE COMMENTAIRES ══ --}}
-@if($projet->commentaires->count() > 0)
-<div class="form-card" style="margin-top:16px;">
-    <div class="form-card-header">
-        <i class="fas fa-comments"></i>
-        <span>Historique des commenataires ({{ $projet->commentaires->count() }})</span>
-    </div>
-
-    <div class="form-card-body">
-        <div class="timeline">
-            @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $commentaire)
-            @php
-                $icons  = [
-                    'approbation'=>'fa-check-circle',
-                    'rejet'=>'fa-times-circle',
-                    'demande'=>'fa-exclamation-circle',
-                    'info'=>'fa-info-circle'
-                ];
-
-                $colors = [
-                    'approbation'=>'#16a34a',
-                    'rejet'=>'#dc2626',
-                    'demande'=>'#d97706',
-                    'info'=>'#2563eb'
-                ];
-
-                # En cas de type different on utilise par defaut
-                $icon   = $icons[$commentaire->typeCommentaire]  ?? 'fa-comment';
-                $color  = $colors[$commentaire->typeCommentaire] ?? '#6b7280';
-
-            @endphp
-            <div class="timeline-item">
-                <div class="timeline-icon" style="background:{{ $color }}15;color:{{ $color }};">
-                    <i class="fas {{ $icon }}"></i>
-                </div>
-                <div class="timeline-content">
-                    <div class="timeline-header">
-                        <span class="timeline-author">{{ optional($commentaire->utilisateur)->role ?? '—' }}</span>
-                        <span class="timeline-date">{{ $commentaire->dateEnvoi->format('d/m/Y à H:i') }}</span>
-                    </div>
-                    <p class="timeline-message">{{ $commentaire->message }}</p>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
-</div>{{-- fin .projets-page --}}
 
 @push('scripts')
-    <script>
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        document.querySelectorAll('.modal-overlay').forEach(m => {
-            m.addEventListener('click', function(e) {
-                if (e.target === this) closeModal(this.id);
-            });
-        });
-
-        @if($errors->any())
-            openModal('modalPlanifier');
-        @endif
-
-        // ── Gestion ajout documents ──
-        const newDocInput  = document.getElementById('newDocuments');
-        const newFileList  = document.getElementById('newFileList');
-        const submitDocBtn = document.getElementById('submitDocBtn');
-
-        if (newDocInput) {
-            newDocInput.addEventListener('change', function() {
-                const files = Array.from(this.files);
-                if (files.length === 0) return;
-
-                newFileList.style.display = 'block';
-                submitDocBtn.style.display = 'block';
-
-                newFileList.innerHTML = files.map(f => `
-                    <div class="doc-file-item">
-                        <i class="${getDocIcon(f.name)} doc-file-icon"></i>
-                        <div class="doc-file-info">
-                            <span class="doc-file-name">${f.name}</span>
-                            <span class="doc-file-size">${formatDocSize(f.size)}</span>
-                        </div>
-                        <span class="doc-file-ok"><i class="fas fa-check-circle"></i> Accepté</span>
-                    </div>
-                `).join('');
-            });
-        }
-
-        function resetDocForm() {
-            if (newDocInput) newDocInput.value = '';
-            if (newFileList) { newFileList.innerHTML = ''; newFileList.style.display = 'none'; }
-            if (submitDocBtn) submitDocBtn.style.display = 'none';
-        }
-
-        function getDocIcon(name) {
-            const ext = name.split('.').pop().toLowerCase();
-            if (['pdf'].includes(ext))              return 'fas fa-file-pdf';
-            if (['doc','docx'].includes(ext))       return 'fas fa-file-word';
-            if (['xls','xlsx'].includes(ext))       return 'fas fa-file-excel';
-            if (['jpg','jpeg','png'].includes(ext)) return 'fas fa-file-image';
-            return 'fas fa-file-alt';
-        }
-
-        function formatDocSize(b) {
-            if (b < 1024)    return b + ' o';
-            if (b < 1048576) return (b / 1024).toFixed(1) + ' Ko';
-            return (b / 1048576).toFixed(1) + ' Mo';
-        }
-
-    </script>
+<script>
+function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow=''; }
+const newDocInput  = document.getElementById('newDocuments');
+const newFileList  = document.getElementById('newFileList');
+const submitDocBtn = document.getElementById('submitDocBtn');
+if (newDocInput) {
+    newDocInput.addEventListener('change', function() {
+        const files = Array.from(this.files);
+        if (!files.length) return;
+        newFileList.style.display = 'block';
+        submitDocBtn.style.display = 'block';
+        newFileList.innerHTML = files.map(f => `
+            <div class="doc-file-item">
+                <i class="${getDocIcon(f.name)} doc-file-icon"></i>
+                <div class="doc-file-info">
+                    <span class="doc-file-name">${f.name}</span>
+                    <span class="doc-file-size">${formatDocSize(f.size)}</span>
+                </div>
+                <span class="doc-file-ok"><i class="fas fa-check-circle"></i> Accepté</span>
+            </div>`).join('');
+    });
+}
+function resetDocForm() {
+    if (newDocInput) newDocInput.value = '';
+    if (newFileList) { newFileList.innerHTML=''; newFileList.style.display='none'; }
+    if (submitDocBtn) submitDocBtn.style.display='none';
+}
+function getDocIcon(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    if (['pdf'].includes(ext)) return 'fas fa-file-pdf';
+    if (['doc','docx'].includes(ext)) return 'fas fa-file-word';
+    if (['xls','xlsx'].includes(ext)) return 'fas fa-file-excel';
+    if (['jpg','jpeg','png'].includes(ext)) return 'fas fa-file-image';
+    return 'fas fa-file-alt';
+}
+function formatDocSize(b) {
+    if (b < 1024) return b+' o';
+    if (b < 1048576) return (b/1024).toFixed(1)+' Ko';
+    return (b/1048576).toFixed(1)+' Mo';
+}
+</script>
 @endpush
-
 @endsection

@@ -13,7 +13,6 @@ class Planification extends Model
 
     protected $fillable = [
         'activitePlanification',
-        'reference',
         'indicateur',
         'uniteIndicateur',
         'resultatsAttendues',
@@ -27,8 +26,7 @@ class Planification extends Model
     ];
 
     // ── Relations ──
-    public function projet()
-    {
+    public function projet(){
         return $this->belongsTo(Projet::class, 'projet_id');
     }
 

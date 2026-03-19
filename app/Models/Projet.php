@@ -56,39 +56,38 @@ class Projet extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function approbateur()
-    {
+    public function approbateur(){
         return $this->belongsTo(User::class, 'approbateur_id');
     }
 
-    public function validateur()
-    {
+    public function validateur() {
+
         return $this->belongsTo(User::class, 'validated_by');
     }
 
-    public function secteur()
-    {
+    public function secteur(){
+
         return $this->belongsTo(SecteurActivite::class, 'secteur_id');
     }
 
-    public function activites()
-    {
+    public function activites(){
+
         return $this->hasMany(Activite::class);
     }
 
-    public function documents()
-    {
+    public function documents() {
+
         return $this->hasMany(DocumentProjet::class);
     }
 
-    public function commentaires()
-    {
+    public function commentaires(){
+
         return $this->hasMany(Commentaire::class, 'projet_id');
     }
 
-    public function planification()
-    {
-        return $this->hasOne(Planification::class, 'projet_id');
+    public function planifications(){
+
+        return $this->hasMany(Planification::class, 'projet_id');
     }
 
     // ── Accesseurs ──
