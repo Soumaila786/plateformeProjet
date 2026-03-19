@@ -58,37 +58,8 @@
             @endif
         </div>
     </div>
+    
 
-    {{-- ── Alerte motif rejet + modification ── --}}
-    @php
-        $dernierRejet = $projet->commentaires->where('typeCommentaire', 'rejet')->last();
-        // Si vous utilisez un type différent pour les modifs, adaptez le nom ci-dessous
-        $derniereModif = $projet->commentaires->where('typeCommentaire', 'demande')->last();
-    @endphp
-
-    @if($dernierRejet)
-        <div class="rejet-banner">
-            {{-- Bloc Rouge : Motif du Rejet --}}
-            <div class="rejet-banner-block rejet-block-rouge">
-                <i class="fas fa-times-circle"></i>
-                <div>
-                    <p class="rejet-banner-label">Motif du rejet</p>
-                    <p class="rejet-banner-text">{{ $dernierRejet->message }}</p>
-                </div>
-            </div>
-
-            {{-- Bloc Jaune : Si un commentaire de type modification existe aussi --}}
-            @if($derniereModif)
-            <div class="rejet-banner-block rejet-block-jaune">
-                <i class="fas fa-exclamation-triangle"></i>
-                <div>
-                    <p class="rejet-banner-label">Modifications demandées par l'approbateur</p>
-                    <p class="rejet-banner-text">{{ $derniereModif->message }}</p>
-                </div>
-            </div>
-            @endif
-        </div>
-    @endif
 
     {{-- ══ BARRE D'ACTIONS ══ --}}
     <div class="projet-actions-bar">
@@ -205,7 +176,7 @@
                     <span>Les activites du projet ({{ $projet->activites->count() }})</span>
                     <button type="button" class="card-header-btn"
                             onclick="openModal('modalPlanifier')">
-                        <i class="fas fa-plus"></i> Ajouter
+                        Ajouter
                     </button>
                 </div>
                 @if($projet->activites->count())
@@ -345,6 +316,9 @@
                             class="doc-action-link" title="Télécharger">
                             <i class="fas fa-download"></i>
                         </a>
+
+                        @if (!in_array($projet->statutProjet, ['approuve', 'valide']))
+                            
                         <form method="POST"
                                 action="{{ route('porteur.projets.documents.destroy', [$projet, $doc]) }}"
                                 onsubmit="return confirm('Supprimer ce document ?')"
@@ -354,12 +328,16 @@
                                 <i class="fas fa-times"></i>
                             </button>
                         </form>
+                        @endif
                     </div>
                     @empty
                     <p class="info-empty">Aucun document joint.</p>
                     @endforelse
 
                     {{-- Formulaire ajout document --}}
+                    @if (!in_array($projet->statutProjet , ['approuve', 'valide']))
+                        
+                    
                     <form method="POST"
                             action="{{ route('porteur.projets.documents.store', $projet) }}"
                             enctype="multipart/form-data"
@@ -393,6 +371,7 @@
                                     onclick="resetDocForm()">Annuler</button>
                         </div>
                     </form>
+                    @endif
 
                 </div>
             </div>
@@ -403,7 +382,6 @@
 
     {{-- Phase de la planification --}}
     @if($projet->planification)
-
         <div class="form-card" style="margin-top:16px;">
             <div class="form-card-header">
                 <i class="fas fa-calendar-check"></i>
@@ -417,11 +395,6 @@
                     <div class="info-item">
                         <span class="info-label">Activité</span>
                         <span class="info-value">{{ $projet->planification->activitePlanification }}</span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Référence</span>
-                        <span class="info-value">{{ $projet->planification->reference }}</span>
                     </div>
 
                     <div class="info-item">
@@ -455,8 +428,7 @@
 
             </div>
         </div>
-
-        @endif
+    @endif
 </div>
 
 {{-- ══ MODAL ACTIVITE ══ --}}
@@ -592,73 +564,73 @@
 </div>{{-- fin .projets-page --}}
 
 @push('scripts')
-<script>
-function openModal(id) {
-    document.getElementById(id).classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-    document.body.style.overflow = '';
-}
-document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', function(e) {
-        if (e.target === this) closeModal(this.id);
-    });
-});
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', function(e) {
+                if (e.target === this) closeModal(this.id);
+            });
+        });
 
-@if($errors->any())
-    openModal('modalPlanifier');
-@endif
+        @if($errors->any())
+            openModal('modalPlanifier');
+        @endif
 
-// ── Gestion ajout documents ──
-const newDocInput  = document.getElementById('newDocuments');
-const newFileList  = document.getElementById('newFileList');
-const submitDocBtn = document.getElementById('submitDocBtn');
+        // ── Gestion ajout documents ──
+        const newDocInput  = document.getElementById('newDocuments');
+        const newFileList  = document.getElementById('newFileList');
+        const submitDocBtn = document.getElementById('submitDocBtn');
 
-if (newDocInput) {
-    newDocInput.addEventListener('change', function() {
-        const files = Array.from(this.files);
-        if (files.length === 0) return;
+        if (newDocInput) {
+            newDocInput.addEventListener('change', function() {
+                const files = Array.from(this.files);
+                if (files.length === 0) return;
 
-        newFileList.style.display = 'block';
-        submitDocBtn.style.display = 'block';
+                newFileList.style.display = 'block';
+                submitDocBtn.style.display = 'block';
 
-        newFileList.innerHTML = files.map(f => `
-            <div class="doc-file-item">
-                <i class="${getDocIcon(f.name)} doc-file-icon"></i>
-                <div class="doc-file-info">
-                    <span class="doc-file-name">${f.name}</span>
-                    <span class="doc-file-size">${formatDocSize(f.size)}</span>
-                </div>
-                <span class="doc-file-ok"><i class="fas fa-check-circle"></i> Accepté</span>
-            </div>
-        `).join('');
-    });
-}
+                newFileList.innerHTML = files.map(f => `
+                    <div class="doc-file-item">
+                        <i class="${getDocIcon(f.name)} doc-file-icon"></i>
+                        <div class="doc-file-info">
+                            <span class="doc-file-name">${f.name}</span>
+                            <span class="doc-file-size">${formatDocSize(f.size)}</span>
+                        </div>
+                        <span class="doc-file-ok"><i class="fas fa-check-circle"></i> Accepté</span>
+                    </div>
+                `).join('');
+            });
+        }
 
-function resetDocForm() {
-    if (newDocInput) newDocInput.value = '';
-    if (newFileList) { newFileList.innerHTML = ''; newFileList.style.display = 'none'; }
-    if (submitDocBtn) submitDocBtn.style.display = 'none';
-}
+        function resetDocForm() {
+            if (newDocInput) newDocInput.value = '';
+            if (newFileList) { newFileList.innerHTML = ''; newFileList.style.display = 'none'; }
+            if (submitDocBtn) submitDocBtn.style.display = 'none';
+        }
 
-function getDocIcon(name) {
-    const ext = name.split('.').pop().toLowerCase();
-    if (['pdf'].includes(ext))              return 'fas fa-file-pdf';
-    if (['doc','docx'].includes(ext))       return 'fas fa-file-word';
-    if (['xls','xlsx'].includes(ext))       return 'fas fa-file-excel';
-    if (['jpg','jpeg','png'].includes(ext)) return 'fas fa-file-image';
-    return 'fas fa-file-alt';
-}
+        function getDocIcon(name) {
+            const ext = name.split('.').pop().toLowerCase();
+            if (['pdf'].includes(ext))              return 'fas fa-file-pdf';
+            if (['doc','docx'].includes(ext))       return 'fas fa-file-word';
+            if (['xls','xlsx'].includes(ext))       return 'fas fa-file-excel';
+            if (['jpg','jpeg','png'].includes(ext)) return 'fas fa-file-image';
+            return 'fas fa-file-alt';
+        }
 
-function formatDocSize(b) {
-    if (b < 1024)    return b + ' o';
-    if (b < 1048576) return (b / 1024).toFixed(1) + ' Ko';
-    return (b / 1048576).toFixed(1) + ' Mo';
-}
+        function formatDocSize(b) {
+            if (b < 1024)    return b + ' o';
+            if (b < 1048576) return (b / 1024).toFixed(1) + ' Ko';
+            return (b / 1048576).toFixed(1) + ' Mo';
+        }
 
-</script>
+    </script>
 @endpush
 
 @endsection

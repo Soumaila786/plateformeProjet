@@ -1,334 +1,422 @@
 @extends('layouts.app')
-
-@section('title', $projet->titre)
-
+@section('title', 'Examen — ' . $projet->titre)
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/projet.css') }}">
+<link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
+
 @endpush
 
 @section('content')
+<div class="vpage">
 
-<div class="projets-page">
+{{-- Breadcrumb --}}
+<div class="breadcrumb">
+    <a href="{{ route('approbateur.dashboard') }}"><i class="fas fa-home"></i></a>
+    <span>/</span>
+    <a href="{{ route('approbateur.projets.index') }}">Projets</a>
+    <span>/</span>
+    <span>{{ $projet->codeProjet }}</span>
+</div>
 
-    {{-- ── Header ── --}}
-    <div class="page-header">
-        <a href="{{ route('approbateur.projets.index') }}" class="btn-back">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <div class="page-header-info">
-            <div>
-                <h1 class="projets-title">{{ $projet->titre }}</h1>
-                <p class="projets-subtitle">{{ $projet->codeProjet }}</p>
-            </div>
-            @php
-                $statusClass = [
-                    'soumis'    => 'status-blue',
-                    'en_examen' => 'status-yellow',
-                    'approuve'  => 'status-green',
-                    'rejete'    => 'status-red',
-                ][$projet->statutProjet] ?? 'status-gray';
-                $statusLabel = [
-                    'soumis'    => 'Soumis',
-                    'en_examen' => 'En examen',
-                    'approuve'  => 'Approuvé',
-                    'rejete'    => 'Rejeté',
-                ][$projet->statutProjet] ?? $projet->statutProjet;
-            @endphp
-            <span class="status-badge {{ $statusClass }} status-lg">{{ $statusLabel }}</span>
+{{-- Header --}}
+@php
+    $map = [
+        'soumis'    => ['lbl'=>'Soumis',   'dot'=>'#6366f1','bg'=>'#eef2ff','color'=>'#4338ca'],
+        'en_examen' => ['lbl'=>'En examen','dot'=>'#f97316','bg'=>'#fff7ed','color'=>'#c2410c'],
+        'approuve'  => ['lbl'=>'Approuvé', 'dot'=>'#22c55e','bg'=>'#f0fdf4','color'=>'#15803d'],
+        'rejete'    => ['lbl'=>'Rejeté',   'dot'=>'#ef4444','bg'=>'#fef2f2','color'=>'#b91c1c'],
+        'valide'    => ['lbl'=>'Validé',   'dot'=>'#0d9488','bg'=>'#f0fdfa','color'=>'#0f766e'],
+        'brouillon' => ['lbl'=>'Brouillon','dot'=>'#9ca3af','bg'=>'#f3f4f6','color'=>'#6b7280'],
+    ];
+    $s = $map[$projet->statutProjet] ?? $map['soumis'];
+@endphp
+
+<div class="show-header mt-4">
+    <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span class="proj-code">{{ $projet->codeProjet }}</span>
+            <span class="status-badge" style="background:{{ $s['bg'] }};color:{{ $s['color'] }};">
+                <span class="dot" style="background:{{ $s['dot'] }};"></span>{{ $s['lbl'] }}
+            </span>
+        </div>
+        <h1 class="show-title">{{ $projet->titre }}</h1>
+        <div class="show-meta">
+            <span><i class="fas fa-user"></i> {{ optional($projet->porteur)->nomComplet ?? '—' }}</span>
+            <span><i class="fas fa-tag"></i> {{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
+            <span><i class="fas fa-calendar"></i> Soumis le {{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</span>
+            @if($projet->dateApprobation)
+            <span><i class="fas fa-check"></i> Approuvé le {{ optional($projet->dateApprobation)->format('d/m/Y') }}</span>
+            @endif
         </div>
     </div>
+    <a href="{{ route('approbateur.projets.index') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
 
-    {{-- ══ BARRE D'ACTIONS ══ --}}
-    <div class="projet-actions-bar">
+{{-- ── Barre d'actions ── --}}
+<div class="actions-bar mt-4 mb-4">
 
-        {{-- Soumis → Mettre en examen --}}
-        @if($projet->statutProjet === 'soumis')
-        <form method="POST" action="{{ route('approbateur.projets.examiner', $projet) }}">
-            @csrf
-            <button type="submit" class="action-btn action-btn-yellow"
-                    onclick="return confirm('Mettre ce projet en examen ?')">
-                <i class="fas fa-search"></i>
-                Mettre en examen
-            </button>
-        </form>
-        @endif
-
-        {{-- En examen → Approuver / Rejeter --}}
-        @if($projet->statutProjet === 'en_examen')
-        <button type="button" class="action-btn action-btn-green"
-                onclick="openModal('modalApprouver')">
-            <i class="fas fa-check-circle"></i>
-            Approuver
+    {{-- Passer en examen --}}
+    @can('examiner', $projet)
+    <form method="POST" action="{{ route('approbateur.projets.examiner', $projet) }}">
+        @csrf
+        <button type="submit" class="action-btn action-orange">
+            <i class="fas fa-search"></i> Mettre en examen
         </button>
-        <button type="button" class="action-btn action-btn-red"
-                onclick="openModal('modalRejeter')">
-            <i class="fas fa-times-circle"></i>
-            Rejeter
-        </button>
-        @endif
+    </form>
+    @endcan
 
-    </div>
+    {{-- Approuver --}}
+    @can('approuver', $projet)
+    <button type="button" class="action-btn action-green" onclick="openModal('modalApprouver')">
+        <i class="fas fa-check-circle"></i> Approuver
+    </button>
+    @endcan
 
-    {{-- ══ CONTENU PRINCIPAL ══ --}}
-    <div class="show-grid">
+    {{-- Rejeter --}}
+    @can('rejeter', $projet)
+    <button type="button" class="action-btn action-red" onclick="openModal('modalRejeter')">
+        <i class="fas fa-times-circle"></i> Rejeter
+    </button>
+    @endcan
 
-        {{-- ── Colonne gauche ── --}}
-        <div class="show-col-main">
 
-            {{-- Infos générales --}}
-            <div class="form-card">
-                <div class="form-card-header">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Informations générales</span>
+    {{-- Planification --}}
+    @can('gererPlanification', $projet)
+    @if($projet->planification)
+    <a href="{{ route('approbateur.planification.edit', [$projet, $projet->planification]) }}"
+        class="action-btn action-indigo">
+        <i class="fas fa-calendar-check"></i> Modifier planification
+    </a>
+    @else
+    <a href="{{ route('approbateur.planification.create', $projet) }}"
+        class="action-btn action-indigo">
+        <i class="fas fa-calendar-plus"></i> Planifier
+    </a>
+    @endif
+    @endcan
+
+    {{-- Exporter en pdf --}}
+    <a href="{{ route('approbateur.projets.export.pdf', $projet) }}"
+        class="action-btn action-indigo" target="_blank">
+        <i class="fas fa-file-pdf"></i> Exporter PDF
+    </a>
+
+</div>
+
+{{-- ── Grille principale ── --}}
+<div class="show-grid">
+
+    {{-- Colonne principale --}}
+    <div class="show-main">
+
+        {{-- Informations générales --}}
+        <div class="info-card">
+            <h4 class="info-title"><i class="fas fa-info-circle"></i> Informations générales</h4>
+            <div class="info-grid-2">
+                <div class="info-item">
+                    <p class="info-lbl">Secteur</p>
+                    <p class="info-val">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</p>
                 </div>
-                <div class="form-card-body">
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Porteur</span>
-                            <span class="info-value">{{ optional($projet->porteur)->nomComplet ?? '—' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Secteur</span>
-                            <span class="info-value">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Durée</span>
-                            <span class="info-value">{{ $projet->duree ? $projet->duree . ' mois' : '—' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Date de création</span>
-                            <span class="info-value">{{ optional($projet->dateCreation)->format('d/m/Y') ?? '—' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Date de soumission</span>
-                            <span class="info-value">{{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Date de début</span>
-                            <span class="info-value">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Date de fin</span>
-                            <span class="info-value">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</span>
-                        </div>
-                        @if($projet->dateApprobation)
-                        <div class="info-item">
-                            <span class="info-label">Date d'approbation</span>
-                            <span class="info-value">{{ $projet->dateApprobation->format('d/m/Y') }}</span>
-                        </div>
-                        @endif
-                    </div>
+                <div class="info-item">
+                    <p class="info-lbl">Durée</p>
+                    <p class="info-val">{{ $projet->duree ? $projet->duree . ' mois' : '—' }}</p>
+                </div>
+                <div class="info-item">
+                    <p class="info-lbl">Date début</p>
+                    <p class="info-val">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</p>
+                </div>
+                <div class="info-item">
+                    <p class="info-lbl">Date fin</p>
+                    <p class="info-val">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</p>
+                </div>
+                <div class="info-item info-full">
+                    <p class="info-lbl">Objectif</p>
+                    <p class="info-val">{{ $projet->objectif ?? '—' }}</p>
+                </div>
+                <div class="info-item info-full">
+                    <p class="info-lbl">Description</p>
+                    <p class="info-val" style="white-space:pre-line;">{{ $projet->description ?? '—' }}</p>
+                </div>
+            </div>
+        </div>
 
-                    @if($projet->description)
-                    <div class="info-block">
-                        <span class="info-label">Description</span>
-                        <p class="info-text">{{ $projet->description }}</p>
+        {{-- Activités du porteur --}}
+        <div class="info-card">
+            <h4 class="info-title">
+                <i class="fas fa-tasks"></i> Activités du porteur
+                <span class="info-count">{{ $projet->activites->count() }}</span>
+            </h4>
+            @forelse($projet->activites as $act)
+            @php
+                $actMap = [
+                    'en_attente' => ['lbl'=>'En attente','bg'=>'#f3f4f6','color'=>'#6b7280'],
+                    'en_cours'   => ['lbl'=>'En cours',  'bg'=>'#eff6ff','color'=>'#1d4ed8'],
+                    'termine'    => ['lbl'=>'Terminée',  'bg'=>'#f0fdf4','color'=>'#15803d'],
+                    'annule'     => ['lbl'=>'Annulée',   'bg'=>'#fef2f2','color'=>'#b91c1c'],
+                    'financee'   => ['lbl'=>'Financée',  'bg'=>'#f0fdfa','color'=>'#0f766e'],
+                ];
+                $a = $actMap[$act->statutActivite] ?? $actMap['en_attente'];
+            @endphp
+            <div class="activite-item">
+                <div class="activite-head">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div class="activite-num">{{ $loop->iteration }}</div>
+                        <p class="activite-titre">{{ $act->activite }}</p>
                     </div>
-                    @endif
-
-                    @if($projet->objectif)
-                    <div class="info-block">
-                        <span class="info-label">Objectif</span>
-                        <p class="info-text">{{ $projet->objectif }}</p>
-                    </div>
-                    @endif
-
-                    {{-- Motif rejet précédent --}}
-                    @if($projet->motifRejet)
-                    <div class="info-block">
-                        <span class="info-label" style="color:#dc2626;">Motif du rejet</span>
-                        <p class="info-text" style="color:#dc2626;">{{ $projet->motifRejet }}</p>
-                    </div>
+                    <span class="status-badge" style="background:{{ $a['bg'] }};color:{{ $a['color'] }};">{{ $a['lbl'] }}</span>
+                </div>
+                @if($act->descriptionActivite)
+                <p class="activite-desc">{{ $act->descriptionActivite }}</p>
+                @endif
+                <div class="activite-footer">
+                    <span><i class="fas fa-calendar"></i> {{ optional($act->dateDebut)->format('d/m/Y') ?? '—' }} → {{ optional($act->dateFin)->format('d/m/Y') ?? '—' }}</span>
+                    @if($act->montantDemande)
+                    <span><i class="fas fa-coins"></i> {{ number_format($act->montantDemande, 0, ',', ' ') }} F CFA</span>
                     @endif
                 </div>
             </div>
+            @empty
+            <div class="empty-state" style="padding:20px;">
+                <i class="fas fa-tasks"></i>
+                <p>Aucune activité définie par le porteur.</p>
+            </div>
+            @endforelse
+        </div>
 
-            {{-- activites --}}
-            <div class="form-card">
-                <div class="form-card-header">
-                    <i class="fas fa-tasks"></i>
-                    <span>Planification ({{ $projet->activites->count() }})</span>
+        {{-- Planification (si existe) --}}
+        @can('voirPlanification', $projet)
+        @if($projet->planification)
+        <div class="info-card" style="border-left:3px solid #6366f1;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <h4 class="info-title" style="margin:0;">
+                    <i class="fas fa-calendar-check" style="color:#6366f1;"></i> Planification
+                </h4>
+                @can('gererPlanification', $projet)
+                <div style="display:flex;gap:8px;">
+                    <a href="{{ route('approbateur.planification.edit', [$projet, $projet->planification]) }}"
+                       class="btn-voir" style="background:#eef2ff;color:#6366f1;">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <form method="POST" action="{{ route('approbateur.planification.destroy', [$projet, $projet->planification]) }}"
+                          onsubmit="return confirm('Supprimer cette planification ?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn-voir" style="background:#fef2f2;color:#dc2626;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
                 </div>
-                @if($projet->activites->count())
-                <div class="form-card-body p-0">
-                    @php
-                        $totalActivites  = $projet->activites->sum('montantDemande');
-                        $totalFinancees  = $projet->activites->where('statutActivite','financee')->sum('montantDemande');
-                        $nbFinancees     = $projet->activites->where('statutActivite','financee')->count();
-                        $pctFinance      = $totalActivites > 0 ? round($totalFinancees / $totalActivites * 100) : 0;
-                    @endphp
-
-                    {{-- Résumé financement --}}
-                    <div style="display:flex;gap:16px;padding:14px 20px;border-bottom:1.5px solid var(--gray-100);flex-wrap:wrap;background:var(--gray-50);">
-                        <div style="flex:1;min-width:140px;">
-                            <p style="font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Budget activités</p>
-                            <p style="font-size:1rem;font-weight:800;color:var(--gray-900);">{{ number_format($totalActivites, 0, ',', ' ') }} <span style="font-size:.72rem;color:var(--gray-400);">F CFA</span></p>
-                        </div>
-                        <div style="flex:1;min-width:140px;">
-                            <p style="font-size:.7rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Montant financé</p>
-                            <p style="font-size:1rem;font-weight:800;color:#16a34a;">{{ number_format($totalFinancees, 0, ',', ' ') }} <span style="font-size:.72rem;">F CFA</span></p>
-                        </div>
-                        <div style="flex:1;min-width:140px;">
-                            <p style="font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Taux financement</p>
-                            <div style="display:flex;align-items:center;gap:8px;">
-                                <div style="flex:1;height:6px;background:var(--gray-200);border-radius:4px;overflow:hidden;">
-                                    <div style="height:100%;width:{{ $pctFinance }}%;background:#16a34a;border-radius:4px;transition:width .6s;"></div>
-                                </div>
-                                <span style="font-size:.82rem;font-weight:700;color:var(--gray-700);">{{ $pctFinance }}%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Table activités --}}
-                    <table class="projets-table">
-                        <thead>
-                            <tr>
-                                <th>Activité</th>
-                                <th>Début</th>
-                                <th>Fin</th>
-                                <th>Montant demandé</th>
-                                <th>Statut</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($projet->activites as $plan)
-                            @php
-                                $planStatutClass = ['en_attente'=>'status-gray','financee'=>'status-green','en_cours'=>'status-blue','termine'=>'status-teal','annule'=>'status-red'][$plan->statutActivite] ?? 'status-gray';
-                                $planStatutLabel = ['en_attente'=>'En attente','financee'=>'Financée','en_cours'=>'En cours','termine'=>'Terminée','annule'=>'Annulée'][$plan->statutActivite] ?? $plan->statutActivite;
-                            @endphp
-                            <tr>
-                                <td>
-                                    <span style="font-weight:600;color:var(--gray-900);font-size:.84rem;">{{ $plan->activite }}</span>
-                                    @if($plan->descriptionActivite)
-                                    <br><span style="font-size:.74rem;color:var(--gray-400);">{{ Str::limit($plan->descriptionActivite, 60) }}</span>
-                                    @endif
-                                </td>
-                                <td class="td-muted">{{ optional($plan->dateDebut)->format('d/m/Y') ?? '—' }}</td>
-                                <td class="td-muted">{{ optional($plan->dateFin)->format('d/m/Y') ?? '—' }}</td>
-                                <td class="td-budget">{{ $plan->montantDemande ? number_format($plan->montantDemande, 0, ',', ' ') . ' F' : '—' }}</td>
-                                <td><span class="status-badge {{ $planStatutClass }}">{{ $planStatutLabel }}</span></td>
-                                <td>
-                                    <button type="button"
-                                            class="btn-icon"
-                                            title="Changer le statut"
-                                            onclick="openActiviteModal({{ $plan->id }}, '{{ $plan->statutActivite }}', '{{ addslashes($plan->activite) }}')">
-                                        <i class="fas fa-exchange-alt"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                @endcan
+            </div>
+            <div class="info-grid-2">
+                <div class="info-item">
+                    <p class="info-lbl">Activité planifiée</p>
+                    <p class="info-val">{{ $projet->planification->activitePlanification ?? '—' }}</p>
                 </div>
-                @else
-                <div class="form-card-body">
-                    <div class="doc-empty-state">
-                        <i class="fas fa-calendar"></i>
-                        <span>Aucune activité planifiée.</span>
-                    </div>
+                <div class="info-item">
+                    <p class="info-lbl">Indicateur</p>
+                    <p class="info-val">{{ $projet->planification->indicateur ?? '—' }}</p>
+                </div>
+                <div class="info-item">
+                    <p class="info-lbl">Unité</p>
+                    <p class="info-val">{{ $projet->planification->uniteIndicateur ?? '—' }}</p>
+                </div>
+                <div class="info-item">
+                    <p class="info-lbl">Période</p>
+                    <p class="info-val">{{ $projet->planification->periode ?? '—' }}</p>
+                </div>
+                <div class="info-item">
+                    <p class="info-lbl">Coût estimatif</p>
+                    <p class="info-val">{{ $projet->planification->coutEstimatif ? number_format($projet->planification->coutEstimatif, 0, ',', ' ').' F CFA' : '—' }}</p>
+                </div>
+                @if($projet->planification->resultatsAttendues)
+                <div class="info-item info-full">
+                    <p class="info-lbl">Résultats attendus</p>
+                    <p class="info-val">{{ $projet->planification->resultatsAttendues }}</p>
                 </div>
                 @endif
             </div>
-
         </div>
+        @endif
+        @endcan
 
-        {{-- ── Colonne droite ── --}}
-        <div class="show-col-side">
-
-            {{-- Budget --}}
-            <div class="form-card">
-                <div class="form-card-header">
-                    <i class="fas fa-coins"></i>
-                    <span>Budget</span>
-                </div>
-                <div class="form-card-body">
-                    <div class="budget-display">
-                        <span class="budget-label-sm">Budget total</span>
-                        <span class="budget-value">
-                            {{ $projet->budgetTotal ? number_format($projet->budgetTotal, 0, ',', ' ') . ' F CFA' : '—' }}
-                        </span>
-                    </div>
-                    @if($projet->montantDemande)
-                    <div class="budget-display">
-                        <span class="budget-label-sm">Montant demandé</span>
-                        <span class="budget-value-sm">{{ number_format($projet->montantDemande, 0, ',', ' ') }} F CFA</span>
-                    </div>
-                    @endif
-                    @if($projet->activites->count())
-                    <div class="budget-display">
-                        <span class="budget-label-sm">Total planifié</span>
-                        <span class="budget-value-sm">
-                            {{ number_format($projet->activites->sum('montantDemande'), 0, ',', ' ') }} F CFA
-                        </span>
-                    </div>
-                    @endif
-                </div>
+        {{-- Documents --}}
+        @if($projet->documents->count())
+        <div class="info-card">
+            <h4 class="info-title">
+                <i class="fas fa-paperclip"></i> Documents
+                <span class="info-count">{{ $projet->documents->count() }}</span>
+            </h4>
+            <div class="docs-list">
+                @foreach($projet->documents as $doc)
+                <a href="{{ asset('storage/'.$doc->cheminFichier) }}" target="_blank" class="doc-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>{{ $doc->nomFichier ?? basename($doc->cheminFichier) }}</span>
+                    <i class="fas fa-external-link-alt doc-ext"></i>
+                </a>
+                @endforeach
             </div>
-
-            {{-- Documents --}}
-            <div class="form-card">
-                <div class="form-card-header">
-                    <i class="fas fa-paperclip"></i>
-                    <span>Documents ({{ $projet->documents->count() }})</span>
-                </div>
-                <div class="form-card-body">
-                    @forelse($projet->documents as $doc)
-                    <div class="doc-existing-item">
-                        @php
-                            $ext  = pathinfo($doc->nomFichier, PATHINFO_EXTENSION);
-                            $icon = in_array($ext, ['pdf']) ? 'fa-file-pdf'
-                                    : (in_array($ext, ['doc','docx']) ? 'fa-file-word'
-                                    : (in_array($ext, ['xls','xlsx']) ? 'fa-file-excel'
-                                    : (in_array($ext, ['jpg','jpeg','png']) ? 'fa-file-image'
-                                    : 'fa-file-alt')));
-                        @endphp
-                        <i class="fas {{ $icon }}"></i>
-                        <span class="doc-file-name">{{ $doc->nomFichier }}</span>
-                        <span class="doc-badge">{{ $doc->typeDocument }}</span>
-                        <a href="{{ route('approbateur.projets.documents.download', [$projet, $doc]) }}"
-                            class="doc-action-link" title="Télécharger">
-                            <i class="fas fa-download"></i>
-                        </a>
-                    </div>
-                    @empty
-                    <p class="info-empty">Aucun document joint.</p>
-                    @endforelse
-                </div>
-            </div>
-
         </div>
+        @endif
+
+        {{-- Historique commentaires --}}
+        @if($projet->commentaires->count())
+        <div class="info-card">
+            <h4 class="info-title">
+                <i class="fas fa-comments"></i> Historique
+                <span class="info-count">{{ $projet->commentaires->count() }}</span>
+            </h4>
+            <div class="comments-list">
+                @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $com)
+                @php
+                    $comMap = [
+                        'approbation' => ['icon'=>'fa-check-circle',      'color'=>'#16a34a'],
+                        'rejet'       => ['icon'=>'fa-times-circle',      'color'=>'#dc2626'],
+                        'demande'     => ['icon'=>'fa-exclamation-circle','color'=>'#d97706'],
+                        'info'        => ['icon'=>'fa-info-circle',       'color'=>'#2563eb'],
+                        'examen'      => ['icon'=>'fa-search',            'color'=>'#6366f1'],
+                    ];
+                    $cm = $comMap[$com->typeCommentaire] ?? ['icon'=>'fa-comment','color'=>'#6b7280'];
+                @endphp
+                <div class="comment-item">
+                    <div class="comment-avatar" style="background:{{ $cm['color'] }}18;color:{{ $cm['color'] }};">
+                        <i class="fas {{ $cm['icon'] }}"></i>
+                    </div>
+                    <div class="comment-body">
+                        <div class="comment-head">
+                            <span class="comment-author">
+                                {{ optional($com->utilisateur)->nomComplet ?? '—' }}
+                                <small style="color:#9ca3af;font-weight:400;">· {{ optional($com->utilisateur)->role ?? '' }}</small>
+                            </span>
+                            <span class="comment-date">{{ optional($com->dateEnvoi)->format('d/m/Y H:i') }}</span>
+                        </div>
+                        <p class="comment-text">{{ $com->message }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
     </div>
+
+    {{-- Sidebar --}}
+    <div class="show-aside">
+
+        {{-- Budget --}}
+        <div class="aside-card">
+            <h4 class="info-title"><i class="fas fa-wallet"></i> Budget</h4>
+            <div class="fin-rows">
+                <div class="fin-row">
+                    <span>Budget total</span>
+                    <strong>{{ number_format($projet->budgetTotal ?? 0, 0, ',', ' ') }} F CFA</strong>
+                </div>
+                <div class="fin-row">
+                    <span>Montant demandé</span>
+                    <strong>{{ number_format($projet->montantDemande ?? 0, 0, ',', ' ') }} F CFA</strong>
+                </div>
+                <div class="fin-row">
+                    <span>Durée</span>
+                    <strong>{{ $projet->duree ?? '—' }} mois</strong>
+                </div>
+                @if($projet->activites->count())
+                <div class="fin-row">
+                    <span>Total activités</span>
+                    <strong>{{ number_format($projet->activites->sum('montantDemande'), 0, ',', ' ') }} F CFA</strong>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Porteur --}}
+        <div class="aside-card">
+            <h4 class="info-title"><i class="fas fa-user"></i> Porteur</h4>
+            <div class="porteur-block">
+                <div class="porteur-avatar">
+                    {{ strtoupper(substr(optional($projet->porteur)->nomComplet ?? 'P', 0, 1)) }}
+                </div>
+                <div>
+                    <p class="porteur-name">{{ optional($projet->porteur)->nomComplet ?? '—' }}</p>
+                    <p class="porteur-email">{{ optional($projet->porteur)->email ?? '—' }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Zone décision approbateur --}}
+        @if(in_array($projet->statutProjet, ['soumis','en_examen']))
+        <div class="aside-card" style="border-color:#e0e7ff;">
+            <h4 class="info-title" style="color:#4338ca;">
+                <i class="fas fa-gavel" style="color:#6366f1;"></i> Décision
+            </h4>
+            <p style="font-size:.74rem;color:#9ca3af;margin:0 0 12px;">
+                Approuvez ou rejetez ce projet après examen.
+            </p>
+            @can('approuver', $projet)
+            <button onclick="openModal('modalApprouver')" class="btn-valider" style="margin-bottom:8px;">
+                <i class="fas fa-check-circle"></i> Approuver
+            </button>
+            @endcan
+            @can('rejeter', $projet)
+            <button onclick="openModal('modalRejeter')" class="btn-rejeter">
+                <i class="fas fa-times-circle"></i> Rejeter
+            </button>
+            @endcan
+        </div>
+        @endif
+
+        {{-- Statut final --}}
+        @if(in_array($projet->statutProjet, ['approuve','rejete','valide']))
+        <div class="aside-card">
+            <h4 class="info-title"><i class="fas fa-flag-checkered"></i> Décision finale</h4>
+            <div class="decision-badge {{ $projet->statutProjet === 'approuve' || $projet->statutProjet === 'valide' ? 'decision-valide' : 'decision-rejete' }}">
+                <i class="fas {{ $projet->statutProjet === 'rejete' ? 'fa-times-circle' : 'fa-check-circle' }}"></i>
+                Projet {{ $s['lbl'] }}
+            </div>
+            @if($projet->dateApprobation)
+            <p class="decision-date">
+                <i class="fas fa-calendar-check"></i>
+                {{ optional($projet->dateApprobation)->format('d/m/Y') }}
+            </p>
+            @endif
+            {{-- Motif rejet depuis commentaires --}}
+            @php
+                $motif = $projet->commentaires->where('typeCommentaire','rejet')->last();
+            @endphp
+            @if($motif)
+            <div class="vd-comment-box vd-comment-red" style="margin-top:10px;">
+                {{ $motif->message }}
+            </div>
+            @endif
+        </div>
+        @endif
+
+    </div>
+</div>
+
 </div>
 
 {{-- ══ MODAL APPROUVER ══ --}}
 <div id="modalApprouver" class="modal-overlay">
     <div class="modal-box">
-        <div class="modal-header">
-            <h2 class="modal-title">
-                <i class="fas fa-check-circle"></i> Approuver le projet
-            </h2>
-            <button type="button" class="modal-close" onclick="closeModal('modalApprouver')">
-                <i class="fas fa-times"></i>
-            </button>
+        <div class="modal-head">
+            <h3 class="modal-title"><i class="fas fa-check-circle" style="color:#22c55e;"></i> Approuver le projet</h3>
+            <button onclick="closeModal('modalApprouver')" class="modal-close"><i class="fas fa-times"></i></button>
         </div>
         <form method="POST" action="{{ route('approbateur.projets.approuver', $projet) }}">
             @csrf
             <div class="modal-body">
-                <p style="font-size:.88rem;color:#374151;">
-                    Confirmez-vous l'approbation du projet <strong>{{ $projet->titre }}</strong> ?
-                    Il sera transmis au validateur.
+                <p style="font-size:.82rem;color:#6b7280;margin:0 0 12px;">
+                    Le projet sera transmis au validateur pour validation finale.
                 </p>
-                <div class="form-col form-col-full mt-3">
-                    <label class="field-label">Commentaire <small class="text-muted">(optionnel)</small></label>
-                    <textarea name="commentaire" rows="2"
-                                class="field-input field-textarea"
-                                placeholder="Message pour le porteur..."></textarea>
+                <div class="form-group">
+                    <label class="form-label">Commentaire (optionnel)</label>
+                    <textarea name="commentaire" class="form-textarea" rows="3"
+                              placeholder="Observations sur l'approbation..."></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeModal('modalApprouver')">Annuler</button>
-                <button type="submit" class="btn-save" style="background:#16a34a;border-color:#16a34a;">
+            <div class="modal-foot">
+                <button type="button" onclick="closeModal('modalApprouver')" class="btn-cancel">Annuler</button>
+                <button type="submit" class="btn-valider" style="width:auto;padding:9px 20px;">
                     <i class="fas fa-check-circle"></i> Confirmer l'approbation
                 </button>
             </div>
@@ -339,80 +427,37 @@
 {{-- ══ MODAL REJETER ══ --}}
 <div id="modalRejeter" class="modal-overlay">
     <div class="modal-box">
-        <div class="modal-header">
-            <h2 class="modal-title" style="color:#dc2626;">
-                <i class="fas fa-times-circle"></i> Rejeter le projet
-            </h2>
-            <button type="button" class="modal-close" onclick="closeModal('modalRejeter')">
-                <i class="fas fa-times"></i>
-            </button>
+        <div class="modal-head">
+            <h3 class="modal-title"><i class="fas fa-times-circle" style="color:#ef4444;"></i> Rejeter le projet</h3>
+            <button onclick="closeModal('modalRejeter')" class="modal-close"><i class="fas fa-times"></i></button>
         </div>
         <form method="POST" action="{{ route('approbateur.projets.rejeter', $projet) }}">
             @csrf
             <div class="modal-body">
-
-                <div class="form-col form-col-full">
-                    <label class="field-label">Motif du rejet <span class="required">*</span></label>
-                    <textarea name="motifRejet" rows="3"
-                              class="field-input field-textarea @error('motifRejet') is-invalid @enderror"
-                              placeholder="Expliquez la raison du rejet..." required>{{ old('motifRejet') }}</textarea>
-                    @error('motifRejet')<span class="field-error">{{ $message }}</span>@enderror
+                <div class="form-group">
+                    <label class="form-label">Motif du rejet <span style="color:#ef4444;">*</span></label>
+                    <textarea name="motifRejet" class="form-textarea form-textarea-danger" rows="3"
+                              placeholder="Expliquez le motif du rejet..." required></textarea>
+                    @error('motifRejet')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
-
-                <div class="form-col form-col-full" style="margin-top:14px;">
-                    <label class="field-label">Demander des modifications au porteur <small class="text-muted">(optionnel)</small></label>
-                    <textarea name="messageModification" rows="2"
-                              class="field-input field-textarea"
-                              placeholder="Instructions pour la correction...">{{ old('messageModification') }}</textarea>
-                    <small style="color:#9ca3af;font-size:.72rem;">
-                        Si renseigné, le projet reviendra en brouillon avec ce message visible par le porteur.
-                    </small>
+                <div class="form-group">
+                    <label class="form-label">Demander des modifications (optionnel)</label>
+                    <textarea name="messageModification" class="form-textarea" rows="2"
+                              placeholder="Modifications à apporter avant resoumission..."></textarea>
+                    <p style="font-size:.7rem;color:#9ca3af;margin:4px 0 0;">
+                        Si renseigné, le projet retourne en brouillon pour modification.
+                    </p>
                 </div>
-
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeModal('modalRejeter')">Annuler</button>
-                <button type="submit" class="btn-save" style="background:#dc2626;border-color:#dc2626;">
+            <div class="modal-foot">
+                <button type="button" onclick="closeModal('modalRejeter')" class="btn-cancel">Annuler</button>
+                <button type="submit" class="btn-rejeter" style="width:auto;">
                     <i class="fas fa-times-circle"></i> Confirmer le rejet
                 </button>
             </div>
         </form>
     </div>
 </div>
-
-{{-- ══ TIMELINE COMMENTAIRES ══ --}}
-@if($projet->commentaires->count() > 0)
-<div class="form-card mt-3">
-    <div class="form-card-header">
-        <i class="fas fa-comments"></i>
-        <span>Historique des actions ({{ $projet->commentaires->count() }})</span>
-    </div>
-    <div class="form-card-body">
-        <div class="timeline">
-            @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $commentaire)
-            @php
-                $icons  = ['approbation'=>'fa-check-circle','rejet'=>'fa-times-circle','demande'=>'fa-exclamation-circle','info'=>'fa-info-circle'];
-                $colors = ['approbation'=>'#16a34a','rejet'=>'#dc2626','demande'=>'#d97706','info'=>'#2563eb'];
-                $icon   = $icons[$commentaire->typeCommentaire]  ?? 'fa-comment';
-                $color  = $colors[$commentaire->typeCommentaire] ?? '#6b7280';
-            @endphp
-            <div class="timeline-item">
-                <div class="timeline-icon" style="background:{{ $color }}15;color:{{ $color }};">
-                    <i class="fas {{ $icon }}"></i>
-                </div>
-                <div class="timeline-content">
-                    <div class="timeline-header">
-                        <span class="timeline-author">{{ optional($commentaire->utilisateur)->nomComplet ?? '—' }}</span>
-                        <span class="timeline-date">{{ $commentaire->dateEnvoi->format('d/m/Y à H:i') }}</span>
-                    </div>
-                    <p class="timeline-message">{{ $commentaire->message }}</p>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
 
 @push('scripts')
 <script>
@@ -425,57 +470,9 @@ function closeModal(id) {
     document.body.style.overflow = '';
 }
 document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', function(e) {
-        if (e.target === this) closeModal(this.id);
-    });
+    m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
 });
-
-@if($errors->has('motifRejet'))
-    openModal('modalRejeter');
-@endif
-
-function openActiviteModal(planId, currentStatut, activiteNom) {
-    document.getElementById('activiteNomLabel').textContent = activiteNom;
-    document.getElementById('selectStatutActivite').value = currentStatut;
-    document.getElementById('formActiviteStatut').action =
-        '{{ url("approbateur/projets/" . $projet->id . "/activites") }}/' + planId + '/statut';
-    openModal('modalActivite');
-}
 </script>
 @endpush
-
-{{-- Modal Statut Activité --}}
-<div class="modal-overlay" id="modalActivite">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3><i class="fas fa-exchange-alt" style="color:var(--primary);margin-right:6px;"></i> Statut de l'activité</h3>
-            <button type="button" class="modal-close" onclick="closeModal('modalActivite')"><i class="fas fa-times"></i></button>
-        </div>
-        <form method="POST" id="formActiviteStatut" action="">
-            @csrf
-            <div class="modal-body">
-                <p style="font-size:.82rem;color:var(--gray-500);margin-bottom:14px;">
-                    Activité : <strong id="activiteNomLabel" style="color:var(--gray-900);"></strong>
-                </p>
-                <div class="form-col">
-                    <label class="field-label">Nouveau statut <span class="required">*</span></label>
-                    <select name="statutActivite" id="selectStatutActivite" class="field-input" required>
-                        <option value="en_attente">En attente</option>
-                        <option value="financee">Financée</option>
-                        <option value="en_cours">En cours</option>
-                        <option value="termine">Terminée</option>
-                        <option value="annule">Annulée</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeModal('modalActivite')">Annuler</button>
-                <button type="submit" class="btn-save">
-                    <i class="fas fa-save"></i> Enregistrer
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 @endsection

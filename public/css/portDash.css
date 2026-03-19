@@ -207,3 +207,67 @@
 .finance-sub    { font-size:.68rem; color:#9ca3af; margin:0 0 8px; }
 .finance-bar    { height:3px; background:#f3f4f6; border-radius:4px; overflow:hidden; }
 .finance-bar div { height:100%; background:#1d4ed8; border-radius:4px; }
+
+
+
+/* ── Bannière rejet + resoumission ── */
+.rejet-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.rejet-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid;
+}
+.rejet-rouge  { background:#fef2f2; border-color:#fecaca; }
+.rejet-orange { background:#fff7ed; border-color:#fed7aa; }
+.rejet-blue   { background:#eff6ff; border-color:#bfdbfe; }
+
+.rejet-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.rejet-rouge  .rejet-icon { color:#dc2626; }
+.rejet-orange .rejet-icon { color:#ea580c; }
+.rejet-blue   .rejet-icon { color:#2563eb; }
+
+.rejet-content { flex: 1; }
+.rejet-label {
+    font-size: .75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin: 0 0 4px;
+}
+.rejet-rouge  .rejet-label { color:#b91c1c; }
+.rejet-orange .rejet-label { color:#c2410c; }
+.rejet-blue   .rejet-label { color:#1d4ed8; }
+
+.rejet-text { font-size:.82rem; color:#374151; margin:0 0 3px; line-height:1.5; }
+.rejet-date { font-size:.7rem; color:#9ca3af; margin:0; }
+
+.btn-corriger {
+    display:inline-flex; align-items:center; gap:6px;
+    background:#fff; border:1.5px solid #1d4ed8; color:#1d4ed8;
+    border-radius:8px; padding:8px 14px;
+    font-size:.78rem; font-weight:700;
+    text-decoration:none !important;
+    transition:all .15s;
+}
+.btn-corriger:hover { background:#eff6ff; }
+
+.btn-resoumettre {
+    display:inline-flex; align-items:center; gap:6px;
+    background:#1d4ed8; color:#fff !important;
+    border:none; border-radius:8px; padding:8px 14px;
+    font-size:.78rem; font-weight:700;
+    cursor:pointer; transition:background .15s;
+}
+.btn-resoumettre:hover { background:#1e3a8a; }

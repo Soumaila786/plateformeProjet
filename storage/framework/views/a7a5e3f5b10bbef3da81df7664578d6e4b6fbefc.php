@@ -24,10 +24,10 @@
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text"
-                   id="searchInput"
-                   class="search-input"
-                   placeholder="Rechercher par titre ou code..."
-                   value="<?php echo e(request('search')); ?>">
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Rechercher par titre ou code..."
+                    value="<?php echo e(request('search')); ?>">
         </div>
 
         <div class="status-filters">
@@ -45,7 +45,7 @@
                 <a href="<?php echo e(route('approbateur.projets.index',
                     array_merge(request()->query(),
                     ['statut' => $val, 'search' => request('search')]))); ?>"
-                   class="status-filter <?php echo e(request('statut','') === $val ? 'active' : ''); ?>">
+                    class="status-filter <?php echo e(request('statut','') === $val ? 'active' : ''); ?>">
                     <?php echo e($label); ?>
 
                 </a>
@@ -97,7 +97,7 @@
 
                         <td>
                             <a href="<?php echo e(route('approbateur.projets.show',$projet)); ?>"
-                               class="projet-code">
+                                class="projet-code">
                                 <?php echo e($projet->codeProjet); ?>
 
                             </a>
@@ -105,7 +105,7 @@
 
                         <td>
                             <a href="<?php echo e(route('approbateur.projets.show',$projet)); ?>"
-                               class="projet-titre">
+                                class="projet-titre">
                                 <?php echo e($projet->titre); ?>
 
                             </a>
@@ -147,8 +147,8 @@
 
                                 
                                 <a href="<?php echo e(route('approbateur.projets.show',$projet)); ?>"
-                                   class="btn-icon"
-                                   title="Examiner">
+                                    class="btn-icon"
+                                    title="Examiner">
                                     <i class="fas fa-eye"></i>
                                 </a>
 
@@ -156,8 +156,8 @@
                                 <?php if($projet->statutProjet === 'soumis'): ?>
 
                                     <form method="POST"
-                                          action="<?php echo e(route('approbateur.projets.examiner',$projet)); ?>"
-                                          onsubmit="return confirm('Mettre ce projet en examen ?')">
+                                            action="<?php echo e(route('approbateur.projets.examiner',$projet)); ?>"
+                                            onsubmit="return confirm('Mettre ce projet en examen ?')">
 
                                         <?php echo csrf_field(); ?>
 
@@ -233,4 +233,5 @@
 </div>
 
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/approbateur/projets/index.blade.php ENDPATH**/ ?>

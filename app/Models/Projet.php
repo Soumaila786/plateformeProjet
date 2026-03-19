@@ -94,12 +94,12 @@ class Projet extends Model
     // ── Accesseurs ──
     public function isEditable()
     {
-        return in_array($this->statutProjet, ['brouillon', 'soumis']);
+        return in_array($this->statutProjet, ['brouillon', 'soumis', 'rejete']);
     }
 
     public function isDeletable()
     {
-        return in_array($this->statutProjet, ['brouillon', 'soumis']);
+        return in_array($this->statutProjet, ['brouillon', 'soumis', 'rejete']);
     }
 
     public function isSubmittable()

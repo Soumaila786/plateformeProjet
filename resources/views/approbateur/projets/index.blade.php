@@ -26,10 +26,10 @@
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text"
-                   id="searchInput"
-                   class="search-input"
-                   placeholder="Rechercher par titre ou code..."
-                   value="{{ request('search') }}">
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Rechercher par titre ou code..."
+                    value="{{ request('search') }}">
         </div>
 
         <div class="status-filters">
@@ -47,7 +47,7 @@
                 <a href="{{ route('approbateur.projets.index',
                     array_merge(request()->query(),
                     ['statut' => $val, 'search' => request('search')])) }}"
-                   class="status-filter {{ request('statut','') === $val ? 'active' : '' }}">
+                    class="status-filter {{ request('statut','') === $val ? 'active' : '' }}">
                     {{ $label }}
                 </a>
             @endforeach
@@ -98,14 +98,14 @@
 
                         <td>
                             <a href="{{ route('approbateur.projets.show',$projet) }}"
-                               class="projet-code">
+                                class="projet-code">
                                 {{ $projet->codeProjet }}
                             </a>
                         </td>
 
                         <td>
                             <a href="{{ route('approbateur.projets.show',$projet) }}"
-                               class="projet-titre">
+                                class="projet-titre">
                                 {{ $projet->titre }}
                             </a>
                         </td>
@@ -141,8 +141,8 @@
 
                                 {{-- voir --}}
                                 <a href="{{ route('approbateur.projets.show',$projet) }}"
-                                   class="btn-icon"
-                                   title="Examiner">
+                                    class="btn-icon"
+                                    title="Examiner">
                                     <i class="fas fa-eye"></i>
                                 </a>
 
@@ -150,8 +150,8 @@
                                 @if($projet->statutProjet === 'soumis')
 
                                     <form method="POST"
-                                          action="{{ route('approbateur.projets.examiner',$projet) }}"
-                                          onsubmit="return confirm('Mettre ce projet en examen ?')">
+                                            action="{{ route('approbateur.projets.examiner',$projet) }}"
+                                            onsubmit="return confirm('Mettre ce projet en examen ?')">
 
                                         @csrf
 

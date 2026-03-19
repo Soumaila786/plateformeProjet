@@ -20,6 +20,7 @@ class ProjetController extends Controller{
     }
 
     public function index(Request $request){
+
         $query = Projet::with(['porteur', 'secteur'])
             ->whereIn('statutProjet', ['soumis', 'en_examen']);
 
@@ -40,6 +41,7 @@ class ProjetController extends Controller{
     }
 
     public function show(Projet $projet){
+        
         $projet->load(['porteur', 'secteur', 'activites', 'documents.uploader', 'commentaires.utilisateur']);
         return view('approbateur.projets.show', compact('projet'));
     }
@@ -85,7 +87,7 @@ class ProjetController extends Controller{
 
     // ── Approuver ──
     public function approuver(Request $request, Projet $projet){
-        
+
         $request->validate([
             'commentaire' => 'nullable|string|max:1000',
         ]);
@@ -141,7 +143,7 @@ class ProjetController extends Controller{
             'projet_id'       => $projet->id,
             'utilisateur_id'  => Auth::id(),
         ]);
-        
+
         $projet->update([
             'statutProjet'        => $statutFinal,
             'messageModification' => $request->messageModification,
@@ -149,7 +151,7 @@ class ProjetController extends Controller{
             'commentaire_id'      => $commentaire->id
         ]);
 
-        
+
 
         if ($request->filled('messageModification')) {
             Commentaire::create([

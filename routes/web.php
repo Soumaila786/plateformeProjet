@@ -21,6 +21,7 @@ use App\Http\Controllers\Porteur\ActiviteController  as PorteurActiviteControlle
 use App\Http\Controllers\Approbateur\DashboardController  as ApprobateurDashboardController;
 use App\Http\Controllers\Approbateur\ProjetController     as ApprobateurProjetController;
 use App\Http\Controllers\Approbateur\PlanificationController     as ApprobateurPlanificationController;
+use App\Http\Controllers\Approbateur\ExportController  as ApprobateurExportController;
 
 // Validateur
 use App\Http\Controllers\Validateur\DashboardController   as ValidateurDashboardController;
@@ -182,6 +183,9 @@ Route::middleware(['auth'])->group(function () {
 
         Route::delete('/projets/{projet}/planification/{planification}', [ApprobateurPlanificationController::class, 'destroy'])
             ->name('planification.destroy');
+
+        // Dans routes/web.php — groupe approbateur
+        Route::get('/projets/{projet}/export/pdf', [ApprobateurExportController::class, 'exportPdf'])->name('projets.export.pdf');
 
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');

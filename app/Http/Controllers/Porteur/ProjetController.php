@@ -95,20 +95,19 @@ class ProjetController extends Controller {
                             ->with('success', 'Projet créé avec succès.');
     }
 
-    public function show(Projet $projet)
-{
-    $this->authorize('view', $projet);
+    public function show(Projet $projet)  {
+        $this->authorize('view', $projet);
 
-    $projet->load([
-        'secteur',
-        'activites',
-        'documents',
-        'commentaires.utilisateur',
-        'planification',
-    ]);
+        $projet->load([
+            'secteur',
+            'activites',
+            'documents',
+            'commentaires.utilisateur',
+            'planification',
+        ]);
 
-    return view('porteur.projets.show', compact('projet'));
-}
+        return view('porteur.projets.show', compact('projet'));
+    }
     public function edit(Projet $projet){
 
         $this->authorize('update', $projet);
@@ -163,6 +162,7 @@ class ProjetController extends Controller {
     }
 
     public function soumettre(Projet $projet){
+        
         $this->authorize('soumettre', $projet);
 
         $projet->update([
