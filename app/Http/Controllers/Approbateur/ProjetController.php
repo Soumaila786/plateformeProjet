@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class ProjetController extends Controller{
 
     protected $mailService;
+    
     public function __construct(MailService $mailService){
         $this->mailService = $mailService;
     }
@@ -41,7 +42,7 @@ class ProjetController extends Controller{
     }
 
     public function show(Projet $projet){
-        
+
         $projet->load(['porteur', 'secteur', 'activites', 'documents.uploader', 'commentaires.utilisateur']);
         return view('approbateur.projets.show', compact('projet'));
     }
@@ -150,8 +151,6 @@ class ProjetController extends Controller{
             'approbateur_id'      => Auth::id(),
             'commentaire_id'      => $commentaire->id
         ]);
-
-
 
         if ($request->filled('messageModification')) {
             Commentaire::create([

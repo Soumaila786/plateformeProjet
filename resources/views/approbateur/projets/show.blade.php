@@ -2,14 +2,13 @@
 @section('title', 'Examen — ' . $projet->titre)
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
-<link rel="stylesheet" href="{{ asset('css/projetShow.css') }}">
 @endpush
 
 @section('content')
 <div class="vpage">
 
 {{-- Breadcrumb --}}
-<div class="breadcrumb">
+<div class="breadcrumb mb-3">
     <a href="{{ route('approbateur.dashboard') }}"><i class="fas fa-home"></i></a>
     <span>/</span>
     <a href="{{ route('approbateur.projets.index') }}">Projets</a>
@@ -30,7 +29,7 @@
     $s = $map[$projet->statutProjet] ?? $map['soumis'];
 @endphp
 
-<div class="show-header">
+<div class="show-header mb-4 mt-4">
     <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
             <span class="proj-code">{{ $projet->codeProjet }}</span>
@@ -51,7 +50,7 @@
 </div>
 
 {{-- Barre d'actions --}}
-<div class="actions-bar">
+<div class="actions-bar mb-4 mt-4">
     @can('examiner', $projet)
     <form method="POST" action="{{ route('approbateur.projets.examiner', $projet) }}">
         @csrf

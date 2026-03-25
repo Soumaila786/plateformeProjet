@@ -1,14 +1,13 @@
 <?php $__env->startSection('title', 'Examen — ' . $projet->titre); ?>
 <?php $__env->startPush('styles'); ?>
 <link rel="stylesheet" href="<?php echo e(asset('css/approbDash.css')); ?>">
-<link rel="stylesheet" href="<?php echo e(asset('css/projetShow.css')); ?>">
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="vpage">
 
 
-<div class="breadcrumb">
+<div class="breadcrumb mb-3">
     <a href="<?php echo e(route('approbateur.dashboard')); ?>"><i class="fas fa-home"></i></a>
     <span>/</span>
     <a href="<?php echo e(route('approbateur.projets.index')); ?>">Projets</a>
@@ -29,7 +28,7 @@
     $s = $map[$projet->statutProjet] ?? $map['soumis'];
 ?>
 
-<div class="show-header">
+<div class="show-header mb-4 mt-4">
     <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
             <span class="proj-code"><?php echo e($projet->codeProjet); ?></span>
@@ -51,7 +50,7 @@
 </div>
 
 
-<div class="actions-bar">
+<div class="actions-bar mb-4 mt-4">
     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('examiner', $projet)): ?>
     <form method="POST" action="<?php echo e(route('approbateur.projets.examiner', $projet)); ?>">
         <?php echo csrf_field(); ?>
@@ -461,4 +460,5 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 </script>
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/approbateur/projets/show.blade.php ENDPATH**/ ?>

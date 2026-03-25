@@ -34,11 +34,10 @@
 
         {{-- ══ ADMIN ══ --}}
         @if($role === 'admin')
-
             <li class="nav-item">
                 <a href="{{ route('admin.analytique') }}"
-                    class="nav-link {{ request()->routeIs('admin.projets.*') ? 'active' : '' }}"
-                    data-tooltip="À valider">
+                    class="nav-link {{ request()->routeIs('admin.analytique') ? 'active' : '' }}"
+                    data-tooltip="Tableau Analytique">
                     <i class="fas fa-chart-pie"></i>
                     <span>Tableau Analytique</span>
                 </a>
@@ -73,7 +72,7 @@
         @if($role === 'porteur')
             <li class="nav-item">
                 <a href="{{ route('porteur.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('porteur.projets.*') ? 'active' : '' }}"
+                    class="nav-link {{ request()->routeIs('porteur.projets.index') ? 'active' : '' }}"
                     data-tooltip="Mes projets">
                     <i class="fas fa-folder-open"></i>
                     <span>Mes projets</span>
@@ -93,8 +92,8 @@
         @if($role === 'approbateur')
             <li class="nav-item">
                 <a href="{{ route('approbateur.analytique') }}"
-                    class="nav-link {{ request()->routeIs('approbateur.projets.*') ? 'active' : '' }}"
-                    data-tooltip="À valider">
+                    class="nav-link {{ request()->routeIs('approbateur.analytique') ? 'active' : '' }}"
+                    data-tooltip="Tableau Analytique">
                     <i class="fas fa-chart-pie"></i>
                     <span>Tableau Analytique</span>
                 </a>
@@ -119,24 +118,30 @@
 
         {{-- ══ VALIDATEUR ══ --}}
         @if($role === 'validateur')
-
             <li class="nav-item">
                 <a href="{{ route('validateur.analytique') }}"
-                    class="nav-link {{ request()->routeIs('validateur.projets.*') ? 'active' : '' }}"
-                    data-tooltip="À valider">
+                    class="nav-link {{ request()->routeIs('validateur.analytique') ? 'active' : '' }}"
+                    data-tooltip="Tableau Analytique">
                     <i class="fas fa-chart-pie"></i>
                     <span>Tableau Analytique</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{{ route('validateur.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('validateur.projets.*') ? 'active' : '' }}"
+                    class="nav-link {{ request()->routeIs('validateur.projets.index') ? 'active' : '' }}"
                     data-tooltip="À valider">
                     <i class="fas fa-check-double"></i>
                     <span>À valider</span>
                 </a>
             </li>
-
+            <li class="nav-item">
+                <a href="{{ route('validateur.projets.index') }}"
+                    class="nav-link {{ request()->routeIs('validateur.projets.mes-projets') ? 'active' : '' }}"
+                    data-tooltip="Mes projets traités">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Mes projets traités</span>
+                </a>
+            </li>
         @endif
 
         {{-- ══ COMMUN ══ --}}
@@ -146,7 +151,7 @@
                     ->where('statut', 'non_lu')->count();
             @endphp
             <a href="{{ route($role . '.notifications.index') }}"
-                class="nav-link  {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
+                class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
                 data-tooltip="Notifications">
                 <i class="fas fa-bell"></i>
                 <span>Notifications</span>
@@ -225,11 +230,15 @@ document.addEventListener('DOMContentLoaded', function () {
         sidebar.classList.toggle('collapsed');
         const collapsed = sidebar.classList.contains('collapsed');
         localStorage.setItem('sidebarCollapsed', collapsed);
-        toggleIcon.classList.replace(
-            collapsed ? 'fa-chevron-left'  : 'fa-chevron-right',
-            collapsed ? 'fa-chevron-right' : 'fa-chevron-left'
-        );
-        if (toggleText) toggleText.textContent = collapsed ? 'Agrandir' : 'Réduire';
+        if (collapsed) {
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+            if (toggleText) toggleText.textContent = 'Agrandir';
+        } else {
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+            if (toggleText) toggleText.textContent = 'Réduire';
+        }
     });
 
     window.addEventListener('resize', () => {

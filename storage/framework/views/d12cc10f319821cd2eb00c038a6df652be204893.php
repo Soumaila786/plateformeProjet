@@ -105,18 +105,18 @@
                 </p>
                 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                     <a href="<?php echo e(route('porteur.projets.edit', $projet)); ?>"
-                       style="display:inline-flex;align-items:center;gap:6px;background:#fff;
-                              border:1.5px solid #1d4ed8;color:#1d4ed8;border-radius:8px;
-                              padding:7px 14px;font-size:.78rem;font-weight:700;text-decoration:none;">
+                        style="display:inline-flex;align-items:center;gap:6px;background:#fff;
+                                border:1.5px solid #1d4ed8;color:#1d4ed8;border-radius:8px;
+                                padding:7px 14px;font-size:.78rem;font-weight:700;text-decoration:none;">
                         <i class="fas fa-pencil-alt"></i> Corriger le projet
                     </a>
                     <form method="POST" action="<?php echo e(route('porteur.projets.soumettre', $projet)); ?>"
-                          onsubmit="return confirm('Resoumettre pour une nouvelle approbation ?')">
+                            onsubmit="return confirm('Resoumettre pour une nouvelle approbation ?')">
                         <?php echo csrf_field(); ?>
                         <button type="submit"
                                 style="display:inline-flex;align-items:center;gap:6px;background:#1d4ed8;
-                                       color:#fff;border:none;border-radius:8px;padding:7px 14px;
-                                       font-size:.78rem;font-weight:700;cursor:pointer;">
+                                        color:#fff;border:none;border-radius:8px;padding:7px 14px;
+                                        font-size:.78rem;font-weight:700;cursor:pointer;">
                             <i class="fas fa-paper-plane"></i> Resoumettre le projet
                         </button>
                     </form>
@@ -135,6 +135,15 @@
             <button type="submit" class="action-btn action-btn-indigo"
                     onclick="return confirm('Soumettre ce projet pour approbation ?')">
                 <i class="fas fa-paper-plane"></i> Soumettre le projet
+            </button>
+        </form>
+        <?php endif; ?>
+        <?php if(!$projet->isApprouveAndValide() && !$projet->planification_demandee): ?>
+            <form action="<?php echo e(route('porteur.demande.planification', $projet->id)); ?>" method="POST">
+            <?php echo csrf_field(); ?>
+            <button class="btn btn-primary">
+                <i class="fas fa-calendar"></i>
+                Demander une planification
             </button>
         </form>
         <?php endif; ?>
@@ -429,4 +438,5 @@ function formatDocSize(b) {
 </script>
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/porteur/projets/show.blade.php ENDPATH**/ ?>

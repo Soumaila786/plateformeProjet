@@ -105,18 +105,18 @@
                 </p>
                 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                     <a href="{{ route('porteur.projets.edit', $projet) }}"
-                       style="display:inline-flex;align-items:center;gap:6px;background:#fff;
-                              border:1.5px solid #1d4ed8;color:#1d4ed8;border-radius:8px;
-                              padding:7px 14px;font-size:.78rem;font-weight:700;text-decoration:none;">
+                        style="display:inline-flex;align-items:center;gap:6px;background:#fff;
+                                border:1.5px solid #1d4ed8;color:#1d4ed8;border-radius:8px;
+                                padding:7px 14px;font-size:.78rem;font-weight:700;text-decoration:none;">
                         <i class="fas fa-pencil-alt"></i> Corriger le projet
                     </a>
                     <form method="POST" action="{{ route('porteur.projets.soumettre', $projet) }}"
-                          onsubmit="return confirm('Resoumettre pour une nouvelle approbation ?')">
+                            onsubmit="return confirm('Resoumettre pour une nouvelle approbation ?')">
                         @csrf
                         <button type="submit"
                                 style="display:inline-flex;align-items:center;gap:6px;background:#1d4ed8;
-                                       color:#fff;border:none;border-radius:8px;padding:7px 14px;
-                                       font-size:.78rem;font-weight:700;cursor:pointer;">
+                                        color:#fff;border:none;border-radius:8px;padding:7px 14px;
+                                        font-size:.78rem;font-weight:700;cursor:pointer;">
                             <i class="fas fa-paper-plane"></i> Resoumettre le projet
                         </button>
                     </form>
@@ -135,6 +135,15 @@
             <button type="submit" class="action-btn action-btn-indigo"
                     onclick="return confirm('Soumettre ce projet pour approbation ?')">
                 <i class="fas fa-paper-plane"></i> Soumettre le projet
+            </button>
+        </form>
+        @endif
+        @if (!$projet->isApprouveAndValide() && !$projet->planification_demandee)
+            <form action="{{ route('porteur.demande.planification', $projet->id) }}" method="POST">
+            @csrf
+            <button class="btn btn-primary">
+                <i class="fas fa-calendar"></i>
+                Demander une planification
             </button>
         </form>
         @endif

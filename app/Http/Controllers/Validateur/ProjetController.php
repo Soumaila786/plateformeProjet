@@ -15,8 +15,7 @@ class ProjetController extends Controller
     protected $mailService;
     protected $notifService;
 
-    public function __construct(MailService $mailService, NotificationService $notifService)
-    {
+    public function __construct(MailService $mailService, NotificationService $notifService){
         $this->mailService  = $mailService;
         $this->notifService = $notifService;
     }
@@ -24,7 +23,7 @@ class ProjetController extends Controller
     // ── Liste projets approuvés (à valider) ──
     public function index(Request $request){
         $query = Projet::with(['porteur', 'secteur'])
-            ->where('statutProjet', 'approuve');
+            ->where('statutProjet', ['approuve', 'valide']);
 
         if ($request->filled('search')) {
             $s = $request->search;
@@ -34,8 +33,8 @@ class ProjetController extends Controller
             });
         }
 
-        if ($request->filled('secteur')) {
-            $query->where('secteur_id', $request->secteur);
+        if ($request->filled('statut')) {
+            $query->where('statutProjet', $request->secteur);
         }
 
         $projets  = $query->orderBy('updated_at', 'desc')->paginate(12);

@@ -96,9 +96,9 @@
     .plan-table tr:nth-child(even) td { background:#fafafa; }
     .t-num  { width:4%;  text-align:center; font-weight:700; }
     .t-act  { width:26%; }
-    .t-ind  { width:20%; }
-    .t-prd  { width:12%; text-align:center; }
-    .t-cout { width:15%; text-align:right; }
+    .t-ind  { width:15%; }
+    .t-prd  { width:14%; text-align:center; }
+    .t-cout { width:17%; text-align:right; }
     .t-sign { width:11%; text-align:center; }
     .sign-line { display:block; border-bottom:1px dotted #999; height:20px; }
     .total-row {
