@@ -8,19 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Configuration des couleurs
     const C = {
-        indigo: '#6366f1',
-        orange: '#f97316',
-        green: '#22c55e',
-        teal: '#0d9488',
-        red: '#ef4444',
-        gray: '#9ca3af',
-        blue: '#1d4ed8'
+        indigo:  '#6366f1',
+        orange:  '#f97316',
+        green:   '#22c55e',
+        teal:    '#0d9488',
+        red:     '#ef4444',
+        gray:    '#9ca3af',
+        blue:    '#1d4ed8'
     };
 
     // Fonction helper pour la transparence
     const T = v => v + '1a';
 
-    // ── Donut Chart ──
+    //  Donut Chart
     const donutCanvas = document.getElementById('donutChart');
     if (donutCanvas && data.donut) {
         new Chart(donutCanvas, {
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Courbe temporelle ──
+    //  Courbe temporelle
     const tempoCanvas = document.getElementById('tempoChart');
     if (tempoCanvas && data.temporel) {
         new Chart(tempoCanvas, {
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Motifs rejet ──
+    //  Motifs rejet
     const rejetCanvas = document.getElementById('rejetChart');
     if (rejetCanvas && data.motifs) {
         new Chart(rejetCanvas, {
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Budget vs demande ──
+    //  Budget vs demande
     const budgetCanvas = document.getElementById('budgetChart');
     if (budgetCanvas && data.budget) {
         new Chart(budgetCanvas, {
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Distribution tranches ──
+    //  Distribution tranches
     const trancheCanvas = document.getElementById('trancheChart');
     if (trancheCanvas && data.tranches) {
         new Chart(trancheCanvas, {
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: data.tranches.labels,
                 datasets: [{
-                    label: 'Nb projets',
+                    label: 'Nombre de projets',
                     data: data.tranches.values,
                     backgroundColor: 'rgba(99,102,241,.12)',
                     borderColor: C.indigo,
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Secteurs ──
+    //  Secteurs
     const secteurCanvas = document.getElementById('secteurChart');
     if (secteurCanvas && data.secteurs) {
         new Chart(secteurCanvas, {
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: data.secteurs.labels,
                 datasets: [
                     {
-                        label: 'Nb projets',
+                        label: 'Nombre de projets',
                         data: data.secteurs.nb,
                         backgroundColor: 'rgba(99,102,241,.12)',
                         borderColor: C.indigo,
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Matrice scatter ──
+    //  Matrice scatter
     const matriceCanvas = document.getElementById('matriceChart');
     if (matriceCanvas && data.matrice && data.matrice.length > 0) {
         new Chart(matriceCanvas, {

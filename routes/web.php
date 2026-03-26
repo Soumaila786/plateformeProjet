@@ -188,9 +188,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/projets/{projet}/export/pdf', [ApprobateurExportController::class, 'exportPdf'])->name('projets.export.pdf');
 
         // Notifications
-        Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
-        Route::post('/notifications/toutes-lues', [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');
-        Route::delete('/notifications/lues',      [NotificationController::class, 'destroyLues'])->name('notifications.destroy-lues');
+        Route::get('/notifications',                   [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/toutes-lues',      [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');
+        Route::delete('/notifications/lues',           [NotificationController::class, 'destroyLues'])->name('notifications.destroy-lues');
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
@@ -207,6 +207,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/chart/line',  [App\Http\Controllers\Validateur\DashboardController::class, 'chartLine'])->name('chart.line');
 
         // Projets
+        Route::get('/projets/mes_projets',        [App\Http\Controllers\Validateur\ProjetController::class, 'mesProjets'])->name('projets.mes_projets');
         Route::get('/projets',                    [App\Http\Controllers\Validateur\ProjetController::class, 'index'])->name('projets.index');
         Route::get('/projets/{projet}',           [App\Http\Controllers\Validateur\ProjetController::class, 'show'])->name('projets.show');
         Route::post('/projets/{projet}/valider',  [App\Http\Controllers\Validateur\ProjetController::class, 'valider'])->name('projets.valider');

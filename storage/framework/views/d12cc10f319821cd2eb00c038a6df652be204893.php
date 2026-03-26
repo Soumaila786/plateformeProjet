@@ -129,14 +129,40 @@
     
     <div class="projet-actions-bar">
         
-        <?php if($projet->isSubmittable() && !$dernierRejet): ?>
-        <form method="POST" action="<?php echo e(route('porteur.projets.soumettre', $projet)); ?>">
-            <?php echo csrf_field(); ?>
-            <button type="submit" class="action-btn action-btn-indigo"
-                    onclick="return confirm('Soumettre ce projet pour approbation ?')">
-                <i class="fas fa-paper-plane"></i> Soumettre le projet
-            </button>
-        </form>
+        <?php if($projet->isSubmittable()): ?>
+
+            
+            <?php if($projet->statutProjet === 'rejete'): ?>
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Projet rejeté</strong><br>
+                    Ce projet a été rejeté. Après avoir effectué les modifications nécessaires,
+                    vous pouvez le soumettre à nouveau pour évaluation.
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="<?php echo e(route('porteur.projets.soumettre', $projet)); ?>">
+                <?php echo csrf_field(); ?>
+                <button type="submit" class="action-btn action-btn-indigo"
+                        onclick="return confirm('<?php echo e($projet->statutProjet === 'rejete' ? 'Soumettre à nouveau ce projet pour évaluation ?' : 'Soumettre ce projet pour approbation ?'); ?>')">
+                    <i class="fas <?php echo e($projet->statutProjet === 'rejete' ? 'fa-redo-alt' : 'fa-paper-plane'); ?>"></i>
+                    <?php echo e($projet->statutProjet === 'rejete' ? 'Soumettre à nouveau' : 'Soumettre le projet'); ?>
+
+                </button>
+            </form>
+        <?php else: ?>
+            
+            <?php if($projet->statutProjet === 'soumis'): ?>
+                <div class="alert alert-info">
+                    <i class="fas fa-clock"></i>
+                    Ce projet est déjà en attente d'approbation.
+                </div>
+            <?php elseif(in_array($projet->statutProjet, ['approuve', 'valide', 'finance'])): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Ce projet a déjà été approuvé et ne peut plus être modifié.
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
         <?php if(!$projet->isApprouveAndValide() && !$projet->planification_demandee): ?>
             <form action="<?php echo e(route('porteur.demande.planification', $projet->id)); ?>" method="POST">

@@ -56,28 +56,28 @@ class ProjetPolicy
         }
     }
 
-    // ── Soumettre un projet ──
+    // Soumettre un projet
     public function soumettre(User $user, Projet $projet)
     {
         return $projet->user_id === $user->id
-            && $projet->statutProjet === 'brouillon';
+            && in_array($projet->statutProjet, ['brouillon', 'rejete']);
     }
 
-    // ── Mettre en examen ──
+    // Mettre en examen
     public function examiner(User $user, Projet $projet)
     {
         return $user->role === 'approbateur'
             && $projet->statutProjet === 'soumis';
     }
 
-    // ── Approuver ──
+    // Approuver
     public function approuver(User $user, Projet $projet)
     {
         return $user->role === 'approbateur'
             && $projet->statutProjet === 'en_examen';
     }
 
-    // ── Rejeter ──
+    // Rejeter
     public function rejeter(User $user, Projet $projet)
     {
         if ($user->role === 'approbateur') {
@@ -89,21 +89,21 @@ class ProjetPolicy
         return false;
     }
 
-    // ── Valider ──
+    // Valider
     public function valider(User $user, Projet $projet)
     {
         return $user->role === 'validateur'
             && $projet->statutProjet === 'approuve';
     }
 
-    // ── Demande de modification ──
+    // Demande de modification
     public function demandeModification(User $user, Projet $projet)
     {
         return $user->role === 'approbateur'
             && in_array($projet->statutProjet, ['soumis', 'en_examen']);
     }
 
-    // ── Documents ──
+    // Documents
     public function uploadDocument(User $user, Projet $projet)
     {
         switch ($user->role) {

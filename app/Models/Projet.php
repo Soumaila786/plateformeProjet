@@ -101,9 +101,9 @@ class Projet extends Model
         return in_array($this->statutProjet, ['brouillon', 'soumis', 'rejete']);
     }
 
-    public function isSubmittable()
+    public function isSubmittable():bool
     {
-        return $this->statutProjet === 'brouillon';
+        return in_array($this->statutProjet, ['brouillon', 'rejete']);
     }
 
     public function isApprouveAndValide()

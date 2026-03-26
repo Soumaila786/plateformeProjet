@@ -1,26 +1,31 @@
 // public/js/adminAnalytique.js
 
-const C = {
-    indigo: '#6366f1',
-    orange: '#f97316',
-    green: '#22c55e',
-    teal: '#0d9488',
-    red: '#ef4444',
-    gray: '#9ca3af'
-};
-
-// Attendre que le DOM soit chargé
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // ── Donut ──
-    if (document.getElementById('donutChart')) {
-        new Chart(document.getElementById('donutChart'), {
+    // Vérifier que les données existent
+    if (!window.adminAnalytiqueData) return;
+
+    const data = window.adminAnalytiqueData;
+
+    // Configuration des couleurs
+    const C = {
+        indigo: '#6366f1',
+        orange: '#f97316',
+        green: '#22c55e',
+        teal: '#0d9488',
+        red: '#ef4444',
+        gray: '#9ca3af'
+    };
+
+    // ── Donut Chart ──
+    const donutCanvas = document.getElementById('donutChart');
+    if (donutCanvas && data.donut) {
+        new Chart(donutCanvas, {
             type: 'doughnut',
             data: {
-                labels: window.statutLabels || [],
+                labels: data.donut.labels,
                 datasets: [{
-                    data: window.statutValues || [],
-                    backgroundColor: window.statutColors || [],
+                    data: data.donut.values,
+                    backgroundColor: data.donut.colors,
                     borderWidth: 2,
                     borderColor: '#fff',
                     hoverOffset: 6
@@ -46,15 +51,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ── Évolution mensuelle ──
-    if (document.getElementById('evolutionChart')) {
-        new Chart(document.getElementById('evolutionChart'), {
+    const evolutionCanvas = document.getElementById('evolutionChart');
+    if (evolutionCanvas && data.evolution) {
+        new Chart(evolutionCanvas, {
             type: 'line',
             data: {
-                labels: window.moisLabels || [],
+                labels: data.evolution.labels,
                 datasets: [
                     {
                         label: 'Soumissions',
-                        data: window.moisSoumis || [],
+                        data: data.evolution.soumis,
                         borderColor: C.indigo,
                         backgroundColor: 'rgba(99,102,241,.1)',
                         borderWidth: 2,
@@ -64,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     {
                         label: 'Validations',
-                        data: window.moisValides || [],
+                        data: data.evolution.valides,
                         borderColor: C.teal,
                         backgroundColor: 'rgba(13,148,136,.08)',
                         borderWidth: 2,
@@ -97,7 +103,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     y: {
                         beginAtZero: true,
                         grid: { color: '#f3f4f6' },
-                        ticks: { color: '#9ca3af', font: { size: 11 }, stepSize: 1 }
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { size: 11 },
+                            stepSize: 1
+                        }
                     }
                 }
             }
@@ -105,14 +115,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ── Motifs rejet ──
-    if (document.getElementById('rejetChart')) {
-        new Chart(document.getElementById('rejetChart'), {
+    const rejetCanvas = document.getElementById('rejetChart');
+    if (rejetCanvas && data.rejets) {
+        new Chart(rejetCanvas, {
             type: 'bar',
             data: {
-                labels: window.motifsLabels || [],
+                labels: data.rejets.labels,
                 datasets: [{
                     label: 'Occurrences',
-                    data: window.motifsValues || [],
+                    data: data.rejets.values,
                     backgroundColor: 'rgba(239,68,68,.12)',
                     borderColor: C.red,
                     borderWidth: 2,
@@ -129,7 +140,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     x: {
                         beginAtZero: true,
                         grid: { color: '#f3f4f6' },
-                        ticks: { color: '#9ca3af', font: { size: 11 }, stepSize: 1 }
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { size: 11 },
+                            stepSize: 1
+                        }
                     },
                     y: {
                         grid: { display: false },
@@ -141,15 +156,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ── Secteurs double axe ──
-    if (document.getElementById('secteurChart')) {
-        new Chart(document.getElementById('secteurChart'), {
+    const secteurCanvas = document.getElementById('secteurChart');
+    if (secteurCanvas && data.secteurs) {
+        new Chart(secteurCanvas, {
             type: 'bar',
             data: {
-                labels: window.sectLabels || [],
+                labels: data.secteurs.labels,
                 datasets: [
                     {
                         label: 'Nb projets',
-                        data: window.sectNb || [],
+                        data: data.secteurs.nb,
                         backgroundColor: 'rgba(99,102,241,.12)',
                         borderColor: C.indigo,
                         borderWidth: 2,
@@ -158,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     {
                         label: 'Nb validés',
-                        data: window.sectValide || [],
+                        data: data.secteurs.valides,
                         backgroundColor: 'rgba(13,148,136,.12)',
                         borderColor: C.teal,
                         borderWidth: 2,
@@ -167,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     {
                         label: 'Montant demandé (M)',
-                        data: (window.sectDemande || []).map(v => +(v / 1000000).toFixed(1)),
+                        data: data.secteurs.demande.map(v => +(v / 1000000).toFixed(1)),
                         backgroundColor: 'rgba(249,115,22,.12)',
                         borderColor: C.orange,
                         borderWidth: 2,
@@ -202,7 +218,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         position: 'left',
                         beginAtZero: true,
                         grid: { color: '#f3f4f6' },
-                        ticks: { color: '#9ca3af', font: { size: 11 }, stepSize: 1 }
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { size: 11 },
+                            stepSize: 1
+                        }
                     },
                     y2: {
                         position: 'right',
@@ -220,21 +240,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ── Charge équipes ──
-    if (document.getElementById('equipeChart')) {
-        const equipeColors = (window.equipeRoles || []).map(r =>
+    const equipeCanvas = document.getElementById('equipeChart');
+    if (equipeCanvas && data.equipes) {
+        const equipeColors = data.equipes.roles.map(r =>
             r === 'Approbateur' ? 'rgba(99,102,241,.2)' : 'rgba(13,148,136,.2)'
         );
-        const equipeBorders = (window.equipeRoles || []).map(r =>
+        const equipeBorders = data.equipes.roles.map(r =>
             r === 'Approbateur' ? C.indigo : C.teal
         );
-        
-        new Chart(document.getElementById('equipeChart'), {
+
+        new Chart(equipeCanvas, {
             type: 'bar',
             data: {
-                labels: window.equipeLabels || [],
+                labels: data.equipes.labels,
                 datasets: [{
                     label: 'Projets traités',
-                    data: window.equipeNb || [],
+                    data: data.equipes.nb,
                     backgroundColor: equipeColors,
                     borderColor: equipeBorders,
                     borderWidth: 2,
@@ -250,8 +271,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
-                            label: ctx => {
-                                const role = (window.equipeRoles || [])[ctx.dataIndex];
+                            label: function(ctx) {
+                                const role = data.equipes.roles[ctx.dataIndex];
                                 return ` ${ctx.parsed.x} projets traités (${role})`;
                             }
                         }
@@ -261,7 +282,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     x: {
                         beginAtZero: true,
                         grid: { color: '#f3f4f6' },
-                        ticks: { color: '#9ca3af', font: { size: 11 }, stepSize: 1 }
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { size: 11 },
+                            stepSize: 1
+                        }
                     },
                     y: {
                         grid: { display: false },

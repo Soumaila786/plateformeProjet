@@ -161,7 +161,7 @@ class ProjetController extends Controller {
     }
 
     public function soumettre(Projet $projet){
-        
+
         $this->authorize('soumettre', $projet);
 
         $projet->update([

@@ -135,8 +135,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('validateur.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('validateur.projets.mes-projets') ? 'active' : '' }}"
+                <a href="{{ route('validateur.projets.mes_projets') }}"
+                    class="nav-link {{ request()->routeIs('validateur.projets.mes_projets') ? 'active' : '' }}"
                     data-tooltip="Mes projets traités">
                     <i class="fas fa-folder-open"></i>
                     <span>Mes projets traités</span>

@@ -129,14 +129,39 @@
     {{-- ══ BARRE D'ACTIONS ══ --}}
     <div class="projet-actions-bar">
         {{-- Soumettre (seulement si brouillon sans rejet en attente) --}}
-        @if($projet->isSubmittable() && !$dernierRejet)
-        <form method="POST" action="{{ route('porteur.projets.soumettre', $projet) }}">
-            @csrf
-            <button type="submit" class="action-btn action-btn-indigo"
-                    onclick="return confirm('Soumettre ce projet pour approbation ?')">
-                <i class="fas fa-paper-plane"></i> Soumettre le projet
-            </button>
-        </form>
+        @if($projet->isSubmittable())
+
+            {{-- Message d'information pour les projets rejetés --}}
+            @if($projet->statutProjet === 'rejete')
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Projet rejeté</strong><br>
+                    Ce projet a été rejeté. Après avoir effectué les modifications nécessaires,
+                    vous pouvez le soumettre à nouveau pour évaluation.
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('porteur.projets.soumettre', $projet) }}">
+                @csrf
+                <button type="submit" class="action-btn action-btn-indigo"
+                        onclick="return confirm('{{ $projet->statutProjet === 'rejete' ? 'Soumettre à nouveau ce projet pour évaluation ?' : 'Soumettre ce projet pour approbation ?' }}')">
+                    <i class="fas {{ $projet->statutProjet === 'rejete' ? 'fa-redo-alt' : 'fa-paper-plane' }}"></i>
+                    {{ $projet->statutProjet === 'rejete' ? 'Soumettre à nouveau' : 'Soumettre le projet' }}
+                </button>
+            </form>
+        @else
+            {{-- Messages d'information selon le statut --}}
+            @if($projet->statutProjet === 'soumis')
+                <div class="alert alert-info">
+                    <i class="fas fa-clock"></i>
+                    Ce projet est déjà en attente d'approbation.
+                </div>
+            @elseif(in_array($projet->statutProjet, ['approuve', 'valide', 'finance']))
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Ce projet a déjà été approuvé et ne peut plus être modifié.
+                </div>
+            @endif
         @endif
         @if (!$projet->isApprouveAndValide() && !$projet->planification_demandee)
             <form action="{{ route('porteur.demande.planification', $projet->id) }}" method="POST">

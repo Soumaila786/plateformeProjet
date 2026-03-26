@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class AnalytiqueController extends Controller
 {
-    public function index()
-    {
+    public function index() {
+        
         $now = Carbon::now();
 
-        // ════════ 1. ENTONNOIR ════════
+        //  1. ENTONNOIR
         $entonnoir = [
             ['lbl'=>'Soumis',    'key'=>'soumis',    'color'=>'#6366f1'],
             ['lbl'=>'En examen', 'key'=>'en_examen', 'color'=>'#f97316'],
@@ -33,7 +33,7 @@ class AnalytiqueController extends Controller
         }
         unset($step);
 
-        // ════════ 2. DONUT STATUTS ════════
+        //  2. DONUT STATUTS
         $statuts = ['brouillon','soumis','en_examen','approuve','valide','rejete'];
         $labels  = ['Brouillon','Soumis','En examen','Approuvé','Validé','Rejeté'];
         $colors  = ['#9ca3af','#6366f1','#f97316','#22c55e','#0d9488','#ef4444'];
@@ -42,7 +42,7 @@ class AnalytiqueController extends Controller
             $donutValues[] = Projet::where('statutProjet', $s)->count();
         }
 
-        // ════════ 3. ANALYSE TEMPORELLE ════════
+        //  3. ANALYSE TEMPORELLE
         // Soumissions par mois (12 derniers mois)
         $tempLabels   = [];
         $tempSoumis   = [];
@@ -62,7 +62,7 @@ class AnalytiqueController extends Controller
             ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
             ->value('moy') ?? 0;
 
-        // ════════ 4. ANALYSE BUDGÉTAIRE ════════
+        //  4. ANALYSE BUDGÉTAIRE
         // Budget vs demande par projet (top 8 par montant)
         $budgetProjets = Projet::whereNotNull('montantDemande')
             ->orderByDesc('montantDemande')
@@ -86,7 +86,7 @@ class AnalytiqueController extends Controller
             '> 50M'   => Projet::where('montantDemande', '>=', 50000000)->count(),
         ];
 
-        // ════════ 5. DÉLAIS ════════
+        //  5. DÉLAIS
         $delaiAppro = round(Projet::whereNotNull('dateApprobation')
             ->whereNotNull('dateSoumission')
             ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
@@ -103,7 +103,7 @@ class AnalytiqueController extends Controller
         $retard15 = Projet::whereIn('statutProjet', ['soumis','en_examen'])
             ->where('dateSoumission', '<', $now->copy()->subDays(15))->count();
 
-        // ════════ 6. MOTIFS DE REJET ════════
+        //  6. MOTIFS DE REJET
         $motifsCles = [
             'budget'     => ['Budget','montant','financier','coût','fonds'],
             'dossier'    => ['pièce','document','dossier','manquant','incomplet'],
@@ -141,7 +141,7 @@ class AnalytiqueController extends Controller
             if (!$found) $motifsValues[4]++;
         }
 
-        // ════════ 7. PAR SECTEUR ════════
+        //  7. PAR SECTEUR
         $secteursData = Projet::with('secteur')
             ->select('secteur_id',
                 DB::raw('COUNT(*) as nb'),
@@ -154,14 +154,14 @@ class AnalytiqueController extends Controller
         $sectNb      = $secteursData->pluck('nb')->map(fn($v) => (int)$v)->toArray();
         $sectDemande = $secteursData->pluck('total_demande')->map(fn($v) => (int)$v)->toArray();
 
-        // ════════ 8. TIMELINE ════════
+        //  8. TIMELINE
         $timeline = Projet::whereNotNull('dateDebut')
             ->whereIn('statutProjet', ['approuve','valide'])
             ->orderBy('dateDebut')
             ->take(10)
             ->get(['titre','dateDebut','dateFin','statutProjet']);
 
-        // ════════ 9. TOP PORTEURS ════════
+        //  9. TOP PORTEURS
         $topPorteurs = Projet::select(
                 'user_id',
                 DB::raw('COUNT(*) as total'),
@@ -180,7 +180,7 @@ class AnalytiqueController extends Controller
                 ];
             });
 
-        // ════════ 10. MATRICE PRIORISATION ════════
+        //  10. MATRICE PRIORISATION
         // Axe X = montantDemande (importance), Axe Y = duree (urgence)
         $matrice = Projet::whereIn('statutProjet', ['soumis','en_examen'])
             ->whereNotNull('montantDemande')

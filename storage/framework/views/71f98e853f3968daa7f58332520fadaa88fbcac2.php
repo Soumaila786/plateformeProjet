@@ -23,7 +23,7 @@
     
     <?php
         $nbModif = $projets->getCollection()->filter(function($p) {
-                return $p->statutProjet === 'brouillon' && 
+                return $p->statutProjet === 'brouillon' &&
                     $p->commentaires->where('typeCommentaire', 'rejet')->isNotEmpty();
             })->count();
     ?>

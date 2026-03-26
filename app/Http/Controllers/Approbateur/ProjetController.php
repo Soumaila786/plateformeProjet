@@ -7,6 +7,7 @@ use App\Models\Projet;
 use App\Models\Activite;
 use App\Models\Commentaire;
 use App\Models\DocumentProjet;
+use App\Models\SecteurActivite;
 use App\Services\NotificationService;
 use App\Services\MailService;
 use Illuminate\Http\Request;
@@ -15,31 +16,78 @@ use Illuminate\Support\Facades\Auth;
 class ProjetController extends Controller{
 
     protected $mailService;
-    
+
     public function __construct(MailService $mailService){
         $this->mailService = $mailService;
     }
 
     public function index(Request $request){
+    $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
 
-        $query = Projet::with(['porteur', 'secteur'])
-            ->whereIn('statutProjet', ['soumis', 'en_examen']);
+    $query = Projet::with(['secteur', 'porteur'])
+        ->whereIn('statutProjet', ['soumis', 'en_examen', 'approuve', 'rejete']);
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('titre', 'like', "%{$search}%")
-                    ->orWhere('codeProjet', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('statut')) {
-            $query->where('statutProjet', $request->statut);
-        }
-
-        $projets = $query->latest()->paginate(10);
-        return view('approbateur.projets.index', compact('projets'));
+    if ($request->filled('search')) {
+        $s = $request->search;
+        $query->where(function ($q) use ($s) {
+            $q->where('titre', 'like', '%'.$s.'%')
+                ->orWhere('codeProjet', 'like', '%'.$s.'%');
+        });
     }
+
+    if ($request->filled('statut')) {
+        $query->where('statutProjet', $request->statut);
+    }
+
+    if ($request->filled('secteur_id')) {
+        $query->where('secteur_id', $request->secteur_id);
+    }
+
+    $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
+
+    return view('approbateur.projets.index', compact('projets', 'secteurs'));
+}
+
+public function mesProjets(Request $request){
+    $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
+
+    $query = Projet::with(['secteur', 'porteur'])
+        ->where('approbateur_id', Auth::id());
+
+    if ($request->filled('search')) {
+        $s = $request->search;
+        $query->where(function ($q) use ($s) {
+            $q->where('titre', 'like', '%'.$s.'%')
+                ->orWhere('codeProjet', 'like', '%'.$s.'%');
+        });
+    }
+
+    if ($request->filled('statut')) {
+        $query->where('statutProjet', $request->statut);
+    }
+
+    if ($request->filled('secteur_id')) {
+        $query->where('secteur_id', $request->secteur_id);
+    }
+
+    $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
+
+    // Motif rejet depuis commentaires
+    $projets->getCollection()->transform(function ($projet) {
+        $projet->motifRejet = null;
+        if ($projet->statutProjet === 'rejete') {
+            $com = \App\Models\Commentaire::where('projet_id', $projet->id)
+                ->where('typeCommentaire', 'rejet')
+                ->latest('dateEnvoi')
+                ->first();
+            $projet->motifRejet = $com ? $com->message : null;
+        }
+        return $projet;
+    });
+
+    return view('approbateur.projets.mes_projets', compact('projets', 'secteurs'));
+}
+
 
     public function show(Projet $projet){
 
@@ -47,27 +95,27 @@ class ProjetController extends Controller{
         return view('approbateur.projets.show', compact('projet'));
     }
 
-    public function mesProjets(Request $request){
+    // public function mesProjets(Request $request){
 
-        $query = Projet::with(['secteur', 'porteur'])
-            ->where('approbateur_id', Auth::id());
+    //     $query = Projet::with(['secteur', 'porteur'])
+    //         ->where('approbateur_id', Auth::id());
 
-        if ($request->filled('statut')) {
-            $query->where('statutProjet', $request->statut);
-        }
+    //     if ($request->filled('statut')) {
+    //         $query->where('statutProjet', $request->statut);
+    //     }
 
-        if ($request->filled('search')) {
-            $s = $request->search;
-            $query->where(function($q) use ($s) {
-                $q->where('titre', 'like', '%'.$s.'%')
-                    ->orWhere('codeProjet', 'like', '%'.$s.'%');
-            });
-        }
+    //     if ($request->filled('search')) {
+    //         $s = $request->search;
+    //         $query->where(function($q) use ($s) {
+    //             $q->where('titre', 'like', '%'.$s.'%')
+    //                 ->orWhere('codeProjet', 'like', '%'.$s.'%');
+    //         });
+    //     }
 
-        $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
+    //     $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
 
-        return view('approbateur.projets.mes_projets', compact('projets'));
-    }
+    //     return view('approbateur.projets.mes_projets', compact('projets'));
+    // }
 
     // ── Mettre en examen ──
     public function examiner(Projet $projet){

@@ -1,34 +1,85 @@
 @extends('layouts.app')
-
 @section('title', 'Mes projets traités')
-
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/projet.css') }}">
+<link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
+<style>
+    .proj-table { width:100%; border-collapse:collapse; }
+    .proj-table thead tr { background:#f8fafc; }
+    .proj-table th {
+        padding:11px 14px; font-size:.7rem; font-weight:700;
+        color:#6b7280; text-transform:uppercase; letter-spacing:.05em;
+        border-bottom:1.5px solid #e5e7eb; white-space:nowrap;
+    }
+    .proj-table td {
+        padding:12px 14px; font-size:.82rem; color:#374151;
+        border-bottom:1px solid #f1f5f9; vertical-align:middle;
+    }
+    .proj-table tbody tr:hover td { background:#fafafa; }
+    .proj-table tbody tr:last-child td { border-bottom:none; }
+    .table-wrap {
+        border:1px solid #e5e7eb; border-radius:12px;
+        overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.05);
+        background:#fff;
+    }
+    .col-code   { font-size:.72rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; }
+    .col-titre  { font-weight:700; color:#111827; }
+    .col-muted  { color:#9ca3af; font-size:.78rem; }
+    .col-budget { font-weight:700; color:#111827; white-space:nowrap; }
+    .s-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:20px; font-size:.72rem; font-weight:700; white-space:nowrap; }
+    .s-dot   { width:6px; height:6px; border-radius:50%; display:inline-block; }
+    .td-actions { display:flex; align-items:center; gap:6px; justify-content:flex-end; }
+    .btn-act { width:30px; height:30px; border-radius:7px; border:none; display:flex; align-items:center; justify-content:center; font-size:.75rem; cursor:pointer; text-decoration:none !important; }
+    .btn-act:hover { opacity:.8; }
+    .btn-view { background:#eef2ff; color:#6366f1; }
+    .filters-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+    .s-select { padding:8px 12px; border:1px solid #e5e7eb; border-radius:8px; font-size:.78rem; color:#374151; background:#fff; min-width:160px; cursor:pointer; outline:none; }
+    .s-select:focus { border-color:#6366f1; }
+    .search-box { position:relative; flex:1; min-width:200px; }
+    .search-box i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:.75rem; }
+    .search-box input { width:100%; padding:8px 10px 8px 30px; border:1px solid #e5e7eb; border-radius:8px; font-size:.78rem; outline:none; }
+    .search-box input:focus { border-color:#6366f1; }
+    .reset-link { padding:8px 12px; background:#f3f4f6; color:#6b7280; border-radius:8px; font-size:.75rem; font-weight:600; text-decoration:none !important; }
+    .page-hdr { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+    .page-hdr-title { font-size:1.1rem; font-weight:800; color:#111827; margin:0; }
+    .page-hdr-sub   { font-size:.75rem; color:#9ca3af; margin:2px 0 0; }
+    .btn-secondary  { display:inline-flex; align-items:center; gap:6px; background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; border-radius:8px; padding:8px 14px; font-size:.78rem; font-weight:700; text-decoration:none !important; }
+    .motif-tip { font-size:.7rem; color:#dc2626; cursor:pointer; }
+</style>
 @endpush
 
 @section('content')
-
 <div class="projets-page">
 
-    {{-- ── Header ── --}}
-    <div class="projets-header">
+    {{-- Header --}}
+    <div class="page-hdr">
         <div>
-            <h1 class="projets-title">Mes projets traités</h1>
-            <p class="projets-subtitle">{{ $projets->total() }} projet{{ $projets->total() > 1 ? 's' : '' }} traité{{ $projets->total() > 1 ? 's' : '' }}</p>
+            <h1 class="page-hdr-title">Mes projets traités</h1>
+            <p class="page-hdr-sub">{{ $projets->total() }} projet{{ $projets->total() > 1 ? 's' : '' }} traité{{ $projets->total() > 1 ? 's' : '' }}</p>
         </div>
+        <a href="{{ route('approbateur.projets.index') }}" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Projets à approuver
+        </a>
     </div>
 
-    {{-- ── Filtres ── --}}
-    <div class="projets-filters">
+    {{-- Filtres --}}
+    <div class="filters-bar">
 
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text"
-                    id="searchInput"
-                    class="search-input"
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput"
                     placeholder="Rechercher par titre ou code..."
                     value="{{ request('search') }}">
         </div>
+
+        <select id="secteurSelect" class="s-select">
+            <option value="">Tous les secteurs</option>
+            @foreach($secteurs as $secteur)
+            <option value="{{ $secteur->id }}" {{ request('secteur_id') == $secteur->id ? 'selected' : '' }}>
+                {{ $secteur->nomSecteur }}
+            </option>
+            @endforeach
+        </select>
 
         <div class="status-filters">
             @php
@@ -40,112 +91,107 @@
                 ];
             @endphp
             @foreach($statuts as $val => $label)
-            <a href="{{ route('approbateur.projets.mes_projets', array_merge(request()->query(), ['statut' => $val, 'search' => request('search')])) }}"
-                class="status-filter {{ request('statut', '') === $val ? 'active' : '' }}">
+            <a href="{{ route('approbateur.projets.mes_projets', array_merge(request()->query(), ['statut'=>$val])) }}"
+                class="status-filter {{ request('statut','') === $val ? 'active' : '' }}">
                 {{ $label }}
             </a>
             @endforeach
         </div>
 
+        @if(request('search') || request('secteur_id') || request('statut'))
+        <a href="{{ route('approbateur.projets.mes_projets') }}" class="reset-link">
+            <i class="fas fa-times"></i> Réinitialiser
+        </a>
+        @endif
+
     </div>
 
-    {{-- ── Tableau ── --}}
-    <div class="projets-table-wrap">
-        <div class="table-scroll">
-            <table class="projets-table">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Titre</th>
-                        <th>Porteur</th>
-                        <th>Secteur</th>
-                        <th>Montant demandé</th>
-                        <th>Statut</th>
-                        <th>Date traitement</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($projets as $projet)
-                    @php
-                        $statusClass = [
-                            'en_examen' => 'status-yellow',
-                            'approuve'  => 'status-green',
-                            'rejete'    => 'status-red',
-                        ][$projet->statutProjet] ?? 'status-gray';
-                        $statusLabel = [
-                            'en_examen' => 'En examen',
-                            'approuve'  => 'Approuvé',
-                            'rejete'    => 'Rejeté',
-                        ][$projet->statutProjet] ?? $projet->statutProjet;
-                    @endphp
-                    <tr>
-                        <td>
-                            <a href="{{ route('approbateur.projets.show', $projet) }}" class="projet-code">
-                                {{ $projet->codeProjet }}
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{{ route('approbateur.projets.show', $projet) }}" class="projet-titre">
-                                {{ $projet->titre }}
-                            </a>
-                        </td>
-                        <td class="td-muted">{{ optional($projet->porteur)->nomComplet ?? '—' }}</td>
-                        <td class="td-muted">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</td>
-                        <td class="td-budget">
-                            {{ $projet->montantDemande ? number_format($projet->montantDemande, 0, ',', ' ') . ' F CFA' : '—' }}
-                        </td>
-                        <td>
-                            <span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span>
-                            @if($projet->statutProjet === 'rejete' && $projet->motifRejet)
-                            <br>
-                            <small data-bs-toggle="tooltip" title="{{ $projet->motifRejet }}"
-                                    style="color:#dc2626;cursor:pointer;font-size:.7rem;">
-                                <i class="fas fa-info-circle"></i> Motif
-                            </small>
-                            @endif
-                        </td>
-                        <td class="td-muted">
-                            {{-- Date approbation ou date rejet (updated_at) --}}
-                            @if($projet->dateApprobation)
-                                {{ $projet->dateApprobation->format('d/m/Y') }}
-                            @else
-                                {{ $projet->updated_at->format('d/m/Y') }}
-                            @endif
-                        </td>
-                        <td>
-                            <div class="td-actions">
-                                <a href="{{ route('approbateur.projets.show', $projet) }}"
-                                    class="btn-icon" title="Voir">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="8" class="td-empty">
-                            <i class="fas fa-folder-open"></i>
-                            <p>
-                                @if(request('statut') || request('search'))
-                                    Aucun projet ne correspond à votre recherche.
-                                @else
-                                    Aucun projet traité pour l'instant.
-                                @endif
-                            </p>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+    {{-- Tableau --}}
+    <div class="table-wrap">
+        <table class="proj-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Titre</th>
+                    <th>Porteur</th>
+                    <th>Secteur</th>
+                    <th>Montant demandé</th>
+                    <th>Statut</th>
+                    <th>Date traitement</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @forelse($projets as $projet)
+            @php
+                $stMap = [
+                    'en_examen' => ['lbl'=>'En examen','bg'=>'#fff7ed','color'=>'#c2410c','dot'=>'#f97316'],
+                    'approuve'  => ['lbl'=>'Approuvé', 'bg'=>'#f0fdf4','color'=>'#15803d','dot'=>'#22c55e'],
+                    'rejete'    => ['lbl'=>'Rejeté',   'bg'=>'#fef2f2','color'=>'#b91c1c','dot'=>'#ef4444'],
+                ];
+                $st = $stMap[$projet->statutProjet] ?? ['lbl'=>$projet->statutProjet,'bg'=>'#f3f4f6','color'=>'#6b7280','dot'=>'#9ca3af'];
+                $dateTraitement = $projet->dateApprobation ?? $projet->updated_at;
+            @endphp
+            <tr>
+                <td><span class="col-code">{{ $projet->codeProjet }}</span></td>
+                <td>
+                    <a href="{{ route('approbateur.projets.show', $projet) }}" class="col-titre"
+                       style="text-decoration:none;color:#111827;">
+                        {{ \Illuminate\Support\Str::limit($projet->titre, 45) }}
+                    </a>
+                </td>
+                <td><span class="col-muted">{{ optional($projet->porteur)->nomComplet ?? '—' }}</span></td>
+                <td><span class="col-muted">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span></td>
+                <td>
+                    <span class="col-budget">
+                        {{ $projet->montantDemande ? number_format($projet->montantDemande,0,',',' ').' F CFA' : '—' }}
+                    </span>
+                </td>
+                <td>
+                    <span class="s-badge" style="background:{{ $st['bg'] }};color:{{ $st['color'] }};">
+                        <span class="s-dot" style="background:{{ $st['dot'] }};"></span>
+                        {{ $st['lbl'] }}
+                    </span>
+                    @if($projet->statutProjet === 'rejete' && $projet->motifRejet)
+                    <br>
+                    <span class="motif-tip" data-bs-toggle="tooltip" title="{{ $projet->motifRejet }}">
+                        <i class="fas fa-info-circle"></i> Motif
+                    </span>
+                    @endif
+                </td>
+                <td>
+                    <span class="col-muted">
+                        {{ optional($dateTraitement)->format('d/m/Y') ?? '—' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="td-actions">
+                        <a href="{{ route('approbateur.projets.show', $projet) }}"
+                           class="btn-act btn-view" title="Voir">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="8" style="text-align:center;padding:40px;color:#9ca3af;">
+                    <i class="fas fa-folder-open" style="font-size:1.8rem;margin-bottom:8px;display:block;"></i>
+                    @if(request('statut') || request('search') || request('secteur_id'))
+                        Aucun projet ne correspond à votre recherche.
+                    @else
+                        Aucun projet traité pour l'instant.
+                    @endif
+                </td>
+            </tr>
+            @endforelse
+            </tbody>
+        </table>
     </div>
 
-    {{-- ── Pagination ── --}}
+    {{-- Pagination --}}
     @if($projets->hasPages())
-    <div class="projets-pagination">
-        {{ $projets->withQueryString()->links() }}
-    </div>
+    <div style="margin-top:14px;">{{ $projets->withQueryString()->links() }}</div>
     @endif
 
 </div>
@@ -161,7 +207,15 @@ document.getElementById('searchInput').addEventListener('input', function () {
         url.searchParams.set('search', val);
         url.searchParams.delete('page');
         window.location.href = url.toString();
-    }, 400);
+    }, 450);
+});
+
+document.getElementById('secteurSelect').addEventListener('change', function () {
+    const url = new URL(window.location.href);
+    if (this.value) url.searchParams.set('secteur_id', this.value);
+    else url.searchParams.delete('secteur_id');
+    url.searchParams.delete('page');
+    window.location.href = url.toString();
 });
 
 document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
@@ -169,5 +223,4 @@ document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
 });
 </script>
 @endpush
-
 @endsection

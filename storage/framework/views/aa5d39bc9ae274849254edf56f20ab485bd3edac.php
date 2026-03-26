@@ -135,8 +135,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<?php echo e(route('validateur.projets.index')); ?>"
-                    class="nav-link <?php echo e(request()->routeIs('validateur.projets.mes-projets') ? 'active' : ''); ?>"
+                <a href="<?php echo e(route('validateur.projets.mes_projets')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs('validateur.projets.mes_projets') ? 'active' : ''); ?>"
                     data-tooltip="Mes projets traités">
                     <i class="fas fa-folder-open"></i>
                     <span>Mes projets traités</span>

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Projets à valider')
+@section('title', 'Mes projets traités')
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/validDash.css') }}">
 @endpush
@@ -10,17 +10,16 @@
     {{-- Header --}}
     <div class="page-header" style="margin-bottom:16px;">
         <div>
-            <h1 class="page-title">Projets à valider</h1>
-            <p class="page-sub">{{ $projets->total() }} projet(s) en attente de validation</p>
+            <h1 class="page-title">Mes projets traités</h1>
+            <p class="page-sub">{{ $projets->total() }} projet(s) traité(s) par vous</p>
         </div>
-        <a href="{{ route('validateur.projets.mes_projets') }}" class="btn-back"
-            style="background:#f0fdfa;color:#0f766e;border-color:#99f6e4;">
-            <i class="fas fa-history"></i> Mes projets traités
+        <a href="{{ route('validateur.projets.index') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> À valider
         </a>
     </div>
 
     {{-- Filtres --}}
-    <form method="GET" action="{{ route('validateur.projets.index') }}" id="filterForm">
+    <form method="GET" action="{{ route('validateur.projets.mes_projets') }}" id="filterForm">
         <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
 
             {{-- Recherche --}}
@@ -36,7 +35,7 @@
             {{-- Secteur --}}
             <select name="secteur_id" onchange="document.getElementById('filterForm').submit()"
                     style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;
-                            font-size:.78rem;color:#374151;background:#fff;min-width:160px;">
+                           font-size:.78rem;color:#374151;background:#fff;min-width:160px;">
                 <option value="">Tous les secteurs</option>
                 @foreach($secteurs as $secteur)
                 <option value="{{ $secteur->id }}" {{ request('secteur_id') == $secteur->id ? 'selected' : '' }}>
@@ -45,15 +44,23 @@
                 @endforeach
             </select>
 
-            {{-- Bouton recherche --}}
+            {{-- Statut --}}
+            <select name="statut" onchange="document.getElementById('filterForm').submit()"
+                    style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;
+                           font-size:.78rem;color:#374151;background:#fff;min-width:130px;">
+                <option value="">Tous les statuts</option>
+                <option value="valide"  {{ request('statut') === 'valide'  ? 'selected' : '' }}>Validés</option>
+                <option value="rejete"  {{ request('statut') === 'rejete'  ? 'selected' : '' }}>Rejetés</option>
+            </select>
+
             <button type="submit"
                     style="padding:8px 16px;background:#0d9488;color:#fff;border:none;
-                            border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;">
+                           border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;">
                 <i class="fas fa-filter"></i> Filtrer
             </button>
 
-            @if(request('search') || request('secteur_id'))
-            <a href="{{ route('validateur.projets.index') }}"
+            @if(request('search') || request('secteur_id') || request('statut'))
+            <a href="{{ route('validateur.projets.mes_projets') }}"
                style="padding:8px 12px;background:#f3f4f6;color:#6b7280;border-radius:8px;
                       font-size:.78rem;font-weight:600;text-decoration:none;">
                 <i class="fas fa-times"></i> Réinitialiser
@@ -62,8 +69,15 @@
         </div>
     </form>
 
-    {{-- Liste projets --}}
+    {{-- Liste --}}
     @forelse($projets as $projet)
+    @php
+        $stMap = [
+            'valide' => ['lbl'=>'Validé', 'bg'=>'#f0fdfa','color'=>'#0f766e','dot'=>'#0d9488'],
+            'rejete' => ['lbl'=>'Rejeté', 'bg'=>'#fef2f2','color'=>'#b91c1c','dot'=>'#ef4444'],
+        ];
+        $st = $stMap[$projet->statutProjet] ?? $stMap['valide'];
+    @endphp
     <div class="proj-card" style="margin-bottom:10px;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
             <div style="flex:1;min-width:0;">
@@ -71,8 +85,8 @@
                     <span style="font-size:.68rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;">
                         {{ $projet->codeProjet }}
                     </span>
-                    <span class="status-badge" style="background:#f0fdf4;color:#15803d;">
-                        <span class="dot" style="background:#22c55e;"></span>Approuvé
+                    <span class="status-badge" style="background:{{ $st['bg'] }};color:{{ $st['color'] }};">
+                        <span class="dot" style="background:{{ $st['dot'] }};"></span>{{ $st['lbl'] }}
                     </span>
                 </div>
                 <h3 style="font-size:.9rem;font-weight:700;color:#111827;margin:0 0 6px;line-height:1.3;">
@@ -82,18 +96,35 @@
                     <span><i class="fas fa-user" style="margin-right:3px;"></i>{{ optional($projet->porteur)->nomComplet ?? '—' }}</span>
                     <span><i class="fas fa-tag" style="margin-right:3px;"></i>{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
                     <span><i class="fas fa-wallet" style="margin-right:3px;"></i>{{ number_format($projet->montantDemande ?? 0, 0, ',', ' ') }} F CFA</span>
-                    <span><i class="fas fa-calendar" style="margin-right:3px;"></i>Approuvé le {{ optional($projet->dateApprobation)->format('d/m/Y') ?? '—' }}</span>
+                    <span><i class="fas fa-calendar-check" style="margin-right:3px;"></i>
+                        Traité le {{ optional($projet->validated_at)->format('d/m/Y') ?? '—' }}
+                    </span>
                 </div>
+
+                {{-- Motif rejet --}}
+                @if($projet->statutProjet === 'rejete' && $projet->motifRejet)
+                <div style="margin-top:8px;padding:8px 12px;background:#fef2f2;
+                            border:1px solid #fecaca;border-radius:8px;
+                            font-size:.76rem;color:#b91c1c;">
+                    <i class="fas fa-comment-alt" style="margin-right:5px;"></i>
+                    <strong>Motif :</strong> {{ $projet->motifRejet }}
+                </div>
+                @endif
             </div>
-            <a href="{{ route('validateur.projets.show', $projet) }}" class="btn-examiner">
-                <i class="fas fa-eye"></i> Examiner
+
+            <a href="{{ route('validateur.projets.show', $projet) }}"
+               style="display:inline-flex;align-items:center;gap:6px;
+                      background:#eef2ff;color:#6366f1;border-radius:8px;
+                      padding:7px 12px;font-size:.75rem;font-weight:700;
+                      text-decoration:none;flex-shrink:0;">
+                <i class="fas fa-eye"></i> Voir
             </a>
         </div>
     </div>
     @empty
     <div class="empty-state" style="margin-top:30px;">
-        <i class="fas fa-check-double" style="font-size:2rem;color:#0d9488;margin-bottom:8px;"></i>
-        <p>Aucun projet en attente de validation.</p>
+        <i class="fas fa-folder-open" style="font-size:2rem;color:#9ca3af;margin-bottom:8px;"></i>
+        <p>Vous n'avez traité aucun projet pour le moment.</p>
     </div>
     @endforelse
 

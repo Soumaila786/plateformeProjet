@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Récupérer les données depuis les attributs data ou depuis les variables globales
     const chartData = window.chartData || {};
 
-    // ── Donut Chart ──
+    // Donut Chart
     if (donutCanvas && chartData.donut) {
         new Chart(donutCanvas, {
             type: 'doughnut',
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Délais Chart ──
+    // Délais Chart
     if (delaiCanvas && chartData.delais) {
         new Chart(delaiCanvas, {
             type: 'bar',
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Secteurs barres groupées ──
+    // Secteurs barres groupées
     if (secteurCanvas && chartData.secteurs) {
         new Chart(secteurCanvas, {
             type: 'bar',
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Évolution cumulative ──
+    // Évolution cumulative
     if (evolutionCanvas && chartData.evolution) {
         new Chart(evolutionCanvas, {
             type: 'line',
