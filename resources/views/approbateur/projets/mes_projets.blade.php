@@ -1,6 +1,9 @@
 @extends('layouts.app')
+
 @section('title', 'Mes projets traités')
+
 @push('styles')
+
 <link rel="stylesheet" href="{{ asset('css/projet.css') }}">
 <link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
 <style>

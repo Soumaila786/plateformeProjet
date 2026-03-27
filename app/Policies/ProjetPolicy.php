@@ -7,9 +7,8 @@ use App\Models\Projet;
 
 class ProjetPolicy
 {
-    // ── Voir un projet ──
-    public function view(User $user, Projet $projet)
-    {
+    // Voir un projet
+    public function view(User $user, Projet $projet){
         switch ($user->role) {
             case 'admin':
             case 'approbateur':
@@ -22,15 +21,13 @@ class ProjetPolicy
         }
     }
 
-    // ── Créer un projet ──
-    public function create(User $user)
-    {
+    // Créer un projet
+    public function create(User $user) {
         return $user->role === 'porteur';
     }
 
-    // ── Modifier un projet ──
-    public function update(User $user, Projet $projet)
-    {
+    // Modifier un projet
+    public function update(User $user, Projet $projet){
         switch ($user->role) {
             case 'porteur':
                 return $projet->user_id === $user->id
@@ -42,9 +39,8 @@ class ProjetPolicy
         }
     }
 
-    // ── Supprimer un projet ──
-    public function delete(User $user, Projet $projet)
-    {
+    // Supprimer un projet
+    public function delete(User $user, Projet $projet){
         switch ($user->role) {
             case 'porteur':
                 return $projet->user_id === $user->id
@@ -128,7 +124,7 @@ class ProjetPolicy
         }
     }
 
-    // ── Gérer les ACTIVITÉS (porteur seulement) ──
+    // Gérer les ACTIVITÉS (porteur seulement)
     public function gererActivite(User $user, Projet $projet)
     {
         // Seul le porteur gère ses activités, tant que le projet n'est pas approuvé/validé
@@ -137,7 +133,7 @@ class ProjetPolicy
             && !in_array($projet->statutProjet, ['approuve', 'valide']);
     }
 
-    // ── Gérer la PLANIFICATION (approbateur seulement) ──
+    // Gérer la PLANIFICATION (approbateur seulement)
     public function gererPlanification(User $user, Projet $projet)
     {
         // L'approbateur planifie sur les projets soumis, en examen ou approuvés
@@ -145,7 +141,7 @@ class ProjetPolicy
             && in_array($projet->statutProjet, ['soumis', 'en_examen', 'approuve']);
     }
 
-    // ── Voir la planification ──
+    // Voir la planification
     public function voirPlanification(User $user, Projet $projet)
     {
         switch ($user->role) {

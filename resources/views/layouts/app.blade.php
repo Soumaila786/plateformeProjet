@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title> @yield('title', config('app.name')) </title>
+    <title>@yield('title', $sysConfig->get('nom_app', config('app.name')))</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}">
@@ -14,9 +14,16 @@
 
     <style>
         * { font-family: 'Poppins', sans-serif; }
+
+        {{-- Couleur primaire dynamique via CSS variable --}}
+        :root {
+            --color-primary: {{ $sysConfig->get('couleur_primaire', '#6366f1') }};
+            --color-primary-light: {{ $sysConfig->get('couleur_primaire', '#6366f1') }}18;
+        }
     </style>
 
     @stack('styles')
+
     <style>
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
         .app-layout { display: flex; height: 100vh; width: 100%; overflow: hidden; }
@@ -26,11 +33,45 @@
     </style>
 </head>
 <body>
+
+{{-- Mode maintenance : bloquer les non-admins --}}
+@php
+    $enMaintenance = $sysConfig->get('mode_maintenance', '0') === '1';
+    $isAdmin = auth()->check() && auth()->user()->role === 'admin';
+@endphp
+
+@if($enMaintenance && !$isAdmin)
+<div style="display:flex;align-items:center;justify-content:center;height:100vh;
+            background:#f8fafc;flex-direction:column;gap:16px;text-align:center;padding:20px;">
+    <div style="width:60px;height:60px;background:#fef2f2;border-radius:16px;
+                display:flex;align-items:center;justify-content:center;font-size:1.8rem;">
+        🔧
+    </div>
+    <h2 style="font-size:1.4rem;font-weight:800;color:#111827;margin:0;">
+        {{ $sysConfig->get('nom_app', 'GesProjet') }} est en maintenance
+    </h2>
+    <p style="font-size:.9rem;color:#6b7280;max-width:400px;margin:0;">
+        Nous effectuons des opérations de maintenance. Veuillez réessayer dans quelques instants.
+    </p>
+    @auth
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" style="padding:8px 18px;background:#f3f4f6;border:1px solid #e5e7eb;
+                border-radius:8px;font-size:.82rem;cursor:pointer;color:#374151;">
+            Se déconnecter
+        </button>
+    </form>
+    @endauth
+</div>
+@else
+
 <div class="app-layout">
     @auth
         @include('partials.sidebar')
     @endauth
+    
     <div class="app-content">
+        {{-- Alertes session --}}
         @if(session('success') || session('error') || session('warning'))
         <div class="px-4 pt-4">
             @if(session('success'))
@@ -57,9 +98,11 @@
         <div class="content-area">
             @yield('content')
         </div>
-
     </div>
 </div>
+
+@endif
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
 </body>

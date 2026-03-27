@@ -2,7 +2,7 @@
 
 .adm-wrap { display:flex; flex-direction:column; gap:18px; }
 
-/* ── Banner ── */
+/*  Banner  */
 .adm-banner {
     position:relative; overflow:hidden; border-radius:14px;
     background:linear-gradient(135deg,#1e1b4b,#312e81);
@@ -23,7 +23,7 @@
 .adm-banner-circle.c1 { width:160px; height:160px; top:-50px; right:-40px; }
 .adm-banner-circle.c2 { width:100px; height:100px; bottom:-30px; right:80px; }
 
-/* ── Stats projets ── */
+/*  Stats projets  */
 .adm-stats {
     display:grid; grid-template-columns:repeat(6,1fr); gap:12px;
 }
@@ -40,13 +40,13 @@
 .adm-stat-lbl   { font-size:.7rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.04em; }
 .adm-stat-ic    {
     width:32px; height:32px; border-radius:8px;
-    background:#f5f3ff; color:#7c3aed;
+    background:#f5f3ff; color:#4a51e4;
     display:flex; align-items:center; justify-content:center; font-size:.78rem;
 }
 .adm-stat-val  { font-size:1.7rem; font-weight:800; color:#111827; letter-spacing:-.03em; margin:0 0 2px; line-height:1; }
 .adm-stat-hint { font-size:.68rem; color:#9ca3af; margin:0; }
 
-/* ── Meta cards (users/secteurs) ── */
+/*  Meta cards (users/secteurs)  */
 .adm-meta-grid {
     display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
 }
@@ -63,7 +63,7 @@
 
 .adm-meta-ic {
     width:38px; height:38px; border-radius:10px; flex-shrink:0;
-    background:#f5f3ff; color:#7c3aed;
+    background:#f5f3ff; color:#4a51e4;
     display:flex; align-items:center; justify-content:center; font-size:.9rem;
 }
 .adm-meta-warn .adm-meta-ic { background:#fff7ed; color:#ea580c; }
@@ -71,7 +71,7 @@
 .adm-meta-val  { font-size:1.4rem; font-weight:800; color:#111827; margin:0 0 1px; letter-spacing:-.02em; line-height:1; }
 .adm-meta-hint { font-size:.68rem; color:#9ca3af; margin:0; }
 
-/* ── Lien analytique ── */
+/*  Lien analytique  */
 .analytique-link {
     display:flex; align-items:center; justify-content:space-between;
     background:linear-gradient(135deg,#f5f3ff,#ede9fe);
@@ -79,23 +79,23 @@
     padding:14px 20px; text-decoration:none !important;
     transition:box-shadow .15s, transform .15s; gap:12px;
 }
-.analytique-link:hover { box-shadow:0 4px 16px rgba(124,58,237,.15); transform:translateY(-1px); }
+.analytique-link:hover { box-shadow:0 4px 16px rgba(58, 58, 237, 0.15); transform:translateY(-1px); }
 .analytique-link-left  { display:flex; align-items:center; gap:14px; }
 .analytique-link-ic {
     width:42px; height:42px; border-radius:11px;
-    background:#7c3aed; color:#fff;
+    background:#4a51e4; color:#fff;
     display:flex; align-items:center; justify-content:center;
     font-size:1rem; flex-shrink:0;
 }
 .analytique-link-title { font-size:.88rem; font-weight:800; color:#111827; margin:0 0 2px; }
 .analytique-link-sub   { font-size:.72rem; color:#6b7280; margin:0; }
 .analytique-link-cta   {
-    font-size:.78rem; font-weight:700; color:#7c3aed;
+    font-size:.78rem; font-weight:700; color:#4a51e4;
     display:inline-flex; align-items:center; gap:6px;
     white-space:nowrap; flex-shrink:0;
 }
 
-/* ── Layout principal ── */
+/*  Layout principal  */
 .adm-main-grid {
     display:grid; grid-template-columns:1fr 290px; gap:14px; align-items:start;
 }
@@ -103,7 +103,7 @@
 
 .adm-aside { display:flex; flex-direction:column; gap:12px; }
 
-/* ── Cards communes ── */
+/*  Cards communes  */
 .card {
     background:#fff; border:1px solid #e5e7eb; border-radius:12px;
     overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06);
@@ -118,9 +118,9 @@
     text-decoration:none; display:inline-flex; align-items:center; gap:3px; transition:color .12s;
 }
 .link-more i { font-size:.55rem; }
-.link-more:hover { color:#7c3aed; }
+.link-more:hover { color:#4a51e4; }
 
-/* ── Projet row ── */
+/*  Projet row  */
 .projet-row {
     display:flex; align-items:center; gap:11px;
     padding:11px 16px; border-bottom:1px solid #f9fafb;
@@ -138,7 +138,7 @@
 .projet-name { font-size:.82rem; font-weight:600; color:#111827; margin:0 0 1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .projet-sub  { font-size:.7rem; color:#9ca3af; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* ── User row ── */
+/*  User row  */
 .user-row {
     display:flex; align-items:center; gap:11px;
     padding:10px 16px; border-bottom:1px solid #f9fafb;
@@ -148,12 +148,12 @@
 .user-row:hover { background:#fafafa; }
 .user-avatar {
     width:32px; height:32px; border-radius:8px; flex-shrink:0;
-    background:linear-gradient(135deg,#7c3aed,#6d28d9);
+    background:linear-gradient(135deg,#4a51e4,#6d28d9);
     color:#fff; font-size:.78rem; font-weight:800;
     display:flex; align-items:center; justify-content:center;
 }
 
-/* ── Badge statut ── */
+/*  Badge statut  */
 .status-badge {
     display:inline-flex; align-items:center; gap:5px;
     padding:3px 9px; border-radius:20px; font-size:.7rem; font-weight:600;
@@ -161,7 +161,7 @@
 }
 .dot { width:6px; height:6px; border-radius:50%; display:inline-block; }
 
-/* ── Raccourcis ── */
+/*  Raccourcis  */
 .adm-shortcuts {
     padding:10px 12px 12px;
     display:grid; grid-template-columns:1fr 1fr; gap:8px;
@@ -176,12 +176,12 @@
 .shortcut-item:hover { background:#ede9fe; border-color:#c4b5fd; }
 .shortcut-ic {
     width:28px; height:28px; border-radius:7px;
-    background:#7c3aed; color:#fff;
+    background:#4a51e4; color:#fff;
     display:flex; align-items:center; justify-content:center;
     font-size:.72rem; flex-shrink:0;
 }
 
-/* ── Empty ── */
+/*  Empty  */
 .empty-state {
     display:flex; flex-direction:column; align-items:center;
     gap:8px; padding:28px 16px; color:#9ca3af; text-align:center;

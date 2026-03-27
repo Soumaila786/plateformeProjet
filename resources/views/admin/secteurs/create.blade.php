@@ -21,15 +21,15 @@
                     <div class="form-col form-col-full">
                         <label class="field-label">Nom du secteur <span class="required">*</span></label>
                         <input type="text" name="nomSecteur" value="{{ old('nomSecteur') }}"
-                               class="field-input @error('nomSecteur') is-invalid @enderror"
-                               placeholder="Ex : Agriculture, Santé..." required>
+                                class="field-input @error('nomSecteur') is-invalid @enderror"
+                                placeholder="Ex : Agriculture, Santé..." required>
                         @error('nomSecteur')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-col form-col-full">
                         <label class="field-label">Description</label>
                         <textarea name="description" rows="3"
-                                  class="field-input field-textarea @error('description') is-invalid @enderror"
-                                  placeholder="Description (optionnel)...">{{ old('description') }}</textarea>
+                                    class="field-input field-textarea @error('description') is-invalid @enderror"
+                                    placeholder="Description (optionnel)...">{{ old('description') }}</textarea>
                         @error('description')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-col">

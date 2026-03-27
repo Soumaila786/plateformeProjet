@@ -1,4 +1,4 @@
-<?php $__env->startSection('title', 'Analytique — Administration'); ?>
+<?php $__env->startSection('title', 'Tableau Analytique'); ?>
 
 <?php $__env->startPush('styles'); ?>
 <link rel="stylesheet" href="<?php echo e(asset('css/adminAnalytique.css')); ?>">

@@ -221,7 +221,6 @@
     <tr>
         <td>
             <div class="footer-note">
-                Document généré automatiquement par GesProjet &mdash; Usage interne et confidentiel.<br>
                 Toute reproduction non autorisée est strictement interdite.
             </div>
             <div class="footer-copy">&copy; {{ date('Y') }} GesProjet &mdash; Tous droits réservés</div>

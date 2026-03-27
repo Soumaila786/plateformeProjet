@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Analytique — Administration')
+@section('title', 'Tableau Analytique')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/adminAnalytique.css') }}">
@@ -19,7 +19,7 @@
     </a>
 </div>
 
-{{-- ════ 1. KPIs ════ --}}
+{{--  1. KPIs  --}}
 <div class="kpi-grid">
     @php
         $kpiItems = [
@@ -43,7 +43,7 @@
     @endforeach
 </div>
 
-{{-- ════ DÉLAIS KPI ════ --}}
+{{--  DÉLAIS KPI  --}}
 <div class="delai-grid">
     <div class="delai-card">
         <i class="fas fa-stopwatch delai-ic"></i>
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-{{-- ════ LIGNE 1 : Entonnoir + Donut ════ --}}
+{{--  LIGNE 1 : Entonnoir + Donut  --}}
 <div class="an-row-2">
 
     {{-- Entonnoir --}}
@@ -117,7 +117,7 @@
 
 </div>
 
-{{-- ════ LIGNE 2 : Évolution + Rejets ════ --}}
+{{--  LIGNE 2 : Évolution + Rejets  --}}
 <div class="an-row-2">
 
     {{-- Évolution mensuelle --}}
@@ -140,7 +140,7 @@
 
 </div>
 
-{{-- ════ LIGNE 3 : Secteurs ════ --}}
+{{--  LIGNE 3 : Secteurs  --}}
 <div class="an-card">
     <div class="an-card-head">
         <h3 class="an-card-title">Top secteurs d'activité</h3>
@@ -149,7 +149,7 @@
     <div class="chart-box" style="height:260px;"><canvas id="secteurChart"></canvas></div>
 </div>
 
-{{-- ════ LIGNE 4 : Performance porteurs + Charge équipes ════ --}}
+{{--  LIGNE 4 : Performance porteurs + Charge équipes  --}}
 <div class="an-row-2">
 
     {{-- Top porteurs --}}
@@ -196,7 +196,7 @@
 
 </div>
 
-{{-- ════ 9. PROJETS BLOQUÉS ════ --}}
+{{--  9. PROJETS BLOQUÉS  --}}
 <div class="an-card" style="margin-bottom:0;">
     <div class="an-card-head">
         <h3 class="an-card-title">

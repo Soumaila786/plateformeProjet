@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Analytique — Approbateur')
+@section('title', 'Tableau Analytique')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">

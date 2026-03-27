@@ -95,6 +95,12 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('projets/{projet}/activites/{activite}', [ActiviteController::class, 'destroy'])
             ->name('projets.activites.destroy');
 
+        // Configuration du système
+
+        Route::get('/configuration',  [App\Http\Controllers\Admin\ConfigurationController::class, 'index'])->name('configuration.index');
+        Route::put('/configuration',  [App\Http\Controllers\Admin\ConfigurationController::class, 'update'])->name('configuration.update');
+        Route::post('/configuration/{cle}/reset', [App\Http\Controllers\Admin\ConfigurationController::class, 'reset']) ->name('configuration.reset');
+
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/toutes-lues', [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');

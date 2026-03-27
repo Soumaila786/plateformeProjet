@@ -22,15 +22,29 @@
             </div>
             <div class="page-header-actions">
                 @php
-                    $sc = ['brouillon'=>'status-gray','soumis'=>'status-blue','en_examen'=>'status-yellow','approuve'=>'status-green','valide'=>'status-teal','rejete'=>'status-red'];
-                    $sl = ['brouillon'=>'Brouillon','soumis'=>'Soumis','en_examen'=>'En examen','approuve'=>'Approuvé','valide'=>'Validé','rejete'=>'Rejeté'];
+                    $sc = [
+                        'brouillon'=>'status-gray',
+                        'soumis'=>'status-blue',
+                        'en_examen'=>'status-yellow',
+                        'approuve'=>'status-green',
+                        'valide'=>'status-teal',
+                        'rejete'=>'status-red'
+                    ];
+                    $sl = [
+                        'brouillon'=>'Brouillon',
+                        'soumis'=>'Soumis',
+                        'en_examen'=>'En examen',
+                        'approuve'=>'Approuvé',
+                        'valide'=>'Validé',
+                        'rejete'=>'Rejeté'
+                    ];
                 @endphp
                 <span class="status-badge {{ $sc[$projet->statutProjet] ?? 'status-gray' }} status-lg">
                     {{ $sl[$projet->statutProjet] ?? $projet->statutProjet }}
                 </span>
-                <button type="button" class="btn-edit-main" onclick="openModal('modalStatut')">
+                {{-- <button type="button" class="btn-edit-main" onclick="openModal('modalStatut')">
                     <i class="fas fa-exchange-alt"></i> Changer le statut
-                </button>
+                </button> --}}
                 <form method="POST" action="{{ route('admin.projets.destroy', $projet) }}"
                         onsubmit="return confirm('Supprimer définitivement ce projet ?')" style="display:inline;">
                     @csrf @method('DELETE')
@@ -43,10 +57,14 @@
     </div>
 
     @if(session('success'))
-    <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i> {{ session('success') }}
+    </div>
     @endif
     @if(session('error'))
-    <div class="alert alert-error"><i class="fas fa-times-circle"></i> {{ session('error') }}</div>
+    <div class="alert alert-error">
+        <i class="fas fa-times-circle"></i> {{ session('error') }}
+    </div>
     @endif
 
     {{-- ── Informations générales ── --}}
@@ -158,16 +176,16 @@
                 @php
                     $ext  = pathinfo($doc->nomFichier, PATHINFO_EXTENSION);
                     $icon = in_array($ext, ['pdf']) ? 'fa-file-pdf'
-                          : (in_array($ext, ['doc','docx']) ? 'fa-file-word'
-                          : (in_array($ext, ['xls','xlsx']) ? 'fa-file-excel'
-                          : (in_array($ext, ['jpg','jpeg','png']) ? 'fa-file-image' : 'fa-file-alt')));
+                            : (in_array($ext, ['doc','docx']) ? 'fa-file-word'
+                            : (in_array($ext, ['xls','xlsx']) ? 'fa-file-excel'
+                            : (in_array($ext, ['jpg','jpeg','png']) ? 'fa-file-image' : 'fa-file-alt')));
                 @endphp
                 <i class="fas {{ $icon }}"></i>
                 <span class="doc-file-name">{{ $doc->nomFichier }}</span>
                 <span class="doc-badge">{{ $doc->typeDocument }}</span>
                 <span class="doc-uploader">{{ optional($doc->uploader)->nomComplet ?? '—' }}</span>
                 <a href="{{ route('admin.projets.documents.download', [$projet, $doc]) }}"
-                   class="doc-action-link" title="Télécharger">
+                    class="doc-action-link" title="Télécharger">
                     <i class="fas fa-download"></i>
                 </a>
             </div>
@@ -182,7 +200,7 @@
     <div class="form-card mt-3">
         <div class="form-card-header">
             <i class="fas fa-comments"></i>
-            <span>Historique des actions ({{ $projet->commentaires->count() }})</span>
+            <span>Historique des commentaires du projet ({{ $projet->commentaires->count() }})</span>
         </div>
         <div class="form-card-body">
             <div class="timeline">
@@ -199,7 +217,7 @@
                     </div>
                     <div class="timeline-content">
                         <div class="timeline-header">
-                            <span class="timeline-author">{{ optional($commentaire->utilisateur)->nomComplet ?? '—' }}</span>
+                            <span class="timeline-author">{{ optional($commentaire->utilisateur)->role ?? '—' }}</span>
                             <span class="timeline-date">{{ $commentaire->dateEnvoi->format('d/m/Y à H:i') }}</span>
                         </div>
                         <p class="timeline-message">{{ $commentaire->message }}</p>
@@ -244,58 +262,58 @@
 
 @push('scripts')
 <script>
-function openModal(id) {
-    document.getElementById(id).classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-    document.body.style.overflow = '';
-}
-document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
-});
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+    });
 
-const newDocInput  = document.getElementById('newDocuments');
-const newFileList  = document.getElementById('newFileList');
-const submitDocBtn = document.getElementById('submitDocBtn');
+    const newDocInput  = document.getElementById('newDocuments');
+    const newFileList  = document.getElementById('newFileList');
+    const submitDocBtn = document.getElementById('submitDocBtn');
 
-newDocInput.addEventListener('change', function() {
-    const files = Array.from(this.files);
-    if (!files.length) return;
-    newFileList.style.display = 'block';
-    submitDocBtn.style.display = 'block';
-    newFileList.innerHTML = files.map(f => `
-        <div class="doc-file-item">
-            <i class="${getIcon(f.name)} doc-file-icon"></i>
-            <div class="doc-file-info">
-                <span class="doc-file-name">${f.name}</span>
-                <span class="doc-file-size">${formatSize(f.size)}</span>
-            </div>
-            <span class="doc-file-ok"><i class="fas fa-check-circle"></i> Accepté</span>
-        </div>`).join('');
-});
+    newDocInput.addEventListener('change', function() {
+        const files = Array.from(this.files);
+        if (!files.length) return;
+        newFileList.style.display = 'block';
+        submitDocBtn.style.display = 'block';
+        newFileList.innerHTML = files.map(f => `
+            <div class="doc-file-item">
+                <i class="${getIcon(f.name)} doc-file-icon"></i>
+                <div class="doc-file-info">
+                    <span class="doc-file-name">${f.name}</span>
+                    <span class="doc-file-size">${formatSize(f.size)}</span>
+                </div>
+                <span class="doc-file-ok"><i class="fas fa-check-circle"></i> Accepté</span>
+            </div>`).join('');
+    });
 
-function resetDocForm() {
-    newDocInput.value = '';
-    newFileList.innerHTML = ''; newFileList.style.display = 'none';
-    submitDocBtn.style.display = 'none';
-}
+    function resetDocForm() {
+        newDocInput.value = '';
+        newFileList.innerHTML = ''; newFileList.style.display = 'none';
+        submitDocBtn.style.display = 'none';
+    }
 
-function getIcon(name) {
-    const ext = name.split('.').pop().toLowerCase();
-    if (['pdf'].includes(ext))              return 'fas fa-file-pdf';
-    if (['doc','docx'].includes(ext))       return 'fas fa-file-word';
-    if (['xls','xlsx'].includes(ext))       return 'fas fa-file-excel';
-    if (['jpg','jpeg','png'].includes(ext)) return 'fas fa-file-image';
-    return 'fas fa-file-alt';
-}
+    function getIcon(name) {
+        const ext = name.split('.').pop().toLowerCase();
+        if (['pdf'].includes(ext))              return 'fas fa-file-pdf';
+        if (['doc','docx'].includes(ext))       return 'fas fa-file-word';
+        if (['xls','xlsx'].includes(ext))       return 'fas fa-file-excel';
+        if (['jpg','jpeg','png'].includes(ext)) return 'fas fa-file-image';
+        return 'fas fa-file-alt';
+    }
 
-function formatSize(b) {
-    if (b < 1024) return b + ' o';
-    if (b < 1048576) return (b/1024).toFixed(1) + ' Ko';
-    return (b/1048576).toFixed(1) + ' Mo';
-}
+    function formatSize(b) {
+        if (b < 1024) return b + ' o';
+        if (b < 1048576) return (b/1024).toFixed(1) + ' Ko';
+        return (b/1048576).toFixed(1) + ' Mo';
+    }
 </script>
 @endpush
 

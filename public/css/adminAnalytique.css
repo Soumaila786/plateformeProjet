@@ -1,30 +1,66 @@
 /* adminAnalytique.css */
 
-.an-wrap  { display:flex; flex-direction:column; gap:16px; }
+.an-wrap  {
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
 
-/* ── Header ── */
-.an-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
-.an-title  { font-size:1.2rem; font-weight:800; color:#111827; margin:0 0 2px; letter-spacing:-.02em; }
-.an-sub    { font-size:.74rem; color:#9ca3af; margin:0; }
+/*  Header  */
+.an-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap; gap:10px;
+}
+.an-title  {
+    font-size:1.2rem;
+    font-weight:800;
+    color:#111827;
+    margin:0 0 2px;
+    letter-spacing:-.02em;
+}
+.an-sub    {
+    font-size:.74rem;
+    color:#9ca3af;
+    margin:0;
+}
 
 .btn-back {
-    display:inline-flex; align-items:center; gap:6px;
-    background:#f3f4f6; color:#374151 !important; text-decoration:none !important;
-    border:1px solid #e5e7eb; border-radius:8px; padding:8px 13px;
-    font-size:.78rem; font-weight:600; transition:background .15s; flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#f3f4f6;
+    color:#374151 !important;
+    text-decoration:none !important;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:8px 13px;
+    font-size:.78rem;
+    font-weight:600;
+    transition:background .15s;
+    flex-shrink:0;
 }
-.btn-back:hover { background:#e5e7eb; }
+.btn-back:hover {
+    background:#e5e7eb;
+}
 
-/* ── KPIs ── */
+/*  KPIs  */
 .kpi-grid {
-    display:grid; grid-template-columns:repeat(7,1fr); gap:10px;
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:10px;
 }
+
 @media(max-width:1200px) { .kpi-grid { grid-template-columns:repeat(4,1fr); } }
 @media(max-width:700px)  { .kpi-grid { grid-template-columns:repeat(2,1fr); } }
 
 .kpi-card {
-    background:#fff; border:1px solid #e5e7eb; border-radius:12px;
-    padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,.05);
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
     transition:box-shadow .15s;
 }
 .kpi-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.09); }
@@ -34,44 +70,96 @@
 .kpi-red    { border-top:3px solid #ef4444; }
 .kpi-teal   { border-top:3px solid #0d9488; }
 
-.kpi-top  { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-.kpi-lbl  { font-size:.68rem; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:.04em; }
+.kpi-top  {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+}
+.kpi-lbl  {
+    font-size:.68rem;
+    font-weight:700;
+    color:#9ca3af;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+}
 .kpi-icon {
-    width:28px; height:28px; border-radius:7px;
-    background:#f3f4f6; color:#6b7280;
-    display:flex; align-items:center; justify-content:center; font-size:.72rem;
+    width:28px;
+    height:28px;
+    border-radius:7px;
+    background:#f3f4f6;
+    color:#6b7280;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.72rem;
 }
 .kpi-indigo .kpi-icon { background:#eef2ff; color:#6366f1; }
 .kpi-orange .kpi-icon { background:#fff7ed; color:#f97316; }
 .kpi-green  .kpi-icon { background:#f0fdf4; color:#22c55e; }
 .kpi-red    .kpi-icon { background:#fef2f2; color:#ef4444; }
 .kpi-teal   .kpi-icon { background:#f0fdfa; color:#0d9488; }
-.kpi-val  { font-size:1.6rem; font-weight:800; color:#111827; margin:0; letter-spacing:-.03em; line-height:1; }
+.kpi-val  {
+    font-size:1.6rem;
+    font-weight:800;
+    color:#111827;
+    margin:0;
+    letter-spacing:-.03em;
+    line-height:1;
+}
 
-/* ── Délais ── */
+/*  Délais  */
 .delai-grid {
-    display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
 }
 @media(max-width:720px) { .delai-grid { grid-template-columns:1fr; } }
 
 .delai-card {
-    background:#fff; border:1px solid #e5e7eb; border-radius:12px;
-    padding:14px 18px; display:flex; align-items:center; gap:14px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    gap:14px;
     box-shadow:0 2px 8px rgba(0,0,0,.05);
 }
-.delai-total { border-color:#c7d2fe; background:#eef2ff; }
-.delai-ic    { font-size:1.1rem; color:#6366f1; flex-shrink:0; }
-.delai-lbl   { font-size:.7rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.04em; margin:0 0 3px; }
-.delai-val   { font-size:1.4rem; font-weight:800; color:#111827; margin:0; letter-spacing:-.02em; line-height:1; }
+.delai-total {
+    border-color:#c7d2fe;
+    background:#eef2ff;
+}
+.delai-ic    {
+    font-size:1.1rem;
+    color:#6366f1;
+    flex-shrink:0;
+}
+.delai-lbl   {
+    font-size:.7rem;
+    font-weight:600;
+    color:#9ca3af;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin:0 0 3px;
+}
+.delai-val   {
+    font-size:1.4rem;
+    font-weight:800;
+    color:#111827;
+    margin:0;
+    letter-spacing:-.02em;
+    line-height:1;
+}
 .delai-val span { font-size:.75rem; font-weight:500; color:#9ca3af; }
 
-/* ── Layout ── */
+/*  Layout  */
 .an-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 /* Quand le premier enfant a la classe an-card-lg → entonnoir prend 2/3 */
 .an-row-2:has(.an-card-lg:first-child) { grid-template-columns:2fr 1fr; }
 @media(max-width:860px) { .an-row-2, .an-row-2:has(.an-card-lg:first-child) { grid-template-columns:1fr; } }
 
-/* ── Cards ── */
+/*  Cards  */
 .an-card {
     background:#fff; border:1px solid #e5e7eb; border-radius:12px;
     overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.05);
@@ -82,7 +170,7 @@
 
 .chart-box { padding:14px 16px; height:240px; position:relative; }
 
-/* ── Entonnoir ── */
+/*  Entonnoir  */
 .funnel-wrap {
     padding:16px 20px;
     display:flex; flex-direction:column; gap:13px;
@@ -122,7 +210,7 @@
     border:1px solid #fecaca;
 }
 
-/* ── Porteurs ── */
+/*  Porteurs  */
 .porteurs-list { padding:4px 0; }
 .porteur-row   {
     display:flex; align-items:flex-start; gap:10px;
@@ -151,7 +239,7 @@
 .porteur-bar      { height:100%; background:#6366f1; border-radius:4px; }
 .porteur-taux-lbl { font-size:.67rem; color:#9ca3af; margin:0; }
 
-/* ── Projets bloqués ── */
+/*  Projets bloqués  */
 .bloque-badge {
     display:inline-flex; align-items:center; justify-content:center;
     width:20px; height:20px; border-radius:50%;
@@ -192,7 +280,7 @@
 .jours-warn   { background:#fff7ed; color:#c2410c; }
 .jours-danger { background:#fef2f2; color:#dc2626; }
 
-/* ── Empty ── */
+/*  Empty  */
 .empty-state {
     display:flex; flex-direction:column; align-items:center;
     gap:8px; padding:28px; color:#9ca3af; text-align:center;

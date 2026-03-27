@@ -4,15 +4,20 @@
     <!-- Header logo -->
     <div class="sidebar-header d-flex align-items-center px-3 py-3">
         <div class="logo-container me-2">
-            <div style="width: 38px; height: 38px; background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            <div style="width: 38px; height: 38px;
+                        background: linear-gradient(135deg, {{ $sysConfig->get('couleur_primaire', '#3b82f6') }}, #8b5cf6);
                         border-radius: 10px; display: flex; align-items: center; justify-content: center;
                         color: white; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px;">
-                GP
+                {{ $sysConfig->get('logo_texte', 'GP') }}
             </div>
         </div>
         <div class="app-name-container">
-            <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">{{ config('app.name') }}</h5>
-            <small class="text-muted" style="font-size: 0.7rem;">Gestion de projets</small>
+            <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">
+                {{ $sysConfig->get('nom_app', config('app.name')) }}
+            </h5>
+            <small class="text-muted" style="font-size: 0.7rem;">
+                {{ $sysConfig->get('description_app', 'Gestion de projets') }}
+            </small>
         </div>
     </div>
 
@@ -64,6 +69,14 @@
                     data-tooltip="Secteurs">
                     <i class="fas fa-building"></i>
                     <span>Secteurs</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.configuration.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.configuration.*') ? 'active' : '' }}"
+                    data-tooltip="Configuration">
+                    <i class="fas fa-cogs"></i>
+                    <span>Configuration système</span>
                 </a>
             </li>
         @endif

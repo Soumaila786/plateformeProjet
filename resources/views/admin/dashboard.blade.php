@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Tableau de bord — Administration')
+@section('title', 'Tableau de bord')
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/adminDash.css') }}">
 @endpush
@@ -84,7 +84,7 @@
     <div class="analytique-link-left">
         <div class="analytique-link-ic"><i class="fas fa-chart-bar"></i></div>
         <div>
-            <p class="analytique-link-title">Tableau analytique complet</p>
+            <p class="analytique-link-title">Tableau analytique</p>
             <p class="analytique-link-sub">Entonnoir · Délais · Secteurs · Porteurs · Rejets · Projets bloqués · Charge équipes</p>
         </div>
     </div>

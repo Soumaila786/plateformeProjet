@@ -1,6 +1,9 @@
 @extends('layouts.app')
+
 @section('title', 'Projets à approuver')
+
 @push('styles')
+
 <link rel="stylesheet" href="{{ asset('css/projet.css') }}">
 <link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
 <style>
@@ -85,11 +88,11 @@
         text-decoration:none !important;
     }
 </style>
+
 @endpush
 
 @section('content')
 <div class="projets-page">
-
     {{-- Header --}}
     <div class="page-hdr">
         <div>
@@ -100,7 +103,7 @@
             <i class="fas fa-history"></i> Mes projets traités
         </a>
     </div>
-
+    
     {{-- Filtres --}}
     <div class="filters-bar">
         <div class="search-box">

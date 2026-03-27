@@ -384,7 +384,7 @@
     <div class="form-card" style="margin-top:16px;">
         <div class="form-card-header">
             <i class="fas fa-comments"></i>
-            <span>Historique des commentaires ({{ $projet->commentaires->count() }})</span>
+            <span>Historique des commentaires du projet ({{ $projet->commentaires->count() }})</span>
         </div>
         <div class="form-card-body">
             <div class="timeline">

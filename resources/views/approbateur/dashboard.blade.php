@@ -1,10 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Tableau de bord — Approbateur')
+@section('title', 'Tableau de bord')
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
 @endpush
 
 @section('content')
+
 <div class="adash">
 
 {{-- Banner --}}

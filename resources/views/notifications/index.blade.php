@@ -34,7 +34,7 @@
                 </button>
             </form>
             <form method="POST" action="{{ route($role . '.notifications.destroy-lues') }}"
-                  onsubmit="return confirm('Supprimer toutes les notifications lues ?')">
+                    onsubmit="return confirm('Supprimer toutes les notifications lues ?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn-delete-read">
                     <i class="fas fa-trash"></i> Supprimer les lues
@@ -95,8 +95,8 @@
                 <span class="notif-dot" title="Non lue"></span>
                 @endif
                 <form method="POST"
-                      action="{{ route($role . '.notifications.destroy', $notif) }}"
-                      onsubmit="return confirm('Supprimer cette notification ?')">
+                        action="{{ route($role . '.notifications.destroy', $notif) }}"
+                        onsubmit="return confirm('Supprimer cette notification ?')">
                     @csrf @method('DELETE')
                     <button type="submit" class="notif-del-btn" title="Supprimer">
                         <i class="fas fa-times"></i>

@@ -1,9 +1,13 @@
 @extends('layouts.app')
+
 @section('title', 'Paramètres généraux')
+
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/parametre.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/parametre.css') }}">
 @endpush
+
 @section('content')
+
 <div class="param-subpage">
 
     <div class="param-subpage-header">

@@ -23,8 +23,8 @@
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text" id="searchInput" class="search-input"
-                   placeholder="Rechercher par titre ou code..."
-                   value="{{ request('search') }}">
+                    placeholder="Rechercher par titre ou code..."
+                    value="{{ request('search') }}">
         </div>
         <div class="status-filters">
             @php
@@ -40,7 +40,7 @@
             @endphp
             @foreach($statuts as $val => $label)
             <a href="{{ route('admin.projets.index', array_merge(request()->query(), ['statut' => $val])) }}"
-               class="status-filter {{ request('statut', '') === $val ? 'active' : '' }}">
+                class="status-filter {{ request('statut', '') === $val ? 'active' : '' }}">
                 {{ $label }}
             </a>
             @endforeach
@@ -50,8 +50,22 @@
     {{-- ── Cards ── --}}
     @forelse($projets as $projet)
     @php
-        $sc = ['brouillon'=>'status-gray','soumis'=>'status-blue','en_examen'=>'status-yellow','approuve'=>'status-green','valide'=>'status-teal','rejete'=>'status-red'];
-        $sl = ['brouillon'=>'Brouillon','soumis'=>'Soumis','en_examen'=>'En examen','approuve'=>'Approuvé','valide'=>'Validé','rejete'=>'Rejeté'];
+        $sc = [
+            'brouillon'=>'status-gray',
+            'soumis'=>'status-blue',
+            'en_examen'=>'status-yellow',
+            'approuve'=>'status-green',
+            'valide'=>'status-teal',
+            'rejete'=>'status-red'
+        ];
+        $sl = [
+            'brouillon'=>'Brouillon',
+            'soumis'=>'Soumis',
+            'en_examen'=>'En examen',
+            'approuve'=>'Approuvé',
+            'valide'=>'Validé',
+            'rejete'=>'Rejeté'
+        ];
     @endphp
     <div class="projet-card">
         <div class="projet-card-top">
@@ -63,17 +77,17 @@
             </div>
             <div class="projet-card-actions">
                 <a href="{{ route('admin.projets.show', $projet) }}"
-                   class="btn-icon" title="Voir le détail">
+                    class="btn-icon" title="Voir le détail">
                     <i class="fas fa-eye"></i>
                 </a>
-                <button type="button" class="btn-icon"
+                {{-- <button type="button" class="btn-icon"
                         onclick="openStatutModal({{ $projet->id }}, '{{ $projet->statutProjet }}')"
                         title="Changer le statut">
                     <i class="fas fa-exchange-alt"></i>
-                </button>
+                </button> --}}
                 <form method="POST" action="{{ route('admin.projets.destroy', $projet) }}"
-                      onsubmit="return confirm('Supprimer ce projet définitivement ?')"
-                      style="display:inline;">
+                        onsubmit="return confirm('Supprimer ce projet définitivement ?')"
+                        style="display:inline;">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn-icon btn-icon-danger" title="Supprimer">
                         <i class="fas fa-trash"></i>
@@ -160,37 +174,37 @@
 
 @push('scripts')
 <script>
-let timer;
-document.getElementById('searchInput').addEventListener('input', function () {
-    clearTimeout(timer);
-    const val = this.value;
-    timer = setTimeout(() => {
-        const url = new URL(window.location.href);
-        url.searchParams.set('search', val);
-        url.searchParams.delete('page');
-        window.location.href = url.toString();
-    }, 400);
-});
-
-function openStatutModal(projetId, currentStatut) {
-    document.getElementById('formStatut').action = '/admin/projets/' + projetId + '/statut';
-    document.getElementById('selectStatut').value = currentStatut;
-    openModal('modalStatut');
-}
-
-function openModal(id) {
-    document.getElementById(id).classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-    document.body.style.overflow = '';
-}
-document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', function(e) {
-        if (e.target === this) closeModal(this.id);
+    let timer;
+    document.getElementById('searchInput').addEventListener('input', function () {
+        clearTimeout(timer);
+        const val = this.value;
+        timer = setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', val);
+            url.searchParams.delete('page');
+            window.location.href = url.toString();
+        }, 400);
     });
-});
+
+    function openStatutModal(projetId, currentStatut) {
+        document.getElementById('formStatut').action = '/admin/projets/' + projetId + '/statut';
+        document.getElementById('selectStatut').value = currentStatut;
+        openModal('modalStatut');
+    }
+
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', function(e) {
+            if (e.target === this) closeModal(this.id);
+        });
+    });
 </script>
 @endpush
 

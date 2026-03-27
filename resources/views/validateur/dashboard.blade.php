@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Tableau de bord — Validateur')
+@section('title', 'Tableau de bord')
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/validDash.css') }}">
 @endpush

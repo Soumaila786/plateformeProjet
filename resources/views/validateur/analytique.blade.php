@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Analytique — Validateur')
+@section('title', 'Tableau Analytique')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/validDash.css') }}">
