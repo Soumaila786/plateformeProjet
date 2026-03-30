@@ -1,33 +1,31 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Projets'); ?>
 
-@section('title', 'Projets')
+<?php $__env->startPush('styles'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/admin.css')); ?>">
+<?php $__env->stopPush(); ?>
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-@endpush
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="projets-page">
 
-    {{-- ── Header ── --}}
+    
     <div class="projets-header">
         <div>
             <h1 class="projets-title">Projets</h1>
-            <p class="projets-subtitle">{{ $projets->total() }} projet{{ $projets->total() > 1 ? 's' : '' }} au total</p>
+            <p class="projets-subtitle"><?php echo e($projets->total()); ?> projet<?php echo e($projets->total() > 1 ? 's' : ''); ?> au total</p>
         </div>
     </div>
 
-    {{-- ── Filtres ── --}}
+    
     <div class="projets-filters">
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text" id="searchInput" class="search-input"
                     placeholder="Rechercher par titre ou code..."
-                    value="{{ request('search') }}">
+                    value="<?php echo e(request('search')); ?>">
         </div>
         <div class="status-filters">
-            @php
+            <?php
                 $statuts = [
                     ''          => 'Tous',
                     'brouillon' => 'Brouillon',
@@ -37,19 +35,20 @@
                     'valide'    => 'Validé',
                     'rejete'    => 'Rejeté',
                 ];
-            @endphp
-            @foreach($statuts as $val => $label)
-            <a href="{{ route('admin.projets.index', array_merge(request()->query(), ['statut' => $val])) }}"
-                class="status-filter {{ request('statut', '') === $val ? 'active' : '' }}">
-                {{ $label }}
+            ?>
+            <?php $__currentLoopData = $statuts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e(route('admin.projets.index', array_merge(request()->query(), ['statut' => $val]))); ?>"
+                class="status-filter <?php echo e(request('statut', '') === $val ? 'active' : ''); ?>">
+                <?php echo e($label); ?>
+
             </a>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 
-    {{-- ── Cards ── --}}
-    @forelse($projets as $projet)
-    @php
+    
+    <?php $__empty_1 = true; $__currentLoopData = $projets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+    <?php
         $sc = [
             'brouillon'=>'status-gray',
             'soumis'=>'status-blue',
@@ -66,25 +65,26 @@
             'valide'=>'Validé',
             'rejete'=>'Rejeté'
         ];
-    @endphp
+    ?>
     <div class="projet-card">
         <div class="projet-card-top">
             <div class="projet-card-meta">
-                <span class="projet-card-code">{{ $projet->codeProjet }}</span>
-                <span class="status-badge {{ $sc[$projet->statutProjet] ?? 'status-gray' }}">
-                    {{ $sl[$projet->statutProjet] ?? $projet->statutProjet }}
+                <span class="projet-card-code"><?php echo e($projet->codeProjet); ?></span>
+                <span class="status-badge <?php echo e($sc[$projet->statutProjet] ?? 'status-gray'); ?>">
+                    <?php echo e($sl[$projet->statutProjet] ?? $projet->statutProjet); ?>
+
                 </span>
             </div>
             <div class="projet-card-actions">
-                <a href="{{ route('admin.projets.show', $projet) }}"
+                <a href="<?php echo e(route('admin.projets.show', $projet)); ?>"
                     class="btn-icon" title="Voir le détail">
                     <i class="fas fa-eye"></i>
                 </a>
-
-                <form method="POST" action="{{ route('admin.projets.destroy', $projet) }}"
+                
+                <form method="POST" action="<?php echo e(route('admin.projets.destroy', $projet)); ?>"
                         onsubmit="return confirm('Supprimer ce projet définitivement ?')"
                         style="display:inline;">
-                    @csrf @method('DELETE')
+                    <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                     <button type="submit" class="btn-icon btn-icon-danger" title="Supprimer">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -92,51 +92,50 @@
             </div>
         </div>
 
-        <h3 class="projet-card-titre">{{ $projet->titre }}</h3>
+        <h3 class="projet-card-titre"><?php echo e($projet->titre); ?></h3>
 
-        @if($projet->description)
-        <p class="projet-card-desc">{{ Str::limit($projet->description, 100) }}</p>
-        @endif
+        <?php if($projet->description): ?>
+        <p class="projet-card-desc"><?php echo e(Str::limit($projet->description, 100)); ?></p>
+        <?php endif; ?>
 
         <div class="projet-card-footer">
             <div class="projet-card-info-row">
                 <span class="projet-card-info">
                     <i class="fas fa-user"></i>
-                    {{ optional($projet->porteur)->nomComplet ?? '—' }}
+                    <?php echo e(optional($projet->porteur)->nomComplet ?? '—'); ?>
+
                 </span>
                 <span class="projet-card-info">
                     <i class="fas fa-tag"></i>
-                    {{ optional($projet->secteur)->nomSecteur ?? '—' }}
+                    <?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?>
+
                 </span>
-                @if($projet->budgetTotal)
+                <?php if($projet->budgetTotal): ?>
                 <span class="projet-card-info">
                     <i class="fas fa-coins"></i>
-                    {{ number_format($projet->budgetTotal, 0, ',', ' ') }} F CFA
+                    <?php echo e(number_format($projet->budgetTotal, 0, ',', ' ')); ?> F CFA
                 </span>
-                @endif
+                <?php endif; ?>
                 <span class="projet-card-info">
                     <i class="fas fa-calendar"></i>
-                    {{ optional($projet->dateCreation)->format('d/m/Y') ?? '—' }}
+                    <?php echo e(optional($projet->dateCreation)->format('d/m/Y') ?? '—'); ?>
+
                 </span>
             </div>
         </div>
     </div>
-    @empty
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
     <div class="cards-empty">
         <i class="fas fa-folder-open"></i>
         <p>Aucun projet trouvé.</p>
     </div>
-    @endforelse
+    <?php endif; ?>
 
-    {{-- @if($projets->hasPages())
-    <div class="projets-pagination">
-        {{ $projets->withQueryString()->links() }}
-    </div>
-    @endif --}}
+    
 
 </div>
 
-{{-- ── Modal Changer Statut ── --}}
+
 <div class="modal-overlay" id="modalStatut">
     <div class="modal-box">
         <div class="modal-header">
@@ -146,7 +145,7 @@
             </button>
         </div>
         <form method="POST" id="formStatut" action="">
-            @csrf
+            <?php echo csrf_field(); ?>
             <div class="modal-body">
                 <label class="field-label">Nouveau statut</label>
                 <select name="statut" id="selectStatut" class="field-input" required>
@@ -168,7 +167,7 @@
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     let timer;
     document.getElementById('searchInput').addEventListener('input', function () {
@@ -202,6 +201,8 @@
         });
     });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/admin/projets/index.blade.php ENDPATH**/ ?>

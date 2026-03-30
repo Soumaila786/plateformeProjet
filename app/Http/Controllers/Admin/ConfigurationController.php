@@ -11,6 +11,7 @@ class ConfigurationController extends Controller {
     public function index() {
 
         $configs = Configuration::grouped();
+        
         $groupes = [
             'general'  => ['label' => 'Général',    'icon' => 'fa-cog'],
             'email'    => ['label' => 'Email',       'icon' => 'fa-envelope'],

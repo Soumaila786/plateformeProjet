@@ -1,11 +1,9 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Projets à approuver'); ?>
 
-@section('title', 'Projets à approuver')
+<?php $__env->startPush('styles'); ?>
 
-@push('styles')
-
-<link rel="stylesheet" href="{{ asset('css/projet.css') }}">
-<link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
+<link rel="stylesheet" href="<?php echo e(asset('css/projet.css')); ?>">
+<link rel="stylesheet" href="<?php echo e(asset('css/approbDash.css')); ?>">
 <style>
     .proj-table { width:100%; border-collapse:collapse; }
     .proj-table thead tr { background:#f8fafc; }
@@ -89,62 +87,64 @@
     }
 </style>
 
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="projets-page">
-    {{-- Header --}}
+    
     <div class="page-hdr">
         <div>
             <h1 class="page-hdr-title">Projets à approuver</h1>
-            <p class="page-hdr-sub">{{ $projets->total() }} projet{{ $projets->total() > 1 ? 's' : '' }} au total</p>
+            <p class="page-hdr-sub"><?php echo e($projets->total()); ?> projet<?php echo e($projets->total() > 1 ? 's' : ''); ?> au total</p>
         </div>
-        <a href="{{ route('approbateur.projets.mes_projets') }}" class="btn-secondary">
+        <a href="<?php echo e(route('approbateur.projets.mes_projets')); ?>" class="btn-secondary">
             <i class="fas fa-history"></i> Mes projets traités
         </a>
     </div>
 
-    {{-- Filtres --}}
+    
     <div class="filters-bar">
         <div class="search-box">
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput"
                     placeholder="Rechercher par titre ou code..."
-                    value="{{ request('search') }}">
+                    value="<?php echo e(request('search')); ?>">
         </div>
 
         <select id="secteurSelect" class="s-select">
             <option value="">Tous les secteurs</option>
-            @foreach($secteurs as $secteur)
-            <option value="{{ $secteur->id }}" {{ request('secteur_id') == $secteur->id ? 'selected' : '' }}>
-                {{ $secteur->nomSecteur }}
+            <?php $__currentLoopData = $secteurs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $secteur): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <option value="<?php echo e($secteur->id); ?>" <?php echo e(request('secteur_id') == $secteur->id ? 'selected' : ''); ?>>
+                <?php echo e($secteur->nomSecteur); ?>
+
             </option>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
 
         <div class="status-filters">
-            @php
+            <?php
                 $statuts = [
                     '' => 'Tous', 'soumis'=>'Soumis',
                     'en_examen'=>'En examen', 'approuve'=>'Approuvé', 'rejete'=>'Rejeté',
                 ];
-            @endphp
-            @foreach($statuts as $val => $label)
-            <a href="{{ route('approbateur.projets.index', array_merge(request()->query(), ['statut'=>$val])) }}"
-                class="status-filter {{ request('statut','') === $val ? 'active' : '' }}">
-                {{ $label }}
+            ?>
+            <?php $__currentLoopData = $statuts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e(route('approbateur.projets.index', array_merge(request()->query(), ['statut'=>$val]))); ?>"
+                class="status-filter <?php echo e(request('statut','') === $val ? 'active' : ''); ?>">
+                <?php echo e($label); ?>
+
             </a>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
 
-        @if(request('search') || request('secteur_id') || request('statut'))
-        <a href="{{ route('approbateur.projets.index') }}" class="reset-link">
+        <?php if(request('search') || request('secteur_id') || request('statut')): ?>
+        <a href="<?php echo e(route('approbateur.projets.index')); ?>" class="reset-link">
             <i class="fas fa-times"></i> Réinitialiser
         </a>
-        @endif
+        <?php endif; ?>
     </div>
 
-    {{-- Tableau --}}
+    
     <div class="table-wrap">
         <table class="proj-table">
             <thead>
@@ -160,8 +160,8 @@
                 </tr>
             </thead>
             <tbody>
-            @forelse($projets as $projet)
-            @php
+            <?php $__empty_1 = true; $__currentLoopData = $projets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <?php
                 $stMap = [
                     'soumis'    => ['lbl'=>'Soumis',   'bg'=>'#eef2ff','color'=>'#4338ca','dot'=>'#6366f1'],
                     'en_examen' => ['lbl'=>'En examen','bg'=>'#fff7ed','color'=>'#c2410c','dot'=>'#f97316'],
@@ -169,77 +169,78 @@
                     'rejete'    => ['lbl'=>'Rejeté',   'bg'=>'#fef2f2','color'=>'#b91c1c','dot'=>'#ef4444'],
                 ];
                 $st = $stMap[$projet->statutProjet] ?? ['lbl'=>$projet->statutProjet,'bg'=>'#f3f4f6','color'=>'#6b7280','dot'=>'#9ca3af'];
-            @endphp
+            ?>
             <tr>
-                <td><span class="col-code">{{ $projet->codeProjet }}</span></td>
+                <td><span class="col-code"><?php echo e($projet->codeProjet); ?></span></td>
                 <td>
-                    <a href="{{ route('approbateur.projets.show', $projet) }}" class="col-titre"
+                    <a href="<?php echo e(route('approbateur.projets.show', $projet)); ?>" class="col-titre"
                         style="text-decoration:none;color:#111827;">
-                        {{ \Illuminate\Support\Str::limit($projet->titre, 45) }}
+                        <?php echo e(\Illuminate\Support\Str::limit($projet->titre, 45)); ?>
+
                     </a>
                 </td>
-                <td><span class="col-muted">{{ optional($projet->porteur)->nomComplet ?? '—' }}</span></td>
-                <td><span class="col-muted">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span></td>
+                <td><span class="col-muted"><?php echo e(optional($projet->porteur)->nomComplet ?? '—'); ?></span></td>
+                <td><span class="col-muted"><?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?></span></td>
                 <td>
                     <span class="col-budget">
-                        {{ $projet->montantDemande ? number_format($projet->montantDemande,0,',',' ').' F CFA' : '—' }}
+                        <?php echo e($projet->montantDemande ? number_format($projet->montantDemande,0,',',' ').' F CFA' : '—'); ?>
+
                     </span>
                 </td>
                 <td>
-                    <span class="s-badge" style="background:{{ $st['bg'] }};color:{{ $st['color'] }};">
-                        <span class="s-dot" style="background:{{ $st['dot'] }};"></span>
-                        {{ $st['lbl'] }}
+                    <span class="s-badge" style="background:<?php echo e($st['bg']); ?>;color:<?php echo e($st['color']); ?>;">
+                        <span class="s-dot" style="background:<?php echo e($st['dot']); ?>;"></span>
+                        <?php echo e($st['lbl']); ?>
+
                     </span>
                 </td>
-                <td><span class="col-muted">{{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</span></td>
+                <td><span class="col-muted"><?php echo e(optional($projet->dateSoumission)->format('d/m/Y') ?? '—'); ?></span></td>
                 <td>
                     <div class="td-actions">
-                        <a href="{{ route('approbateur.projets.show', $projet) }}"
+                        <a href="<?php echo e(route('approbateur.projets.show', $projet)); ?>"
                             class="btn-act btn-view" title="Voir">
                             <i class="fas fa-eye"></i>
                         </a>
-                        @if($projet->statutProjet === 'soumis')
-                        <form method="POST" action="{{ route('approbateur.projets.examiner', $projet) }}"
+                        <?php if($projet->statutProjet === 'soumis'): ?>
+                        <form method="POST" action="<?php echo e(route('approbateur.projets.examiner', $projet)); ?>"
                                 onsubmit="return confirm('Mettre ce projet en examen ?')">
-                            @csrf
+                            <?php echo csrf_field(); ?>
                             <button type="submit" class="btn-act btn-exam" title="Mettre en examen">
                                 <i class="fas fa-search"></i>
                             </button>
                         </form>
-                        @endif
-                        @if($projet->statutProjet === 'en_examen')
+                        <?php endif; ?>
+                        <?php if($projet->statutProjet === 'en_examen'): ?>
                         <button type="button" class="btn-act btn-ok" title="Approuver"
-                                onclick="openApprouver({{ $projet->id }})">
+                                onclick="openApprouver(<?php echo e($projet->id); ?>)">
                             <i class="fas fa-check"></i>
                         </button>
                         <button type="button" class="btn-act btn-nok" title="Rejeter"
-                                onclick="openRejeter({{ $projet->id }})">
+                                onclick="openRejeter(<?php echo e($projet->id); ?>)">
                             <i class="fas fa-times"></i>
                         </button>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </td>
             </tr>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tr>
                 <td colspan="8" style="text-align:center;padding:40px;color:#9ca3af;">
                     <i class="fas fa-folder-open" style="font-size:1.8rem;margin-bottom:8px;display:block;"></i>
                     Aucun projet trouvé.
                 </td>
             </tr>
-            @endforelse
+            <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    {{-- Pagination --}}
-    {{-- @if($projets->hasPages())
-    <div style="margin-top:14px;">{{ $projets->withQueryString()->links() }}</div>
-    @endif --}}
+    
+    
 
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
     <script>
         // Recherche auto
         let timer;
@@ -263,5 +264,7 @@
             window.location.href = url.toString();
         });
     </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/approbateur/projets/index.blade.php ENDPATH**/ ?>

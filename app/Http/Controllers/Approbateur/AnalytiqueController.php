@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class AnalytiqueController extends Controller
 {
     public function index() {
-        
+
         $now = Carbon::now();
 
         //  1. ENTONNOIR
@@ -196,6 +196,8 @@ class AnalytiqueController extends Controller
                         : 0,
                 ];
             });
+
+            
 
         return view('approbateur.analytique', compact(
             'entonnoir',

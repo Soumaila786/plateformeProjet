@@ -30,9 +30,11 @@
 
     <?php
         $generalGroup = $configs->get('general');
+        // Si $generalGroup existe, alors cherche la config dont la clé est 'mode_maintenance' et prends la première. Sinon, mets null.
         $maintenance  = $generalGroup ? $generalGroup->where('cle','mode_maintenance')->first() : null;
         $modeMaintenanceActif = $maintenance && $maintenance->valeur === '1';
     ?>
+
     <?php if($modeMaintenanceActif): ?>
     <div class="maintenance-alert">
         <i class="fas fa-exclamation-triangle"></i>
@@ -64,7 +66,7 @@
 
             <?php if($configs->has($key)): ?>
                 <div class="config-card">
-
+                    
                     <div class="config-card-head">
                         <div class="config-card-icon">
                             <i class="fas <?php echo e($groupe['icon']); ?>"></i>
@@ -74,16 +76,19 @@
 
                         </h3>
                     </div>
-
+                    
                     <div class="config-card-body">
                         <div class="field-row">
                             <?php $__currentLoopData = $configs->get($key); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $config): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+
                                 <?php
                                     $isFullWidth = in_array($config->type, ['boolean']) || strlen($config->description ?? '') > 60;
                                 ?>
+
                                 <div class="field-group <?php echo e($config->type === 'boolean' ? 'field-full' : ''); ?>">
 
                                     <?php if($config->type === 'boolean'): ?>
+
                                     
                                     <label class="field-label"><?php echo e($config->label); ?></label>
                                     <?php if($config->description): ?>
@@ -170,6 +175,7 @@
 
 <?php $__env->startPush('scripts'); ?>
 <script>
+
     function showSection(key) {
         // Masquer toutes les sections
         document.querySelectorAll('.config-section').forEach(s => s.classList.remove('active'));

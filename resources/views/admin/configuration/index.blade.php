@@ -30,9 +30,11 @@
 
     @php
         $generalGroup = $configs->get('general');
+        // Si $generalGroup existe, alors cherche la config dont la clé est 'mode_maintenance' et prends la première. Sinon, mets null.
         $maintenance  = $generalGroup ? $generalGroup->where('cle','mode_maintenance')->first() : null;
         $modeMaintenanceActif = $maintenance && $maintenance->valeur === '1';
     @endphp
+
     @if($modeMaintenanceActif)
     <div class="maintenance-alert">
         <i class="fas fa-exclamation-triangle"></i>
@@ -45,14 +47,12 @@
 
     {{-- Tabs --}}
     <div class="config-tabs">
-
         @foreach($groupes as $key => $groupe)
         <a href="#" class="config-tab {{ $key === 'general' ? 'active' : '' }}"
             onclick="showSection('{{ $key }}'); return false;">
             <i class="fas {{ $groupe['icon'] }}"></i> {{ $groupe['label'] }}
         </a>
         @endforeach
-        
     </div>
 
     {{-- Formulaire --}}
@@ -65,7 +65,7 @@
 
             @if($configs->has($key))
                 <div class="config-card">
-
+                    {{-- Header --}}
                     <div class="config-card-head">
                         <div class="config-card-icon">
                             <i class="fas {{ $groupe['icon'] }}"></i>
@@ -74,16 +74,19 @@
                             Paramètres {{ $groupe['label'] }}
                         </h3>
                     </div>
-
+                    {{-- Body --}}
                     <div class="config-card-body">
                         <div class="field-row">
                             @foreach($configs->get($key) as $config)
+
                                 @php
                                     $isFullWidth = in_array($config->type, ['boolean']) || strlen($config->description ?? '') > 60;
                                 @endphp
+
                                 <div class="field-group {{ $config->type === 'boolean' ? 'field-full' : '' }}">
 
                                     @if($config->type === 'boolean')
+
                                     {{-- Toggle switch --}}
                                     <label class="field-label">{{ $config->label }}</label>
                                     @if($config->description)

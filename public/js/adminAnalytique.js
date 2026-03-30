@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gray: '#9ca3af'
     };
 
-    // ── Donut Chart ──
+    // Donut Chart
     const donutCanvas = document.getElementById('donutChart');
     if (donutCanvas && data.donut) {
         new Chart(donutCanvas, {
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Évolution mensuelle ──
+    // Évolution mensuelle
     const evolutionCanvas = document.getElementById('evolutionChart');
     if (evolutionCanvas && data.evolution) {
         new Chart(evolutionCanvas, {
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Motifs rejet ──
+    // Motifs rejet
     const rejetCanvas = document.getElementById('rejetChart');
     if (rejetCanvas && data.rejets) {
         new Chart(rejetCanvas, {
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Secteurs double axe ──
+    // Secteurs double axe
     const secteurCanvas = document.getElementById('secteurChart');
     if (secteurCanvas && data.secteurs) {
         new Chart(secteurCanvas, {
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ── Charge équipes ──
+    // Charge équipes
     const equipeCanvas = document.getElementById('equipeChart');
     if (equipeCanvas && data.equipes) {
         const equipeColors = data.equipes.roles.map(r =>

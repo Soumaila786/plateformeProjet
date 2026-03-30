@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AnalytiqueController extends Controller {
-    public function index()
-    {
+
+    public function index() {
+
         $now = Carbon::now();
 
-        // ════════ 1. KPIs ════════
+        // 1. KPIs
         $kpis = [
             'total'     => Projet::count(),
             'brouillon' => Projet::where('statutProjet', 'brouillon')->count(),
@@ -25,7 +26,7 @@ class AnalytiqueController extends Controller {
             'valide'    => Projet::where('statutProjet', 'valide')->count(),
         ];
 
-        // ════════ 2. ENTONNOIR ════════
+        // 2. ENTONNOIR
         $entonnoir = [
             ['lbl' => 'Brouillon',  'key' => 'brouillon', 'color' => '#9ca3af', 'val' => $kpis['brouillon']],
             ['lbl' => 'Soumis',     'key' => 'soumis',    'color' => '#6366f1', 'val' => $kpis['soumis']],
@@ -33,14 +34,17 @@ class AnalytiqueController extends Controller {
             ['lbl' => 'Approuvés',  'key' => 'approuve',  'color' => '#22c55e', 'val' => $kpis['approuve']],
             ['lbl' => 'Validés',    'key' => 'valide',    'color' => '#0d9488', 'val' => $kpis['valide']],
         ];
+
         // Forcer int sur toutes les valeurs de l'entonnoir
+        // Le & est utiliser pour modifier directement la valeur dans le tableau.
+        // si on change la valeur de $step directement la valeur dans le tableau entonnoir change aussi
         foreach ($entonnoir as &$step) {
-            $step['val'] = (int)($step['val'] ?? 0);
+            $step['val'] = (int)($step['val'] ?? 0); // conversion en entier la valeur
         }
-        unset($step);
+        unset($step);  // unset() sert à supprimer une variable ou une référence en PHP.Problème : après la boucle, $step reste lié au dernier élément
         $maxEntonnoir = max(1, collect($entonnoir)->max('val'));
 
-        // ════════ 3. ÉVOLUTION MENSUELLE ════════
+        // 3. ÉVOLUTION MENSUELLE
         $moisLabels  = [];
         $moisSoumis  = [];
         $moisValides = [];
@@ -54,13 +58,13 @@ class AnalytiqueController extends Controller {
                 ->whereMonth('validated_at', $m->month)->count();
         }
 
-        // ════════ 4. RÉPARTITION STATUTS ════════
+        // 4. RÉPARTITION STATUTS
         $statutLabels = ['Brouillon','Soumis','En examen','Approuvé','Rejeté','Validé'];
         $statutKeys   = ['brouillon','soumis','en_examen','approuve','rejete','valide'];
         $statutColors = ['#9ca3af','#6366f1','#f97316','#22c55e','#ef4444','#0d9488'];
         $statutValues = array_map(fn($k) => (int)($kpis[$k] ?? 0), $statutKeys);
 
-        // ════════ 5. TOP SECTEURS ════════
+        // 5. TOP SECTEURS
         $secteurs = Projet::with('secteur')
             ->select('secteur_id',
                 DB::raw('COUNT(*) as nb'),
@@ -77,7 +81,7 @@ class AnalytiqueController extends Controller {
         $sectDemande = $secteurs->pluck('total_demande')->map(function($v) { return (int)($v ?? 0); })->toArray();
         $sectValide  = $secteurs->pluck('nb_valide')->map(function($v) { return (int)($v ?? 0); })->toArray();
 
-        // ════════ 6. DÉLAIS MOYENS ════════
+        // 6. DÉLAIS MOYENS
         $rawAppro = Projet::whereNotNull('dateApprobation')
             ->whereNotNull('dateSoumission')
             ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
@@ -96,7 +100,7 @@ class AnalytiqueController extends Controller {
             ->value('moy');
         $delaiTotal = round((float)($rawTotal ?? 0), 1);
 
-        // ════════ 7. PERFORMANCE PORTEURS ════════
+        // 7. PERFORMANCE PORTEURS
         $porteurs = Projet::select(
                 'user_id',
                 DB::raw('COUNT(*) as total'),
@@ -120,7 +124,7 @@ class AnalytiqueController extends Controller {
                 ];
             });
 
-        // ════════ 8. ANALYSE REJETS ════════
+        // 8. ANALYSE REJETS
         $motifsCles = [
             'Budget'          => ['budget','montant','financier','coût','fonds','prix'],
             'Dossier incomplet' => ['pièce','document','dossier','manquant','incomplet','fichier'],
@@ -165,30 +169,31 @@ class AnalytiqueController extends Controller {
                 }
             });
 
-        // ════════ 9. PROJETS EN ATTENTE CRITIQUE (> 10 jours) ════════
+        // 9. PROJETS EN ATTENTE CRITIQUE (> 10 jours)
         $critiqueStatuts = ['soumis','en_examen','approuve'];
-        $projetsBloque   = Projet::with(['porteur','secteur'])
-            ->whereIn('statutProjet', $critiqueStatuts)
-            ->where('updated_at', '<', $now->copy()->subDays(10))
-            ->orderBy('updated_at')
-            ->take(15)
-            ->get()
-            ->map(function ($p) use ($now) {
+        $projetsBloque   = Projet::with(['porteur','secteur'])       // récupères les projets avec leurs relations
+            ->whereIn('statutProjet', $critiqueStatuts)             // récupérer les projets dont le statut est dans la liste
+            ->where('updated_at', '<', $now->copy()->subDays(10))  // prendre les projets non modifiés depuis plus de 10 jours
+            ->orderBy('updated_at')                               // Trie par date de mise à jour (du plus ancien au plus récent)
+            ->take(5)                                            // prend les 5 projets les plus critiques
+            ->get()                                             // Exécuter la requête
+            ->map(function ($p) use ($now) {                   // Tu transformes chaque projet en tableau personnalisé
                 return [
                     'id'      => $p->id,
                     'titre'   => $p->titre,
                     'statut'  => $p->statutProjet,
-                    'porteur' => optional($p->porteur)->nomComplet ?? '—',
+                    'porteur' => optional($p->porteur)->nomComplet ?? '—',        // optional() évite les erreurs si null
                     'secteur' => optional($p->secteur)->nomSecteur ?? '—',
-                    'jours'   => $now->diffInDays(Carbon::parse($p->updated_at)),
+                    'jours'   => $now->diffInDays(Carbon::parse($p->updated_at)), // Calcul des jours : combien de jours depuis la dernière mise à jour
                     'code'    => $p->codeProjet,
                 ];
             });
 
-        // ════════ 10. CHARGE DE TRAVAIL ÉQUIPES ════════
-        $approbateurs = User::where('role', 'approbateur')->get()
+        // 10. CHARGE DE TRAVAIL ÉQUIPES
+        $approbateurs = User::where('role', 'approbateur')
+            ->get()
             ->map(function ($u) {
-                $nb = Projet::whereIn('statutProjet', ['approuve','rejete'])
+                $nb = Projet::whereIn('statutProjet', ['approuve', 'rejete'])
                     ->whereNotNull('dateApprobation')
                     ->where('user_id', '!=', null) // sécurité
                     ->count();
@@ -210,15 +215,28 @@ class AnalytiqueController extends Controller {
 
         return view('admin.analytique', compact(
             'kpis',
-            'entonnoir', 'maxEntonnoir',
-            'moisLabels', 'moisSoumis', 'moisValides',
-            'statutLabels', 'statutColors', 'statutValues',
-            'sectLabels', 'sectNb', 'sectDemande', 'sectValide',
-            'delaiAppro', 'delaiValid', 'delaiTotal',
+            'entonnoir',
+            'maxEntonnoir',
+            'moisLabels',
+            'moisSoumis',
+            'moisValides',
+            'statutLabels',
+            'statutColors',
+            'statutValues',
+            'sectLabels',
+            'sectNb',
+            'sectDemande',
+            'sectValide',
+            'delaiAppro',
+            'delaiValid',
+            'delaiTotal',
             'porteurs',
-            'motifsLabels', 'motifsValues',
+            'motifsLabels',
+            'motifsValues',
             'projetsBloque',
-            'equipeLabels', 'equipeNb', 'equipeRoles'
+            'equipeLabels',
+            'equipeNb',
+            'equipeRoles'
         ));
     }
 }

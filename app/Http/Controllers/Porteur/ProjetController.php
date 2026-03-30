@@ -13,38 +13,31 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjetController extends Controller {
 
-    public function index(Request $request){
+    public function index(Request $request) {
 
         $query = Projet::with('secteur')
             ->where('user_id', Auth::id());
-
-        // ── Filtre statut ──
+        // Filtre statut
         if ($request->filled('statut')) {
             $query->where('statutProjet', $request->statut);
         }
-
-        // ── Recherche titre / code ──
+        // Recherche titre / code
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('titre', 'like', '%' . $search . '%')
-                    ->orWhere('codeProjet', 'like', '%' . $search . '%');
-            });
+                    ->orWhere('codeProjet', 'like', '%' . $search . '%'); });
         }
-
         $projets = $query->orderBy('created_at', 'desc')->paginate(10);
-
         return view('porteur.projets.index', compact('projets'));
     }
 
-    public function create(){
-
+    public function create() {
         $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
         return view('porteur.projets.create', compact('secteurs'));
     }
 
     public function store(Request $request){
-
         $request->validate([
             'titre'         => 'required|string|max:255',
             'description'   => 'required|string',
@@ -58,9 +51,7 @@ class ProjetController extends Controller {
             'documents'     => 'nullable|array',
             'documents.*'   => 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
         ]);
-
         $code = 'PRJ-' . strtoupper(substr(md5(uniqid()), 0, 8));
-
         $projet = Projet::create([
             'codeProjet'     => $code,
             'titre'          => $request->titre,
@@ -76,7 +67,6 @@ class ProjetController extends Controller {
             'user_id'        => Auth::id(),
             'secteur_id'     => $request->secteur_id,
         ]);
-
         if ($request->hasFile('documents')) {
             foreach ($request->file('documents') as $file) {
                 $chemin = $file->store("projets/{$projet->id}/documents", 'public');
@@ -90,34 +80,28 @@ class ProjetController extends Controller {
                 ]);
             }
         }
-
         return redirect()->route('porteur.projets.show', $projet)
                             ->with('success', 'Projet créé avec succès.');
     }
 
-    public function show(Projet $projet)  {
+    public function show(Projet $projet) {
         $this->authorize('view', $projet);
-
         $projet->load([
             'secteur',
             'documents',
             'commentaires.utilisateur',
             'planifications',
         ]);
-
         return view('porteur.projets.show', compact('projet'));
     }
     public function edit(Projet $projet){
-
         $this->authorize('update', $projet);
         $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
         return view('porteur.projets.edit', compact('projet', 'secteurs'));
     }
 
     public function update(Request $request, Projet $projet){
-
         $this->authorize('update', $projet);
-
         $request->validate([
             'titre'         => 'required|string|max:255',
             'description'   => 'required|string',
@@ -163,33 +147,28 @@ class ProjetController extends Controller {
     public function soumettre(Projet $projet){
 
         $this->authorize('soumettre', $projet);
-
         $projet->update([
             'statutProjet'   => 'soumis',
             'dateSoumission' => now(),
         ]);
-
         // Notifier les approbateurs
         NotificationService::notifierApprobateurs(
             'Un nouveau projet « ' . $projet->titre . ' » ('. $projet->codeProjet .') a été soumis et est en attente d\'examen.',
             'soumission',
             $projet->id
         );
-
         // Notifier le porteur lui-même
         NotificationService::notifierPorteur(
             $projet,
             'Votre projet « ' . $projet->titre . ' » a été soumis avec succès et est en attente d\'examen.',
             'soumission'
         );
-
         return redirect()->route('porteur.projets.show', $projet)
                             ->with('success', 'Projet soumis avec succès.');
     }
 
     public function storeDocument(Request $request, Projet $projet) {
         $this->authorize('update', $projet);
-
         $request->validate([
             'documents'   => 'required|array',
             'documents.*' => 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
@@ -206,12 +185,10 @@ class ProjetController extends Controller {
                 'uploader_id'   => Auth::id(),
             ]);
         }
-
         return back()->with('success', 'Documents ajoutés.');
     }
 
     public function destroyDocument(Projet $projet, DocumentProjet $document){
-
         $this->authorize('update', $projet);
         Storage::disk('public')->delete($document->cheminFichier);
         $document->delete();
@@ -231,9 +208,7 @@ class ProjetController extends Controller {
     public function demanderPlanification($id){
 
         $projet = Projet::findOrFail($id);
-        $projet->update([
-            'planification_demandee' => 1 // True
-        ]);
+        $projet->update([ 'planification_demandee' => 1 ]);
         // Notifier les approbateurs
         NotificationService::notifierApprobateurs(
             'Un nouveau projet « ' . $projet->titre . ' » ('. $projet->codeProjet .') besoin de planification.',

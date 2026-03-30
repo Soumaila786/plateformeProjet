@@ -12,10 +12,11 @@
 <div class="an-header">
     <div>
         <h1 class="an-title">Tableau analytique</h1>
-        <p class="an-sub">Vue globale en temps réel · {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+        <p class="an-sub">Vue globale en temps réel · {{ \Carbon\Carbon::now()->translatedFormat('d F Y H:i') }}</p>
     </div>
     <a href="{{ route('admin.dashboard') }}" class="btn-back">
-        <i class="fas fa-arrow-left"></i> Tableau de bord
+        <i class="fas fa-arrow-left"></i>
+        Tableau de bord
     </a>
 </div>
 
@@ -35,10 +36,12 @@
     @foreach($kpiItems as $k)
     <div class="kpi-card {{ $k['cls'] }}">
         <div class="kpi-top">
-            <span class="kpi-lbl">{{ $k['lbl'] }}</span>
-            <div class="kpi-icon"><i class="fas {{ $k['icon'] }}"></i></div>
+            <span class="kpi-lbl"> {{ $k['lbl'] }} </span>
+            <div class="kpi-icon">
+                <i class="fas {{ $k['icon'] }}"></i>
+            </div>
         </div>
-        <p class="kpi-val">{{ $k['val'] }}</p>
+        <p class="kpi-val"> {{ $k['val'] }} </p>
     </div>
     @endforeach
 </div>
@@ -48,10 +51,16 @@
     <div class="delai-card">
         <i class="fas fa-stopwatch delai-ic"></i>
         <div>
-            <p class="delai-lbl">Délai moyen approbation</p>
-            <p class="delai-val">{{ $delaiAppro }}<span> jours</span></p>
+            <p class="delai-lbl">
+                Délai moyen approbation
+            </p>
+            <p class="delai-val">
+                {{ $delaiAppro }}
+                <span> jours</span>
+            </p>
         </div>
     </div>
+
     <div class="delai-card">
         <i class="fas fa-hourglass-half delai-ic"></i>
         <div>
@@ -77,7 +86,9 @@
             <h3 class="an-card-title">Entonnoir complet du processus</h3>
             <p class="an-card-sub">De la création à la validation finale</p>
         </div>
+
         <div class="funnel-wrap">
+
             @foreach($entonnoir as $i => $step)
             @php
                 $stepVal  = (int)($step['val'] ?? 0);
@@ -88,20 +99,25 @@
                 $conv     = (int)round($stepVal / $totalRef * 100);
             @endphp
             <div class="funnel-step">
-                <span class="funnel-lbl-txt">{{ $step['lbl'] }}</span>
+                <span class="funnel-lbl-txt"> {{ $step['lbl'] }} </span>
                 <div class="funnel-bar-wrap">
-                    <div class="funnel-bar" style="background:{{ $step['color'] }};opacity:.12;"></div>
-                    <div class="funnel-bar funnel-bar-fill" style="width:{{ $barPct }}%;background:{{ $step['color'] }};"></div>
+                    <div class="funnel-bar" style="background: {{ $step['color'] }}; opacity:.12 ;"></div>
+                    <div class="funnel-bar funnel-bar-fill" style="width: {{ $barPct }}%; background: {{ $step['color'] }};"></div>
                 </div>
                 <div class="funnel-label">
-                    <span class="funnel-lbl-val" style="color:{{ $step['color'] }};">{{ $stepVal }}</span>
+                    <span class="funnel-lbl-val" style="color: {{ $step['color'] }} ;">
+                        {{ $stepVal }}
+                    </span>
                     <span class="funnel-lbl-pct">{{ $conv }}%</span>
                 </div>
             </div>
             @endforeach
             <div class="funnel-rejet">
                 <i class="fas fa-times-circle" style="color:#ef4444;font-size:.75rem;"></i>
-                <span>Rejetés : <strong style="color:#ef4444;">{{ $kpis['rejete'] }}</strong> projet(s) sur l'ensemble du processus</span>
+                <span>
+                    Rejetés : <strong style="color:#ef4444;">{{ $kpis['rejete'] }} </strong>
+                    projet(s) sur l'ensemble du processus
+                </span>
             </div>
         </div>
     </div>
@@ -112,7 +128,9 @@
             <h3 class="an-card-title">Répartition par statut</h3>
             <p class="an-card-sub">Distribution de tous les projets</p>
         </div>
-        <div class="chart-box"><canvas id="donutChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="donutChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -126,7 +144,9 @@
             <h3 class="an-card-title">Évolution mensuelle</h3>
             <p class="an-card-sub">Soumissions vs validations — 12 derniers mois</p>
         </div>
-        <div class="chart-box"><canvas id="evolutionChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="evolutionChart"></canvas>
+        </div>
     </div>
 
     {{-- Analyse rejets --}}
@@ -135,7 +155,9 @@
             <h3 class="an-card-title">Motifs de rejet</h3>
             <p class="an-card-sub">Regroupement par mots-clés</p>
         </div>
-        <div class="chart-box"><canvas id="rejetChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="rejetChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -146,7 +168,9 @@
         <h3 class="an-card-title">Top secteurs d'activité</h3>
         <p class="an-card-sub">Nombre de projets et montants demandés par secteur</p>
     </div>
-    <div class="chart-box" style="height:260px;"><canvas id="secteurChart"></canvas></div>
+    <div class="chart-box" style="height:260px;">
+        <canvas id="secteurChart"></canvas>
+    </div>
 </div>
 
 {{--  LIGNE 4 : Performance porteurs + Charge équipes  --}}
@@ -191,7 +215,9 @@
             <h3 class="an-card-title">Charge de travail des équipes</h3>
             <p class="an-card-sub">Projets traités par approbateur et validateur</p>
         </div>
-        <div class="chart-box"><canvas id="equipeChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="equipeChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -228,28 +254,34 @@
             </thead>
             <tbody>
                 @foreach($projetsBloque as $p)
+
                 @php
                     $mapStatut = [
                         'soumis'    => ['lbl'=>'Soumis',   'bg'=>'#eef2ff','color'=>'#4338ca','dot'=>'#6366f1'],
                         'en_examen' => ['lbl'=>'En examen','bg'=>'#fff7ed','color'=>'#c2410c','dot'=>'#f97316'],
                         'approuve'  => ['lbl'=>'Approuvé', 'bg'=>'#f0fdf4','color'=>'#15803d','dot'=>'#22c55e'],
                     ];
-                    $st = $mapStatut[$p['statut']] ?? $mapStatut['soumis'];
-                    $urgence = $p['jours'] >= 30 ? 'row-danger' : ($p['jours'] >= 20 ? 'row-warn' : '');
+                    $st = $mapStatut[ $p['statut'] ] ?? $mapStatut['soumis'];
+                    $urgence = $p['jours'] >= 30 ? 'row-danger' : ($p['jours'] >= 20 ? 'row-warn' : 'row-normal');
                 @endphp
+
                 <tr class="{{ $urgence }}">
-                    <td><span class="bloque-code">{{ $p['code'] }}</span></td>
-                    <td class="bloque-titre">{{ Str::limit($p['titre'], 40) }}</td>
+                    <td>
+                        <span class="bloque-code"> {{ $p['code'] }} </span>
+                    </td>
+                    <td class="bloque-titre"> {{ Str::limit($p['titre'], 40) }} </td>
                     <td>
                         <span class="status-badge" style="background:{{ $st['bg'] }};color:{{ $st['color'] }};">
-                            <span class="dot" style="background:{{ $st['dot'] }};"></span>{{ $st['lbl'] }}
+                            <span class="dot" style="background:{{ $st['dot'] }};"></span>
+                            {{ $st['lbl'] }}
                         </span>
                     </td>
-                    <td class="td-muted">{{ $p['porteur'] }}</td>
-                    <td class="td-muted">{{ $p['secteur'] }}</td>
+                    <td class="td-muted"> {{ $p['porteur'] }} </td>
+                    <td class="td-muted"> {{ $p['secteur'] }} </td>
                     <td>
                         <span class="jours-badge {{ $p['jours'] >= 30 ? 'jours-danger' : ($p['jours'] >= 20 ? 'jours-warn' : 'jours-normal') }}">
-                            <i class="fas fa-clock"></i> {{ $p['jours'] }} j
+                            <i class="fas fa-clock"></i>
+                            {{ $p['jours'] }} j
                         </span>
                     </td>
                 </tr>

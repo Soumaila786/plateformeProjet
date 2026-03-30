@@ -52,8 +52,12 @@
 
 
 <div class="finance-grid">
+
+    
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-wallet"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-wallet"></i>
+        </div>
         <div>
             <p class="finance-label">Budget total</p>
             <p class="finance-amount"><?php echo e(number_format($budgetTotal, 0, ',', ' ')); ?> <span>F CFA</span></p>
@@ -61,35 +65,55 @@
             <div class="finance-bar"><div style="width:100%;"></div></div>
         </div>
     </div>
+
+    
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-hand-holding-usd"></i>
+        </div>
         <div>
-            <?php $pctD = $budgetTotal > 0 ? min(100, round($montantDemande / $budgetTotal * 100)) : 0; ?>
+            <?php
+                $pctD = $budgetTotal > 0 ? min(100, round($montantDemande / $budgetTotal * 100)) : 0;
+            ?>
             <p class="finance-label">Montant demandé</p>
             <p class="finance-amount"><?php echo e(number_format($montantDemande, 0, ',', ' ')); ?> <span>F CFA</span></p>
             <p class="finance-sub"><?php echo e($pctD); ?>% du budget total</p>
-            <div class="finance-bar"><div style="width:<?php echo e($pctD); ?>%;"></div></div>
+            <div class="finance-bar">
+                <div style="width:<?php echo e($pctD); ?>%;"></div>
+            </div>
         </div>
     </div>
+
+    
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-coins"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-coins"></i>
+        </div>
         <div>
             <p class="finance-label">Montant financé</p>
-            <p class="finance-amount">— <span>F CFA</span></p>
+            <p class="finance-amount"> — <span>F CFA</span></p>
             <p class="finance-sub">Non disponible</p>
             <div class="finance-bar"><div style="width:0%;"></div></div>
         </div>
     </div>
+
+    
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-hourglass-half"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
         <div>
-            <?php $restant = max(0, $montantDemande - 0); $pctR = $montantDemande > 0 ? 100 : 0; ?>
+            <?php
+                $restant = max(0, $montantDemande - 0);
+                $pctR = $montantDemande > 0 ? 100 : 0;
+            ?>
             <p class="finance-label">Restant à financer</p>
             <p class="finance-amount"><?php echo e(number_format($restant, 0, ',', ' ')); ?> <span>F CFA</span></p>
             <p class="finance-sub">Montant non encore financé</p>
             <div class="finance-bar"><div style="width:<?php echo e($pctR); ?>%;"></div></div>
         </div>
     </div>
+
 </div>
 
 
@@ -97,11 +121,14 @@
 
     
     <div class="card">
+
         <div class="card-head">
             <h3 class="card-title">Projets récents</h3>
-            <a href="<?php echo e(route('porteur.projets.index')); ?>" class="link-more">Voir tous <i class="fas fa-arrow-right"></i></a>
+            <a href="<?php echo e(route('porteur.projets.index')); ?>" class="link-more"> Voir tous <i class="fas fa-arrow-right"></i></a>
         </div>
+
         <?php $__empty_1 = true; $__currentLoopData = $projetsRecents; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+
         <?php
             $map = [
                 'brouillon' => ['lbl'=>'Brouillon','dot'=>'#9ca3af','bg'=>'#f3f4f6','color'=>'#6b7280'],
@@ -113,23 +140,38 @@
             ];
             $s = $map[$projet->statutProjet] ?? $map['brouillon'];
         ?>
+
         <a href="<?php echo e(route('porteur.projets.show', $projet)); ?>" class="projet-row">
-            <div class="projet-avatar"><?php echo e(strtoupper(substr(optional($projet->secteur)->nomSecteur ?? $projet->titre, 0, 1))); ?></div>
+
+            <div class="projet-avatar">
+                <?php echo e(strtoupper(substr(optional($projet->secteur)->nomSecteur ?? $projet->titre, 0, 1))); ?>
+
+            </div>
+
             <div class="projet-info">
                 <p class="projet-name"><?php echo e($projet->titre); ?></p>
-                <p class="projet-sub"><?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?> &middot; <?php echo e(optional($projet->updated_at)->translatedFormat('d F Y')); ?></p>
+                <p class="projet-sub">
+                    <?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?>
+
+                    &middot;
+                    <?php echo e(optional($projet->updated_at)->translatedFormat('d F Y')); ?>
+
+                </p>
             </div>
-            <span class="status-badge" style="background:<?php echo e($s['bg']); ?>;color:<?php echo e($s['color']); ?>;">
+
+            <span class="status-badge" style="background:<?php echo e($s['bg']); ?>; color:<?php echo e($s['color']); ?>;">
                 <span class="dot" style="background:<?php echo e($s['dot']); ?>;"></span><?php echo e($s['lbl']); ?>
 
             </span>
         </a>
+
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <div class="empty-state">
             <i class="fas fa-folder-open"></i>
             <p>Aucun projet pour le moment</p>
             <a href="<?php echo e(route('porteur.projets.create')); ?>" class="btn-primary"><i class="fas fa-plus"></i> Créer un projet</a>
         </div>
+
         <?php endif; ?>
     </div>
 
@@ -160,7 +202,7 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             <?php if($total === 0): ?><p class="empty-text">Aucun projet</p><?php endif; ?>
         </div>
-        
+
         
         <div class="card">
             <div class="card-head">

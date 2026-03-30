@@ -9,11 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
+    public function index() {
         $user = Auth::user();
 
-        // ── Compteurs statuts ──
+        // Compteurs statuts
         $base = Projet::where('user_id', $user->id);
 
         $total     = (clone $base)->count();
@@ -25,22 +24,22 @@ class DashboardController extends Controller
         $rejete    = (clone $base)->where('statutProjet', 'rejete')->count();
         $finance   = (clone $base)->where('statutProjet', 'finance')->count();
 
-        // ── Finances ──
+        // Finances
         $budgetTotal    = (clone $base)->sum('budgetTotal')    ?? 0;
         $montantDemande = (clone $base)->sum('montantDemande') ?? 0;
         $montantFinance = 0; // colonne non encore créée
 
-        // ── Projets récents (max 5) ──
+        // Projets récents (max 5)
         $projetsRecents = Projet::where('user_id', $user->id)
             ->with('secteur')
             ->latest('updated_at')
             ->take(5)
             ->get();
 
-        // ── Notifications récentes (max 4) ──
+        // Notifications récentes (max 4)
         $notifications = Notification::where('destinataire_id', $user->id)
             ->latest()
-            ->take(4)
+            ->take(2)
             ->get();
 
         return view('porteur.dashboard', compact(

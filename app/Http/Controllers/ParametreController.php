@@ -6,27 +6,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class ParametreController extends Controller
-{
-    public function __construct()
-    {
+class ParametreController extends Controller {
+    public function __construct() {
         $this->middleware('auth');
     }
 
-    // ── Index ──────────────────────────────────────────
-    public function index()
-    {
+    //  Index
+    public function index() {
         return view('parametres.index');
     }
 
-    // ── Profil ─────────────────────────────────────────
-    public function profil()
-    {
+    //  Profil
+    public function profil() {
         return view('parametres.profil');
     }
 
-    public function profilUpdate(Request $request)
-    {
+    public function profilUpdate(Request $request) {
         $request->validate([
             'nomComplet' => 'required|string|max:255',
             'email'      => 'required|email|unique:users,email,' . Auth::id(),
@@ -47,14 +42,12 @@ class ParametreController extends Controller
                             ->with('success', 'Profil mis à jour avec succès.');
     }
 
-    // ── Sécurité ───────────────────────────────────────
-    public function securite()
-    {
+    //  Sécurité
+    public function securite() {
         return view('parametres.securite');
     }
 
-    public function securiteUpdate(Request $request)
-    {
+    public function securiteUpdate(Request $request) {
         $request->validate([
             'current_password'     => 'required',
             'new_password'         => 'required|min:8|confirmed',
@@ -74,43 +67,27 @@ class ParametreController extends Controller
                             ->with('success', 'Mot de passe mis à jour avec succès.');
     }
 
-    // ── Notifications ──────────────────────────────────
+    //  Notifications
     public function notifications()
     {
         return view('parametres.notifications');
     }
 
-    public function notificationsUpdate(Request $request)
-    {
-        // À adapter selon les colonnes réelles dans ta table users
-        // Auth::user()->update([
-        //     'notif_email'        => $request->boolean('email_notifications'),
-        //     'notif_projets'      => $request->boolean('projet_notifications'),
-        //     'notif_commentaires' => $request->boolean('commentaire_notifications'),
-        // ]);
-
+    public function notificationsUpdate(Request $request) {
         return redirect()->route('parametres.notifications')
                             ->with('success', 'Préférences de notifications mises à jour.');
     }
 
-    // ── Général ────────────────────────────────────────
-    public function general()
-    {
+    //  Général
+    public function general() {
         return view('parametres.general');
     }
 
-    public function generalUpdate(Request $request)
-    {
+    public function generalUpdate(Request $request) {
         $request->validate([
             'langue'   => 'required|in:fr,en',
             'timezone' => 'required|string',
         ]);
-
-        // À adapter selon les colonnes réelles dans ta table users
-        // Auth::user()->update([
-        //     'langue'   => $request->langue,
-        //     'timezone' => $request->timezone,
-        // ]);
 
         return redirect()->route('parametres.general')
                             ->with('success', 'Paramètres généraux mis à jour.');

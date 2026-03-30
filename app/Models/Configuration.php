@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Configuration extends Model {
-    
+
     protected $table = 'configurations';
 
     protected $fillable = [
@@ -19,6 +19,7 @@ class Configuration extends Model {
 
     // Récupérer une valeur par clé
     public static function get($cle, $defaut = null) {
+        
         $config = static::where('cle', $cle)->first();
         return $config ? $config->valeur : $defaut;
     }

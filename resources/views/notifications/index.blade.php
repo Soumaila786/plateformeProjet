@@ -9,7 +9,7 @@
 @section('content')
 <div class="notif-page">
 
-    {{-- ── Header ── --}}
+    {{--  Header  --}}
     <div class="notif-header">
         <div>
             <h1 class="notif-page-title">
@@ -43,14 +43,14 @@
         </div>
     </div>
 
-    {{-- ── Succès ── --}}
+    {{--  Succès  --}}
     @if(session('success'))
     <div class="notif-alert-success">
         <i class="fas fa-check-circle"></i> {{ session('success') }}
     </div>
     @endif
 
-    {{-- ── Liste ── --}}
+    {{--  Liste  --}}
     @if($notifications->count() > 0)
     <div class="notif-list">
         @foreach($notifications as $notif)
@@ -109,7 +109,7 @@
     </div>
 
     @if($notifications->hasPages())
-    <div class="notif-pagination">{{ $notifications->links() }}</div>
+    {{-- <div class="notif-pagination">{{ $notifications->links() }}</div> --}}
     @endif
 
     @else

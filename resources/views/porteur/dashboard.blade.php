@@ -53,8 +53,12 @@
 
 {{-- Finances --}}
 <div class="finance-grid">
+
+    {{-- Montant total des projets --}}
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-wallet"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-wallet"></i>
+        </div>
         <div>
             <p class="finance-label">Budget total</p>
             <p class="finance-amount">{{ number_format($budgetTotal, 0, ',', ' ') }} <span>F CFA</span></p>
@@ -62,35 +66,55 @@
             <div class="finance-bar"><div style="width:100%;"></div></div>
         </div>
     </div>
+
+    {{-- Montant total demandé --}}
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-hand-holding-usd"></i>
+        </div>
         <div>
-            @php $pctD = $budgetTotal > 0 ? min(100, round($montantDemande / $budgetTotal * 100)) : 0; @endphp
+            @php
+                $pctD = $budgetTotal > 0 ? min(100, round($montantDemande / $budgetTotal * 100)) : 0;
+            @endphp
             <p class="finance-label">Montant demandé</p>
             <p class="finance-amount">{{ number_format($montantDemande, 0, ',', ' ') }} <span>F CFA</span></p>
             <p class="finance-sub">{{ $pctD }}% du budget total</p>
-            <div class="finance-bar"><div style="width:{{ $pctD }}%;"></div></div>
+            <div class="finance-bar">
+                <div style="width:{{ $pctD }}%;"></div>
+            </div>
         </div>
     </div>
+
+    {{-- Montant total financé --}}
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-coins"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-coins"></i>
+        </div>
         <div>
             <p class="finance-label">Montant financé</p>
-            <p class="finance-amount">— <span>F CFA</span></p>
+            <p class="finance-amount"> — <span>F CFA</span></p>
             <p class="finance-sub">Non disponible</p>
             <div class="finance-bar"><div style="width:0%;"></div></div>
         </div>
     </div>
+
+    {{-- Montant total restant a financé --}}
     <div class="finance-card">
-        <div class="finance-icon"><i class="fas fa-hourglass-half"></i></div>
+        <div class="finance-icon">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
         <div>
-            @php $restant = max(0, $montantDemande - 0); $pctR = $montantDemande > 0 ? 100 : 0; @endphp
+            @php
+                $restant = max(0, $montantDemande - 0);
+                $pctR = $montantDemande > 0 ? 100 : 0;
+            @endphp
             <p class="finance-label">Restant à financer</p>
             <p class="finance-amount">{{ number_format($restant, 0, ',', ' ') }} <span>F CFA</span></p>
             <p class="finance-sub">Montant non encore financé</p>
             <div class="finance-bar"><div style="width:{{ $pctR }}%;"></div></div>
         </div>
     </div>
+
 </div>
 
 {{-- Zone principale --}}
@@ -98,11 +122,14 @@
 
     {{-- Projets récents --}}
     <div class="card">
+
         <div class="card-head">
             <h3 class="card-title">Projets récents</h3>
-            <a href="{{ route('porteur.projets.index') }}" class="link-more">Voir tous <i class="fas fa-arrow-right"></i></a>
+            <a href="{{ route('porteur.projets.index') }}" class="link-more"> Voir tous <i class="fas fa-arrow-right"></i></a>
         </div>
+
         @forelse($projetsRecents as $projet)
+
         @php
             $map = [
                 'brouillon' => ['lbl'=>'Brouillon','dot'=>'#9ca3af','bg'=>'#f3f4f6','color'=>'#6b7280'],
@@ -114,22 +141,34 @@
             ];
             $s = $map[$projet->statutProjet] ?? $map['brouillon'];
         @endphp
+
         <a href="{{ route('porteur.projets.show', $projet) }}" class="projet-row">
-            <div class="projet-avatar">{{ strtoupper(substr(optional($projet->secteur)->nomSecteur ?? $projet->titre, 0, 1)) }}</div>
+
+            <div class="projet-avatar">
+                {{ strtoupper(substr(optional($projet->secteur)->nomSecteur ?? $projet->titre, 0, 1)) }}
+            </div>
+
             <div class="projet-info">
                 <p class="projet-name">{{ $projet->titre }}</p>
-                <p class="projet-sub">{{ optional($projet->secteur)->nomSecteur ?? '—' }} &middot; {{ optional($projet->updated_at)->translatedFormat('d F Y') }}</p>
+                <p class="projet-sub">
+                    {{ optional($projet->secteur)->nomSecteur ?? '—' }}
+                    &middot;
+                    {{ optional($projet->updated_at)->translatedFormat('d F Y') }}
+                </p>
             </div>
-            <span class="status-badge" style="background:{{ $s['bg'] }};color:{{ $s['color'] }};">
+
+            <span class="status-badge" style="background:{{ $s['bg'] }}; color:{{ $s['color'] }};">
                 <span class="dot" style="background:{{ $s['dot'] }};"></span>{{ $s['lbl'] }}
             </span>
         </a>
+
         @empty
         <div class="empty-state">
             <i class="fas fa-folder-open"></i>
             <p>Aucun projet pour le moment</p>
             <a href="{{ route('porteur.projets.create') }}" class="btn-primary"><i class="fas fa-plus"></i> Créer un projet</a>
         </div>
+
         @endforelse
     </div>
 
@@ -159,8 +198,8 @@
             @endforeach
             @if($total === 0)<p class="empty-text">Aucun projet</p>@endif
         </div>
-        
-        {{-- Notifications (max 3) --}}
+
+        {{-- Notifications (max 2) --}}
         <div class="card">
             <div class="card-head">
                 <h3 class="card-title">Notifications</h3>

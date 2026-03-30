@@ -11,7 +11,8 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    flex-wrap:wrap; gap:10px;
+    flex-wrap:wrap;
+    gap:10px;
 }
 .an-title  {
     font-size:1.2rem;
@@ -64,11 +65,11 @@
     transition:box-shadow .15s;
 }
 .kpi-card:hover { box-shadow:0 4px 14px rgba(0,0,0,.09); }
-.kpi-indigo { border-top:3px solid #6366f1; }
-.kpi-orange { border-top:3px solid #f97316; }
-.kpi-green  { border-top:3px solid #22c55e; }
-.kpi-red    { border-top:3px solid #ef4444; }
-.kpi-teal   { border-top:3px solid #0d9488; }
+.kpi-indigo { border-left:3px solid #6366f1; }
+.kpi-orange { border-left:3px solid #f97316; }
+.kpi-green  { border-left:3px solid #22c55e; }
+.kpi-red    { border-left:3px solid #ef4444; }
+.kpi-teal   { border-left:3px solid #0d9488; }
 
 .kpi-top  {
     display:flex;
@@ -173,40 +174,74 @@
 /*  Entonnoir  */
 .funnel-wrap {
     padding:16px 20px;
-    display:flex; flex-direction:column; gap:13px;
+    display:flex;
+    flex-direction:column;
+    gap:13px;
 }
 .funnel-step {
-    display:flex; align-items:center; gap:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 /* Label fixe à gauche */
 .funnel-lbl-txt {
-    font-size:.75rem; font-weight:600; color:#374151;
-    width:80px; flex-shrink:0; white-space:nowrap;
+    font-size:.75rem;
+    font-weight:600;
+    color:#374151;
+    width:80px;
+    flex-shrink:0;
+    white-space:nowrap;
 }
 /* Barre au centre — prend tout l'espace restant */
 .funnel-bar-wrap {
-    position:relative; height:28px; border-radius:6px;
-    overflow:hidden; flex:1; min-width:0;
+    position:relative;
+    height:28px;
+    border-radius:6px;
+    overflow:hidden;
+    flex:1;
+    min-width:0;
 }
 .funnel-bar {
-    position:absolute; inset:0; border-radius:6px;
+    position:absolute;
+    inset:0;
+    border-radius:6px;
 }
 .funnel-bar-fill {
-    position:absolute; top:0; left:0; height:100%;
-    border-radius:6px; transition:width .5s ease;
+    position:absolute;
+    top:0; left:0;
+    height:100%;
+    border-radius:6px;
+    transition:width .5s ease;
 }
 /* Stats à droite */
 .funnel-label {
-    display:flex; align-items:center; gap:6px;
-    flex-shrink:0; width:80px; justify-content:flex-end;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    width:80px;
+    justify-content:flex-end;
 }
-.funnel-lbl-val { font-size:.85rem; font-weight:800; }
-.funnel-lbl-pct { font-size:.67rem; color:#9ca3af; }
+.funnel-lbl-val {
+    font-size:.85rem;
+    font-weight:800;
+}
+.funnel-lbl-pct {
+    font-size:.67rem;
+    color:#9ca3af;
+}
+
 
 .funnel-rejet {
-    display:flex; align-items:center; gap:8px;
-    padding:8px 12px; background:#fef2f2; border-radius:8px;
-    font-size:.74rem; color:#6b7280; margin-top:4px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    background:#fef2f2;
+    border-radius:8px;
+    font-size:.74rem;
+    color:#6b7280;
+    margin-top:4px;
     border:1px solid #fecaca;
 }
 
@@ -261,20 +296,37 @@
 .bloque-table tbody tr:hover { background:#fafafa; }
 .row-warn   td { background:#fffbeb; }
 .row-danger td { background:#fef2f2; }
+.row-normal td { background:#ffffff71; }
 
 .bloque-code  { font-size:.7rem; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.04em; }
 .bloque-titre { font-weight:600; color:#111827; max-width:200px; }
 .td-muted     { color:#9ca3af; }
 
 .status-badge {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:3px 9px; border-radius:20px; font-size:.7rem; font-weight:600; white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:3px 9px;
+    border-radius:20px;
+    font-size:.7rem;
+    font-weight:600;
+    white-space:nowrap;
 }
-.dot { width:6px; height:6px; border-radius:50%; display:inline-block; }
+.dot {
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    display:inline-block;
+}
 
 .jours-badge {
-    display:inline-flex; align-items:center; gap:4px;
-    padding:3px 8px; border-radius:8px; font-size:.72rem; font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:3px 8px;
+    border-radius:8px;
+    font-size:.72rem;
+    font-weight:700;
 }
 .jours-normal { background:#f3f4f6; color:#6b7280; }
 .jours-warn   { background:#fff7ed; color:#c2410c; }

@@ -11,10 +11,11 @@
 <div class="an-header">
     <div>
         <h1 class="an-title">Tableau analytique</h1>
-        <p class="an-sub">Vue globale en temps réel · <?php echo e(\Carbon\Carbon::now()->translatedFormat('d F Y')); ?></p>
+        <p class="an-sub">Vue globale en temps réel · <?php echo e(\Carbon\Carbon::now()->translatedFormat('d F Y H:i')); ?></p>
     </div>
     <a href="<?php echo e(route('admin.dashboard')); ?>" class="btn-back">
-        <i class="fas fa-arrow-left"></i> Tableau de bord
+        <i class="fas fa-arrow-left"></i>
+        Tableau de bord
     </a>
 </div>
 
@@ -34,10 +35,12 @@
     <?php $__currentLoopData = $kpiItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <div class="kpi-card <?php echo e($k['cls']); ?>">
         <div class="kpi-top">
-            <span class="kpi-lbl"><?php echo e($k['lbl']); ?></span>
-            <div class="kpi-icon"><i class="fas <?php echo e($k['icon']); ?>"></i></div>
+            <span class="kpi-lbl"> <?php echo e($k['lbl']); ?> </span>
+            <div class="kpi-icon">
+                <i class="fas <?php echo e($k['icon']); ?>"></i>
+            </div>
         </div>
-        <p class="kpi-val"><?php echo e($k['val']); ?></p>
+        <p class="kpi-val"> <?php echo e($k['val']); ?> </p>
     </div>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 </div>
@@ -47,10 +50,17 @@
     <div class="delai-card">
         <i class="fas fa-stopwatch delai-ic"></i>
         <div>
-            <p class="delai-lbl">Délai moyen approbation</p>
-            <p class="delai-val"><?php echo e($delaiAppro); ?><span> jours</span></p>
+            <p class="delai-lbl">
+                Délai moyen approbation
+            </p>
+            <p class="delai-val">
+                <?php echo e($delaiAppro); ?>
+
+                <span> jours</span>
+            </p>
         </div>
     </div>
+
     <div class="delai-card">
         <i class="fas fa-hourglass-half delai-ic"></i>
         <div>
@@ -76,7 +86,9 @@
             <h3 class="an-card-title">Entonnoir complet du processus</h3>
             <p class="an-card-sub">De la création à la validation finale</p>
         </div>
+
         <div class="funnel-wrap">
+
             <?php $__currentLoopData = $entonnoir; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $step): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php
                 $stepVal  = (int)($step['val'] ?? 0);
@@ -87,20 +99,26 @@
                 $conv     = (int)round($stepVal / $totalRef * 100);
             ?>
             <div class="funnel-step">
-                <span class="funnel-lbl-txt"><?php echo e($step['lbl']); ?></span>
+                <span class="funnel-lbl-txt"> <?php echo e($step['lbl']); ?> </span>
                 <div class="funnel-bar-wrap">
-                    <div class="funnel-bar" style="background:<?php echo e($step['color']); ?>;opacity:.12;"></div>
-                    <div class="funnel-bar funnel-bar-fill" style="width:<?php echo e($barPct); ?>%;background:<?php echo e($step['color']); ?>;"></div>
+                    <div class="funnel-bar" style="background: <?php echo e($step['color']); ?>; opacity:.12 ;"></div>
+                    <div class="funnel-bar funnel-bar-fill" style="width: <?php echo e($barPct); ?>%; background: <?php echo e($step['color']); ?>;"></div>
                 </div>
                 <div class="funnel-label">
-                    <span class="funnel-lbl-val" style="color:<?php echo e($step['color']); ?>;"><?php echo e($stepVal); ?></span>
+                    <span class="funnel-lbl-val" style="color: <?php echo e($step['color']); ?> ;">
+                        <?php echo e($stepVal); ?>
+
+                    </span>
                     <span class="funnel-lbl-pct"><?php echo e($conv); ?>%</span>
                 </div>
             </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             <div class="funnel-rejet">
                 <i class="fas fa-times-circle" style="color:#ef4444;font-size:.75rem;"></i>
-                <span>Rejetés : <strong style="color:#ef4444;"><?php echo e($kpis['rejete']); ?></strong> projet(s) sur l'ensemble du processus</span>
+                <span>
+                    Rejetés : <strong style="color:#ef4444;"><?php echo e($kpis['rejete']); ?> </strong>
+                    projet(s) sur l'ensemble du processus
+                </span>
             </div>
         </div>
     </div>
@@ -111,7 +129,9 @@
             <h3 class="an-card-title">Répartition par statut</h3>
             <p class="an-card-sub">Distribution de tous les projets</p>
         </div>
-        <div class="chart-box"><canvas id="donutChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="donutChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -125,7 +145,9 @@
             <h3 class="an-card-title">Évolution mensuelle</h3>
             <p class="an-card-sub">Soumissions vs validations — 12 derniers mois</p>
         </div>
-        <div class="chart-box"><canvas id="evolutionChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="evolutionChart"></canvas>
+        </div>
     </div>
 
     
@@ -134,7 +156,9 @@
             <h3 class="an-card-title">Motifs de rejet</h3>
             <p class="an-card-sub">Regroupement par mots-clés</p>
         </div>
-        <div class="chart-box"><canvas id="rejetChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="rejetChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -145,7 +169,9 @@
         <h3 class="an-card-title">Top secteurs d'activité</h3>
         <p class="an-card-sub">Nombre de projets et montants demandés par secteur</p>
     </div>
-    <div class="chart-box" style="height:260px;"><canvas id="secteurChart"></canvas></div>
+    <div class="chart-box" style="height:260px;">
+        <canvas id="secteurChart"></canvas>
+    </div>
 </div>
 
 
@@ -190,7 +216,9 @@
             <h3 class="an-card-title">Charge de travail des équipes</h3>
             <p class="an-card-sub">Projets traités par approbateur et validateur</p>
         </div>
-        <div class="chart-box"><canvas id="equipeChart"></canvas></div>
+        <div class="chart-box">
+            <canvas id="equipeChart"></canvas>
+        </div>
     </div>
 
 </div>
@@ -227,29 +255,35 @@
             </thead>
             <tbody>
                 <?php $__currentLoopData = $projetsBloque; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+
                 <?php
                     $mapStatut = [
                         'soumis'    => ['lbl'=>'Soumis',   'bg'=>'#eef2ff','color'=>'#4338ca','dot'=>'#6366f1'],
                         'en_examen' => ['lbl'=>'En examen','bg'=>'#fff7ed','color'=>'#c2410c','dot'=>'#f97316'],
                         'approuve'  => ['lbl'=>'Approuvé', 'bg'=>'#f0fdf4','color'=>'#15803d','dot'=>'#22c55e'],
                     ];
-                    $st = $mapStatut[$p['statut']] ?? $mapStatut['soumis'];
-                    $urgence = $p['jours'] >= 30 ? 'row-danger' : ($p['jours'] >= 20 ? 'row-warn' : '');
+                    $st = $mapStatut[ $p['statut'] ] ?? $mapStatut['soumis'];
+                    $urgence = $p['jours'] >= 30 ? 'row-danger' : ($p['jours'] >= 20 ? 'row-warn' : 'row-normal');
                 ?>
+
                 <tr class="<?php echo e($urgence); ?>">
-                    <td><span class="bloque-code"><?php echo e($p['code']); ?></span></td>
-                    <td class="bloque-titre"><?php echo e(Str::limit($p['titre'], 40)); ?></td>
+                    <td>
+                        <span class="bloque-code"> <?php echo e($p['code']); ?> </span>
+                    </td>
+                    <td class="bloque-titre"> <?php echo e(Str::limit($p['titre'], 40)); ?> </td>
                     <td>
                         <span class="status-badge" style="background:<?php echo e($st['bg']); ?>;color:<?php echo e($st['color']); ?>;">
-                            <span class="dot" style="background:<?php echo e($st['dot']); ?>;"></span><?php echo e($st['lbl']); ?>
+                            <span class="dot" style="background:<?php echo e($st['dot']); ?>;"></span>
+                            <?php echo e($st['lbl']); ?>
 
                         </span>
                     </td>
-                    <td class="td-muted"><?php echo e($p['porteur']); ?></td>
-                    <td class="td-muted"><?php echo e($p['secteur']); ?></td>
+                    <td class="td-muted"> <?php echo e($p['porteur']); ?> </td>
+                    <td class="td-muted"> <?php echo e($p['secteur']); ?> </td>
                     <td>
                         <span class="jours-badge <?php echo e($p['jours'] >= 30 ? 'jours-danger' : ($p['jours'] >= 20 ? 'jours-warn' : 'jours-normal')); ?>">
-                            <i class="fas fa-clock"></i> <?php echo e($p['jours']); ?> j
+                            <i class="fas fa-clock"></i>
+                            <?php echo e($p['jours']); ?> j
                         </span>
                     </td>
                 </tr>
