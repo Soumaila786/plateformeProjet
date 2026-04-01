@@ -35,16 +35,16 @@
                     <div class="form-col">
                         <label class="field-label">Nom complet <span class="required">*</span></label>
                         <input type="text" name="nomComplet"
-                               value="{{ old('nomComplet', $user->nomComplet) }}"
-                               class="field-input @error('nomComplet') is-invalid @enderror" required>
+                                value="{{ old('nomComplet', $user->nomComplet) }}"
+                                class="field-input @error('nomComplet') is-invalid @enderror" required>
                         @error('nomComplet')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
                         <label class="field-label">Email <span class="required">*</span></label>
                         <input type="email" name="email"
-                               value="{{ old('email', $user->email) }}"
-                               class="field-input @error('email') is-invalid @enderror" required>
+                                value="{{ old('email', $user->email) }}"
+                                class="field-input @error('email') is-invalid @enderror" required>
                         @error('email')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
@@ -61,19 +61,89 @@
 
                     <div class="form-col">
                         <label class="field-label">Téléphone</label>
-                        <input type="text" name="telephone"
-                               value="{{ old('telephone', $user->telephone) }}"
-                               class="field-input @error('telephone') is-invalid @enderror">
-                        @error('telephone')<span class="field-error">{{ $message }}</span>@enderror
+                        <input type="text" name="contact"
+                                value="{{ old('contact', $user->contact) }}"
+                                class="field-input @error('contact') is-invalid @enderror">
+                        @error('contact')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-col">
+                        <label class="field-label">Fonction</label>
+                        <input type="text" name="fonction"
+                                value="{{ old('fonction', $user->fonction) }}"
+                                class="field-input @error('fonction') is-invalid @enderror">
+                        @error('fonction')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-col">
+                        <label class="field-label">Matricule</label>
+                        <input type="text" name="matricule"
+                                value="{{ old('matricule', $user->matricule) }}"
+                                class="field-input @error('matricule') is-invalid @enderror">
+                        @error('matricule')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col form-col-full">
-                        <label class="field-label">Organisation</label>
+                        <label class="field-label">Organisation / Structure</label>
                         <input type="text" name="organisation"
-                               value="{{ old('organisation', $user->organisation) }}"
-                               class="field-input @error('organisation') is-invalid @enderror">
+                                value="{{ old('organisation', $user->organisation) }}"
+                                class="field-input @error('organisation') is-invalid @enderror">
                         @error('organisation')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
+
+                    {{-- Champs spécifiques selon le rôle --}}
+                    @if ($user->role === 'porteur')
+                        <div class="form-col ">
+                            <label class="field-label">Spécialité</label>
+                            <input type="text" name="specialite"
+                                value="{{ old('specialite', optional($user->porteur)->specialite) }}"
+                                class="field-input @error('specialite') is-invalid @enderror">
+                            @error('specialite')<span class="field-error">{{ $message }}</span>@enderror
+                        </div>
+                    @endif
+
+                    @if ($user->role === 'approbateur')
+                        <div class="form-col form-col-full">
+                            <label class="field-label">Service</label>
+                            <input type="text" name="service"
+                                value="{{ old('service', optional($user->approbateur)->service) }}"
+                                class="field-input @error('service') is-invalid @enderror">
+                            @error('poste')<span class="field-error">{{ $message }}</span>@enderror
+                        </div>
+                        <div class="form-col form-col-full">
+                            <label class="field-label">Poste</label>
+                            <input type="text" name="poste"
+                                value="{{ old('poste', optional($user->approbateur)->poste) }}"
+                                class="field-input @error('poste') is-invalid @enderror">
+                            @error('poste')<span class="field-error">{{ $message }}</span>@enderror
+                        </div>
+                    @endif
+
+                    @php
+                        $dateDebutMandat = old('dateDebutMandat');
+                        if (!$dateDebutMandat && $user->role === 'validateur' && $user->validateur) {
+                            $dateDebutMandat = $user->validateur->dateDebutMandat ? $user->validateur->dateDebutMandat->format('Y-m-d') : '';
+                        }
+                        $dateFinMandat = old('dateFinMandat');
+                        if (!$dateFinMandat && $user->role === 'validateur' && $user->validateur) {
+                            $dateFinMandat = $user->validateur->dateFinMandat ? $user->validateur->dateFinMandat->format('Y-m-d') : '';
+                        }
+                    @endphp
+
+                    @if ($user->role === 'validateur')
+                        <div class="form-col form-col-full">
+                            <label class="field-label">Mandat début</label>
+                            <input type="date" name="dateDebutMandat"
+                                value="{{ $dateDebutMandat }}"
+                                class="field-input @error('dateDebutMandat') is-invalid @enderror">
+                            @error('dateDebutMandat')<span class="field-error">{{ $message }}</span>@enderror
+                        </div>
+                        <div class="form-col form-col-full">
+                            <label class="field-label">Mandat fin</label>
+                            <input type="date" name="dateFinMandat"
+                                value="{{ $dateFinMandat }}"
+                                class="field-input @error('dateFinMandat') is-invalid @enderror">
+                            @error('dateFinMandat')<span class="field-error">{{ $message }}</span>@enderror
+                        </div>
+                    @endif
 
                 </div>
             </div>
@@ -90,16 +160,17 @@
                     <div class="form-col">
                         <label class="field-label">Nouveau mot de passe</label>
                         <input type="password" name="motDePasse"
-                               class="field-input @error('motDePasse') is-invalid @enderror"
-                               placeholder="Min. 8 caractères">
+                                class="field-input @error('motDePasse') is-invalid @enderror"
+                                value=""
+                                placeholder="Min. 8 caractères">
                         @error('motDePasse')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col">
                         <label class="field-label">Confirmer</label>
                         <input type="password" name="motDePasse_confirmation"
-                               class="field-input"
-                               placeholder="Répéter le mot de passe">
+                                class="field-input"
+                                placeholder="Répéter le mot de passe">
                     </div>
 
                 </div>

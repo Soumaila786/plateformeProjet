@@ -17,10 +17,12 @@ class ProjetController extends Controller {
 
         $query = Projet::with('secteur')
             ->where('user_id', Auth::id());
+
         // Filtre statut
         if ($request->filled('statut')) {
             $query->where('statutProjet', $request->statut);
         }
+
         // Recherche titre / code
         if ($request->filled('search')) {
             $search = $request->search;
@@ -28,16 +30,22 @@ class ProjetController extends Controller {
                 $q->where('titre', 'like', '%' . $search . '%')
                     ->orWhere('codeProjet', 'like', '%' . $search . '%'); });
         }
+
         $projets = $query->orderBy('created_at', 'desc')->paginate(10);
+
         return view('porteur.projets.index', compact('projets'));
     }
 
     public function create() {
-        $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
+
+        $secteurs = SecteurActivite::where('statutSecteur', true)
+                    ->orderBy('nomSecteur')->get();
+
         return view('porteur.projets.create', compact('secteurs'));
     }
 
     public function store(Request $request){
+        
         $request->validate([
             'titre'         => 'required|string|max:255',
             'description'   => 'required|string',

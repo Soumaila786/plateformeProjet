@@ -103,9 +103,9 @@ unset($__errorArgs, $__bag); ?>
 
                     <div class="form-col">
                         <label class="field-label">Téléphone</label>
-                        <input type="text" name="telephone"
-                                value="<?php echo e(old('telephone')); ?>"
-                                class="field-input <?php $__errorArgs = ['telephone'];
+                        <input type="text" name="contact"
+                                value="<?php echo e(old('contact')); ?>"
+                                class="field-input <?php $__errorArgs = ['contact'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -114,7 +114,51 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
                                 placeholder="+226 XX XX XX XX">
-                        <?php $__errorArgs = ['telephone'];
+                        <?php $__errorArgs = ['contact'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
+                    <div class="form-col">
+                        <label class="field-label">Fonction</label>
+                        <input type="text" name="fonction"
+                                value="<?php echo e(old('fonction')); ?>"
+                                class="field-input <?php $__errorArgs = ['fonction'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                placeholder="Département---">
+                        <?php $__errorArgs = ['fonction'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
+                    <div class="form-col">
+                        <label class="field-label">Matricule</label>
+                        <input type="text" name="matricule"
+                                value="<?php echo e(old('matricule')); ?>"
+                                class="field-input <?php $__errorArgs = ['matricule'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                placeholder="MAT-001UJKZ">
+                        <?php $__errorArgs = ['matricule'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -147,6 +191,42 @@ endif;
 unset($__errorArgs, $__bag); ?>
                     </div>
 
+                    <div id="role-fields">
+
+                        
+                        <div class="role-group d-none" id="porteur-fields">
+                            <div class="form-col">
+                                <label>Spécialité</label>
+                                <input type="text" name="specialite" class="field-input">
+                            </div>
+                        </div>
+
+                        
+                        <div class="role-group d-none" id="approbateur-fields">
+                            <div class="form-col">
+                                <label>Service</label>
+                                <input type="text" name="service" class="field-input">
+                            </div>
+                            <div class="form-col">
+                                <label>Poste</label>
+                                <input type="text" name="poste" class="field-input">
+                            </div>
+                        </div>
+
+                        
+                        <div class="role-group d-none" id="validateur-fields">
+                            <div class="form-col">
+                                <label>Date début mandat</label>
+                                <input type="date" name="dateDebutMandat" class="field-input">
+                            </div>
+                            <div class="form-col">
+                                <label>Date fin mandat</label>
+                                <input type="date" name="dateFinMandat" class="field-input">
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -161,7 +241,39 @@ unset($__errorArgs, $__bag); ?>
 
     </form>
 </div>
+<?php $__env->startPush('scripts'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
+    const roleSelect = document.querySelector('select[name="role"]');
+
+    const groups = {
+        porteur: document.getElementById('porteur-fields'),
+        approbateur: document.getElementById('approbateur-fields'),
+        validateur: document.getElementById('validateur-fields')
+    };
+
+    function hideAll() {
+        Object.values(groups).forEach(g => g.classList.add('d-none'));
+    }
+
+    function showFields(role) {
+        hideAll();
+        if (groups[role]) {
+            groups[role].classList.remove('d-none');
+        }
+    }
+
+    // changement du select
+    roleSelect.addEventListener('change', function () {
+        showFields(this.value);
+    });
+
+    // au chargement (important si old())
+    showFields(roleSelect.value);
+});
+</script>
+<?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/admin/users/create.blade.php ENDPATH**/ ?>

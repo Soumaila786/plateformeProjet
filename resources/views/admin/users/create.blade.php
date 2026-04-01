@@ -63,11 +63,27 @@
 
                     <div class="form-col">
                         <label class="field-label">Téléphone</label>
-                        <input type="text" name="telephone"
-                                value="{{ old('telephone') }}"
-                                class="field-input @error('telephone') is-invalid @enderror"
+                        <input type="text" name="contact"
+                                value="{{ old('contact') }}"
+                                class="field-input @error('contact') is-invalid @enderror"
                                 placeholder="+226 XX XX XX XX">
-                        @error('telephone')<span class="field-error">{{ $message }}</span>@enderror
+                        @error('contact')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-col">
+                        <label class="field-label">Fonction</label>
+                        <input type="text" name="fonction"
+                                value="{{ old('fonction') }}"
+                                class="field-input @error('fonction') is-invalid @enderror"
+                                placeholder="Département---">
+                        @error('fonction')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+                    <div class="form-col">
+                        <label class="field-label">Matricule</label>
+                        <input type="text" name="matricule"
+                                value="{{ old('matricule') }}"
+                                class="field-input @error('matricule') is-invalid @enderror"
+                                placeholder="MAT-001UJKZ">
+                        @error('matricule')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
                     <div class="form-col form-col-full">
@@ -77,6 +93,42 @@
                                 class="field-input @error('organisation') is-invalid @enderror"
                                 placeholder="Nom de l'organisation">
                         @error('organisation')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+
+                    <div id="role-fields">
+
+                        {{-- PORTEUR --}}
+                        <div class="role-group d-none" id="porteur-fields">
+                            <div class="form-col">
+                                <label>Spécialité</label>
+                                <input type="text" name="specialite" class="field-input">
+                            </div>
+                        </div>
+
+                        {{-- APPROBATEUR --}}
+                        <div class="role-group d-none" id="approbateur-fields">
+                            <div class="form-col">
+                                <label>Service</label>
+                                <input type="text" name="service" class="field-input">
+                            </div>
+                            <div class="form-col">
+                                <label>Poste</label>
+                                <input type="text" name="poste" class="field-input">
+                            </div>
+                        </div>
+
+                        {{-- VALIDATEUR --}}
+                        <div class="role-group d-none" id="validateur-fields">
+                            <div class="form-col">
+                                <label>Date début mandat</label>
+                                <input type="date" name="dateDebutMandat" class="field-input">
+                            </div>
+                            <div class="form-col">
+                                <label>Date fin mandat</label>
+                                <input type="date" name="dateFinMandat" class="field-input">
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -93,5 +145,37 @@
 
     </form>
 </div>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
+    const roleSelect = document.querySelector('select[name="role"]');
+
+    const groups = {
+        porteur: document.getElementById('porteur-fields'),
+        approbateur: document.getElementById('approbateur-fields'),
+        validateur: document.getElementById('validateur-fields')
+    };
+
+    function hideAll() {
+        Object.values(groups).forEach(g => g.classList.add('d-none'));
+    }
+
+    function showFields(role) {
+        hideAll();
+        if (groups[role]) {
+            groups[role].classList.remove('d-none');
+        }
+    }
+
+    // changement du select
+    roleSelect.addEventListener('change', function () {
+        showFields(this.value);
+    });
+
+    // au chargement (important si old())
+    showFields(roleSelect.value);
+});
+</script>
+@endpush
 @endsection

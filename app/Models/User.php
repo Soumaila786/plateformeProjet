@@ -21,6 +21,7 @@ class User extends Authenticatable
         'role',
         'actif',
         'dateCreation',
+        'organisation',
     ];
 
     protected $hidden = [
@@ -32,15 +33,40 @@ class User extends Authenticatable
         'dateCreation' => 'datetime',
     ];
 
+    protected static function boot() {
+
+        parent::boot();
+
+        static::deleting(function ($user) {
+            $user->porteur()->delete();
+            $user->approbateur()->delete();
+            $user->validateur()->delete();
+        });
+    }
+
     // Spatie utilise 'password' par défaut — on pointe vers motDePasse
-    public function getAuthPassword()
-    {
+    public function getAuthPassword() {
+
         return $this->motDePasse;
     }
 
     // Relations
-    public function projets()
-    {
+    public function projets() {
+
         return $this->hasMany(Projet::class);
     }
+
+    public function porteur() {
+        return $this->hasOne(Porteur::class, 'user_id');
+    }
+
+    public function approbateur() {
+        return $this->hasOne(Approbateur::class, 'user_id');
+    }
+
+    public function validateur() {
+        return $this->hasOne(Validateur::class, 'user_id');
+    }
+
+
 }

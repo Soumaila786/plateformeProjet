@@ -59,6 +59,14 @@
                     <span class="role-badge role-{{ $user->role }}">{{ ucfirst($user->role) }}</span>
                 </div>
                 <div class="info-item">
+                    <span class="info-label">Fonction</span>
+                    <span class="role-badge role-{{ $user->fonction }}">{{ $user->fonction ?? '—'}}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Matricule</span>
+                    <span class="role-badge role-{{ $user->matricule }}">{{ $user->matricule ?? '—' }}</span>
+                </div>
+                <div class="info-item">
                     <span class="info-label">Statut</span>
                     @if($user->actif)
                         <span class="status-badge status-green">Actif</span>
@@ -66,6 +74,7 @@
                         <span class="status-badge status-red">Inactif</span>
                     @endif
                 </div>
+
                 <div class="info-item">
                     <span class="info-label">Téléphone</span>
                     <span class="info-value">{{ $user->telephone ?? '—' }}</span>
@@ -78,6 +87,40 @@
                     <span class="info-label">Créé le</span>
                     <span class="info-value">{{ optional($user->dateCreation)->format('d/m/Y') ?? optional($user->created_at)->format('d/m/Y') ?? '—' }}</span>
                 </div>
+
+                @if($user->role === 'porteur')
+                    {{-- Champs spécifiques porteur --}}
+                    <div class="info-item">
+                    <span class="info-label">Structure</span>
+                    <span class="info-value">{{ $user->porteur->structure ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Spécialité </span>
+                    <span class="info-value">{{ $user->porteur->specialite ?? '—' }}</span>
+                </div>
+                @endif
+
+                @if($user->role === 'validateur')
+                    {{-- Champs spécifiques validateur --}}
+                    <div class="info-item">
+                    <span class="info-label">Date début Mandat</span>
+                    <span class="info-value">{{ $user->validateur->dateDebutMandat ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date fin Mandat</span>
+                    <span class="info-value">{{ $user->validateur->dateFinMandat ?? '—' }}</span>
+                </div>
+                @endif
+                @if ($user->role === 'approbateur')
+                <div class="info-item">
+                    <span class="info-label">Service</span>
+                    <span class="info-value">{{ $user->approbateur->service ?? '—' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Poste</span>
+                    <span class="info-value">{{ $user->approbateur->poste ?? '—' }}</span>
+                </div>
+                @endif
             </div>
         </div>
     </div>

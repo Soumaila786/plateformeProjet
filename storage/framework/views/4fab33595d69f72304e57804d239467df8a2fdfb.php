@@ -58,6 +58,14 @@
                     <span class="role-badge role-<?php echo e($user->role); ?>"><?php echo e(ucfirst($user->role)); ?></span>
                 </div>
                 <div class="info-item">
+                    <span class="info-label">Fonction</span>
+                    <span class="role-badge role-<?php echo e($user->fonction); ?>"><?php echo e($user->fonction ?? '—'); ?></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Matricule</span>
+                    <span class="role-badge role-<?php echo e($user->matricule); ?>"><?php echo e($user->matricule ?? '—'); ?></span>
+                </div>
+                <div class="info-item">
                     <span class="info-label">Statut</span>
                     <?php if($user->actif): ?>
                         <span class="status-badge status-green">Actif</span>
@@ -65,6 +73,7 @@
                         <span class="status-badge status-red">Inactif</span>
                     <?php endif; ?>
                 </div>
+
                 <div class="info-item">
                     <span class="info-label">Téléphone</span>
                     <span class="info-value"><?php echo e($user->telephone ?? '—'); ?></span>
@@ -77,6 +86,40 @@
                     <span class="info-label">Créé le</span>
                     <span class="info-value"><?php echo e(optional($user->dateCreation)->format('d/m/Y') ?? optional($user->created_at)->format('d/m/Y') ?? '—'); ?></span>
                 </div>
+
+                <?php if($user->role === 'porteur'): ?>
+                    
+                    <div class="info-item">
+                    <span class="info-label">Structure</span>
+                    <span class="info-value"><?php echo e($user->porteur->structure ?? '—'); ?></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Spécialité </span>
+                    <span class="info-value"><?php echo e($user->porteur->specialite ?? '—'); ?></span>
+                </div>
+                <?php endif; ?>
+
+                <?php if($user->role === 'validateur'): ?>
+                    
+                    <div class="info-item">
+                    <span class="info-label">Date début Mandat</span>
+                    <span class="info-value"><?php echo e($user->validateur->dateDebutMandat ?? '—'); ?></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date fin Mandat</span>
+                    <span class="info-value"><?php echo e($user->validateur->dateFinMandat ?? '—'); ?></span>
+                </div>
+                <?php endif; ?>
+                <?php if($user->role === 'approbateur'): ?>
+                <div class="info-item">
+                    <span class="info-label">Service</span>
+                    <span class="info-value"><?php echo e($user->approbateur->service ?? '—'); ?></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Poste</span>
+                    <span class="info-value"><?php echo e($user->approbateur->poste ?? '—'); ?></span>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

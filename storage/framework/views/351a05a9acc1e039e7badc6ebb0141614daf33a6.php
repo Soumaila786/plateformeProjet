@@ -24,12 +24,12 @@
         <div class="ulist-search-wrapper">
             <i class="fas fa-search ulist-search-icon"></i>
             <input type="text" id="searchInput" class="ulist-search-input"
-                   placeholder="Rechercher par nom, email..." value="<?php echo e(request('search')); ?>">
+                    placeholder="Rechercher par nom, email..." value="<?php echo e(request('search')); ?>">
         </div>
         <div class="ulist-role-filters">
             <?php $__currentLoopData = ['' => 'Tous', 'admin' => 'Admin', 'porteur' => 'Porteur', 'approbateur' => 'Approbateur', 'validateur' => 'Validateur']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <a href="<?php echo e(route('admin.users.index', array_merge(request()->query(), ['role' => $val]))); ?>"
-               class="ulist-role-pill <?php echo e(request('role', '') === $val ? 'active' : ''); ?>">
+                class="ulist-role-pill <?php echo e(request('role', '') === $val ? 'active' : ''); ?>">
                 <?php echo e($label); ?>
 
             </a>
@@ -119,7 +119,7 @@
                     </button>
                 </form>
                 <form method="POST" action="<?php echo e(route('admin.users.destroy', $user)); ?>"
-                      onsubmit="return confirm('Supprimer cet utilisateur ?')" style="display:inline;">
+                        onsubmit="return confirm('Supprimer cet utilisateur ?')" style="display:inline;">
                     <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                     <button type="submit" class="ulist-action-btn ulist-action-danger" title="Supprimer">
                         <i class="fas fa-trash"></i>

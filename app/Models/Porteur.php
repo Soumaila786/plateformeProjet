@@ -11,7 +11,6 @@ class Porteur extends Model
 
     protected $fillable = [
         'user_id',
-        'structure',
         'specialite'
     ];
 
@@ -26,8 +25,4 @@ class Porteur extends Model
         return $this->hasMany(Projet::class, 'porteur_id');
     }
 
-    public function activite()
-    {
-        return $this->hasMany(Activite::class, 'porteur_id');
-    }
 }

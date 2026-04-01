@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Approbateur;
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
 use App\Models\User;
+use App\Models\Commentaire;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +34,8 @@ class AnalytiqueController extends Controller
         }
         unset($step);
 
-        //  2. DONUT STATUTS
+//=================================================== DONUT STATUTS =============================================================
+
         $statuts = ['brouillon','soumis','en_examen','approuve','valide','rejete'];
         $labels  = ['Brouillon','Soumis','En examen','Approuvé','Validé','Rejeté'];
         $colors  = ['#9ca3af','#6366f1','#f97316','#22c55e','#0d9488','#ef4444'];
@@ -41,8 +43,8 @@ class AnalytiqueController extends Controller
         foreach ($statuts as $s) {
             $donutValues[] = Projet::where('statutProjet', $s)->count();
         }
+//=================================================== ANALYSE TEMPORELLE =============================================================
 
-        //  3. ANALYSE TEMPORELLE
         // Soumissions par mois (12 derniers mois)
         $tempLabels   = [];
         $tempSoumis   = [];
@@ -61,8 +63,8 @@ class AnalytiqueController extends Controller
             ->whereNotNull('dateSoumission')
             ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
             ->value('moy') ?? 0;
+//=================================================== ANALYSE BUDGÉTAIRE =============================================================
 
-        //  4. ANALYSE BUDGÉTAIRE
         // Budget vs demande par projet (top 8 par montant)
         $budgetProjets = Projet::whereNotNull('montantDemande')
             ->orderByDesc('montantDemande')
@@ -86,7 +88,8 @@ class AnalytiqueController extends Controller
             '> 50M'   => Projet::where('montantDemande', '>=', 50000000)->count(),
         ];
 
-        //  5. DÉLAIS
+//=================================================== DÉLAIS =============================================================
+
         $delaiAppro = round(Projet::whereNotNull('dateApprobation')
             ->whereNotNull('dateSoumission')
             ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
@@ -103,45 +106,54 @@ class AnalytiqueController extends Controller
         $retard15 = Projet::whereIn('statutProjet', ['soumis','en_examen'])
             ->where('dateSoumission', '<', $now->copy()->subDays(15))->count();
 
-        //  6. MOTIFS DE REJET
+//=================================MOTIFS DE REJET (basé sur les commentaires)=====================================================
+
         $motifsCles = [
-            'budget'     => ['Budget','montant','financier','coût','fonds'],
-            'dossier'    => ['pièce','document','dossier','manquant','incomplet'],
-            'eligibilite'=> ['éligib','critère','condition','secteur'],
-            'delai'      => ['délai','date','expir','retard'],
-            'autre'      => [],
+            'budget'      => ['budget','montant','financier','coût','fonds'],
+            'dossier'     => ['pièce','document','dossier','manquant','incomplet'],
+            'eligibilite' => ['éligib','critère','condition','secteur'],
+            'delai'       => ['objectifs','date','description','duree'],
+            'autre'       => [],
         ];
-        $motifsLabels = ['Budget','Dossier incomplet','Non-éligibilité','Délai dépassé','Autre'];
-        $motifsValues = array_fill(0, 5, 0);
+        $motifsLabels = [ 'Budget', 'Dossier incomplet', 'Non-éligibilité', 'Données manquantes', 'Autre' ];
 
-        $rejets = Projet::where('statutProjet', 'rejete')
-                            ->with(['commentaires' => function ($q) {
-                                $q->whereNotNull('message');
-                            }])
-                            ->get()
-                            ->pluck('commentaires')
-                            ->flatten()
-                            ->pluck('message');
+        $motifsValues = array_fill(0, count($motifsLabels), 0);
 
-        foreach ($rejets as $motif) {
-            $motifLower = mb_strtolower($motif);
-            $found = false;
-            $i = 0;
-            foreach ($motifsCles as $cat => $mots) {
-                if ($cat === 'autre') break;
-                foreach ($mots as $mot) {
-                    if (str_contains($motifLower, mb_strtolower($mot))) {
-                        $motifsValues[$i]++;
-                        $found = true;
-                        break 2;
+        // Récupération des commentaires utiles
+        // query() est un point de départ qui permet de construire une requête SQL étape par étape
+        $commentaires = Commentaire::query()
+            ->whereNotNull('message')
+            ->where('message', '!=', '')
+            ->pluck('message'); // recuperer uniquement la colonne message
+
+        //Analyse des commentaires
+        foreach ($commentaires as $message) {
+
+            $message = mb_strtolower($message);
+            $categorieTrouvee = false;
+            $index = 0;
+
+            foreach ($motifsCles as $categorie => $motsCles) {
+                // ignorer "autre" dans la boucle
+                if ($categorie === 'autre') {
+                    continue;
+                }
+                foreach ($motsCles as $mot) {
+                    if (str_contains($message, $mot)) {
+                        $motifsValues[$index]++;
+                        $categorieTrouvee = true;
+                        break 2; // sortir des deux boucles
                     }
                 }
-                $i++;
+                $index++;
             }
-            if (!$found) $motifsValues[4]++;
+            // Si aucun mot-clé trouvé → catégorie "Autre"
+            if (!$categorieTrouvee) {
+                $motifsValues[count($motifsValues) - 1]++;
+            }
         }
+//=================================================== Par secteur =============================================================
 
-        //  7. PAR SECTEUR
         $secteursData = Projet::with('secteur')
             ->select('secteur_id',
                 DB::raw('COUNT(*) as nb'),
@@ -154,14 +166,16 @@ class AnalytiqueController extends Controller
         $sectNb      = $secteursData->pluck('nb')->map(fn($v) => (int)$v)->toArray();
         $sectDemande = $secteursData->pluck('total_demande')->map(fn($v) => (int)$v)->toArray();
 
-        //  8. TIMELINE
+//=================================================== TIMELINE =============================================================
+
         $timeline = Projet::whereNotNull('dateDebut')
             ->whereIn('statutProjet', ['approuve','valide'])
             ->orderBy('dateDebut')
-            ->take(10)
+            ->take(5)
             ->get(['titre','dateDebut','dateFin','statutProjet']);
 
-        //  9. TOP PORTEURS
+//=================================================== TOP PORTEURS =============================================================
+
         $topPorteurs = Projet::select(
                 'user_id',
                 DB::raw('COUNT(*) as total'),
@@ -170,7 +184,7 @@ class AnalytiqueController extends Controller
             ->with('porteur')
             ->groupBy('user_id')
             ->orderByDesc('total')
-            ->take(8)
+            ->take(5)
             ->get()
             ->map(function($r) {
                 return [
@@ -180,7 +194,7 @@ class AnalytiqueController extends Controller
                 ];
             });
 
-        //  10. MATRICE PRIORISATION
+//=================================================== MATRICE PRIORISATION =============================================================
         // Axe X = montantDemande (importance), Axe Y = duree (urgence)
         $matrice = Projet::whereIn('statutProjet', ['soumis','en_examen'])
             ->whereNotNull('montantDemande')
@@ -197,7 +211,7 @@ class AnalytiqueController extends Controller
                 ];
             });
 
-            
+
 
         return view('approbateur.analytique', compact(
             'entonnoir',

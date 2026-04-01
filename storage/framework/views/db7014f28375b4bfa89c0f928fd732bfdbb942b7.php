@@ -80,7 +80,7 @@
                     class="btn-icon" title="Voir le détail">
                     <i class="fas fa-eye"></i>
                 </a>
-                
+
                 <form method="POST" action="<?php echo e(route('admin.projets.destroy', $projet)); ?>"
                         onsubmit="return confirm('Supprimer ce projet définitivement ?')"
                         style="display:inline;">

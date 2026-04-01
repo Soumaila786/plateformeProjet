@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class ParametreController extends Controller {
+
     public function __construct() {
+
         $this->middleware('auth');
     }
 
@@ -21,25 +23,59 @@ class ParametreController extends Controller {
         return view('parametres.profil');
     }
 
-    public function profilUpdate(Request $request) {
+    public function profilUpdate(Request $request)
+    {
+        $user = Auth::user();
+
+        // Validation de base
         $request->validate([
             'nomComplet' => 'required|string|max:255',
-            'email'      => 'required|email|unique:users,email,' . Auth::id(),
-            'matricule'  => 'nullable|string|max:50',
-            'fonction'   => 'nullable|string|max:100',
+            'email'      => 'required|email|unique:users,email,' . $user->id,
             'contact'    => 'nullable|string|max:50',
         ]);
 
-        Auth::user()->update([
+        // Mise à jour USER
+        $user->update([
             'nomComplet' => $request->nomComplet,
             'email'      => $request->email,
-            'matricule'  => $request->matricule,
-            'fonction'   => $request->fonction,
             'contact'    => $request->contact,
         ]);
 
+        // PORTEUR
+        if ($user->role == 'porteur') {
+            $user->porteur()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'structure'  => $request->structure,
+                    'specialite' => $request->specialite,
+                ]
+            );
+        }
+
+        // APPROBATEUR
+        if ($user->role == 'approbateur') {
+            $user->approbateur()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'service' => $request->service,
+                    'poste'   => $request->poste,
+                ]
+            );
+        }
+
+        // VALIDATEUR
+        if ($user->role == 'validateur') {
+            $user->validateur()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'dateDebutMandat' => $request->dateDebutMandat,
+                    'dateFinMandat'   => $request->dateFinMandat,
+                ]
+            );
+        }
+
         return redirect()->route('parametres.profil')
-                            ->with('success', 'Profil mis à jour avec succès.');
+            ->with('success', 'Profil mis à jour avec succès.');
     }
 
     //  Sécurité
@@ -68,8 +104,8 @@ class ParametreController extends Controller {
     }
 
     //  Notifications
-    public function notifications()
-    {
+    public function notifications() {
+
         return view('parametres.notifications');
     }
 

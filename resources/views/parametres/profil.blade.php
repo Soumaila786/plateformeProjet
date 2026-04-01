@@ -49,39 +49,87 @@
                     <div class="param-field">
                         <label class="param-field-label">Nom complet <span class="required">*</span></label>
                         <input type="text" name="nomComplet"
-                               class="param-field-input @error('nomComplet') is-invalid @enderror"
-                               value="{{ old('nomComplet', Auth::user()->nomComplet) }}" required>
+                                class="param-field-input @error('nomComplet') is-invalid @enderror"
+                                value="{{ old('nomComplet', Auth::user()->nomComplet) }}" required>
                         @error('nomComplet')<span class="param-field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="param-field">
                         <label class="param-field-label">Email <span class="required">*</span></label>
                         <input type="email" name="email"
-                               class="param-field-input @error('email') is-invalid @enderror"
-                               value="{{ old('email', Auth::user()->email) }}" required>
+                                class="param-field-input @error('email') is-invalid @enderror"
+                                value="{{ old('email', Auth::user()->email) }}" required>
                         @error('email')<span class="param-field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="param-field">
                         <label class="param-field-label">Matricule</label>
                         <input type="text" name="matricule"
-                               class="param-field-input @error('matricule') is-invalid @enderror"
-                               value="{{ old('matricule', Auth::user()->matricule) }}">
+                                class="param-field-input @error('matricule') is-invalid @enderror"
+                                value="{{ old('matricule', Auth::user()->matricule) }}">
                         @error('matricule')<span class="param-field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="param-field">
                         <label class="param-field-label">Fonction</label>
                         <input type="text" name="fonction"
-                               class="param-field-input @error('fonction') is-invalid @enderror"
-                               value="{{ old('fonction', Auth::user()->fonction) }}">
+                                class="param-field-input @error('fonction') is-invalid @enderror"
+                                value="{{ old('fonction', Auth::user()->fonction) }}">
                         @error('fonction')<span class="param-field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="param-field">
                         <label class="param-field-label">Contact</label>
                         <input type="text" name="contact"
-                               class="param-field-input @error('contact') is-invalid @enderror"
-                               value="{{ old('contact', Auth::user()->contact) }}"
-                               placeholder="+226 XX XX XX XX">
+                                class="param-field-input @error('contact') is-invalid @enderror"
+                                value="{{ old('contact', Auth::user()->contact) }}"
+                                placeholder="+226 XX XX XX XX">
                         @error('contact')<span class="param-field-error">{{ $message }}</span>@enderror
                     </div>
+                    @php
+    $user = Auth::user();
+@endphp
+
+{{-- PORTEUR --}}
+@if($user->role == 'porteur')
+    <div class="param-field">
+        <label>Structure</label>
+        <input type="text" name="structure"
+            value="{{ old('structure', optional($user->porteur)->structure) }}">
+    </div>
+
+    <div class="param-field">
+        <label>Spécialité</label>
+        <input type="text" name="specialite"
+            value="{{ old('specialite', optional($user->porteur)->specialite) }}">
+    </div>
+@endif
+
+{{-- 🟢 APPROBATEUR --}}
+@if($user->role == 'approbateur')
+    <div class="param-field">
+        <label>Service</label>
+        <input type="text" name="service"
+            value="{{ old('service', optional($user->approbateur)->service) }}">
+    </div>
+
+    <div class="param-field">
+        <label>Poste</label>
+        <input type="text" name="poste"
+            value="{{ old('poste', optional($user->approbateur)->poste) }}">
+    </div>
+@endif
+
+{{-- 🔴 VALIDATEUR --}}
+@if($user->role == 'validateur')
+    <div class="param-field">
+        <label>Date début mandat</label>
+        <input type="date" name="dateDebutMandat"
+            value="{{ old('dateDebutMandat', optional($user->validateur)->dateDebutMandat) }}">
+    </div>
+
+    <div class="param-field">
+        <label>Date fin mandat</label>
+        <input type="date" name="dateFinMandat"
+            value="{{ old('dateFinMandat', optional($user->validateur)->dateFinMandat) }}">
+    </div>
+@endif
                 </div>
                 <div class="param-form-actions">
                     <button type="submit" class="param-btn-save">

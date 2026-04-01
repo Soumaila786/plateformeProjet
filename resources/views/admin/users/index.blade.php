@@ -26,12 +26,12 @@
         <div class="ulist-search-wrapper">
             <i class="fas fa-search ulist-search-icon"></i>
             <input type="text" id="searchInput" class="ulist-search-input"
-                   placeholder="Rechercher par nom, email..." value="{{ request('search') }}">
+                    placeholder="Rechercher par nom, email..." value="{{ request('search') }}">
         </div>
         <div class="ulist-role-filters">
             @foreach(['' => 'Tous', 'admin' => 'Admin', 'porteur' => 'Porteur', 'approbateur' => 'Approbateur', 'validateur' => 'Validateur'] as $val => $label)
             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['role' => $val])) }}"
-               class="ulist-role-pill {{ request('role', '') === $val ? 'active' : '' }}">
+                class="ulist-role-pill {{ request('role', '') === $val ? 'active' : '' }}">
                 {{ $label }}
             </a>
             @endforeach
@@ -117,7 +117,7 @@
                     </button>
                 </form>
                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                      onsubmit="return confirm('Supprimer cet utilisateur ?')" style="display:inline;">
+                        onsubmit="return confirm('Supprimer cet utilisateur ?')" style="display:inline;">
                     @csrf @method('DELETE')
                     <button type="submit" class="ulist-action-btn ulist-action-danger" title="Supprimer">
                         <i class="fas fa-trash"></i>
