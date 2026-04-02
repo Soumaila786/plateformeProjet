@@ -15,19 +15,19 @@ use App\Policies\UserPolicy;
 use App\Policies\ProjetPolicy;
 use App\Policies\SecteurPolicy;
 
-class AuthServiceProvider extends ServiceProvider
-{
+class AuthServiceProvider extends ServiceProvider {
+
     protected $policies = [
         User::class           => UserPolicy::class,
         Projet::class         => ProjetPolicy::class,
         SecteurActivite::class => SecteurPolicy::class,
     ];
 
-    public function boot()
-    {
+    public function boot() {
+
         $this->registerPolicies();
 
-        // ── Gates supplémentaires ──
+        // Gates supplémentaires
 
         // Accès au dashboard admin
         Gate::define('access-admin', function (User $user) {

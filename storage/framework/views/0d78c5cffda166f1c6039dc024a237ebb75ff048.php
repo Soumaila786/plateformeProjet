@@ -13,7 +13,7 @@
             <i class="fas fa-arrow-left"></i>
         </a>
         <div>
-            <h1 class="projets-title">Créer un utilisateur</h1>
+            <h1 class="projets-title">Création d'un utilisateur</h1>
             <p class="projets-subtitle">Remplissez les informations du nouveau compte</p>
         </div>
     </div>
@@ -22,16 +22,19 @@
         <?php echo csrf_field(); ?>
 
         <div class="form-card">
+
             <div class="form-card-header">
                 <i class="fas fa-user"></i>
                 <span>Informations personnelles</span>
             </div>
+
             <div class="form-card-body">
                 <div class="form-row">
 
                     <div class="form-col">
                         <label class="field-label">Nom complet <span class="required">*</span></label>
-                        <input type="text" name="nomComplet"
+                        <input  type="text"
+                                name="nomComplet"
                                 value="<?php echo e(old('nomComplet')); ?>"
                                 class="field-input <?php $__errorArgs = ['nomComplet'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -41,7 +44,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                placeholder="Prénom Nom" required>
+                                placeholder="Prénom Nom"
+                                required >
                         <?php $__errorArgs = ['nomComplet'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -54,7 +58,8 @@ unset($__errorArgs, $__bag); ?>
 
                     <div class="form-col">
                         <label class="field-label">Email <span class="required">*</span></label>
-                        <input type="email" name="email"
+                        <input  type="email"
+                                name="email"
                                 value="<?php echo e(old('email')); ?>"
                                 class="field-input <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -64,7 +69,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                placeholder="email@exemple.com" required>
+                                placeholder="email@exemple.com"
+                                required >
                         <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -85,8 +91,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" required>
-                            <option value="">— Sélectionner —</option>
-                            <option value="admin"        <?php echo e(old('role') === 'admin'        ? 'selected' : ''); ?>>Administrateur</option>
+                            <option value="">— Sélectionner le rôle —</option>
+                            
                             <option value="porteur"      <?php echo e(old('role') === 'porteur'      ? 'selected' : ''); ?>>Porteur de projet</option>
                             <option value="approbateur"  <?php echo e(old('role') === 'approbateur'  ? 'selected' : ''); ?>>Approbateur</option>
                             <option value="validateur"   <?php echo e(old('role') === 'validateur'   ? 'selected' : ''); ?>>Validateur</option>
@@ -103,7 +109,8 @@ unset($__errorArgs, $__bag); ?>
 
                     <div class="form-col">
                         <label class="field-label">Téléphone</label>
-                        <input type="text" name="contact"
+                        <input  type="text"
+                                name="contact"
                                 value="<?php echo e(old('contact')); ?>"
                                 class="field-input <?php $__errorArgs = ['contact'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -125,7 +132,8 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                     <div class="form-col">
                         <label class="field-label">Fonction</label>
-                        <input type="text" name="fonction"
+                        <input  type="text"
+                                name="fonction"
                                 value="<?php echo e(old('fonction')); ?>"
                                 class="field-input <?php $__errorArgs = ['fonction'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -147,7 +155,8 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                     <div class="form-col">
                         <label class="field-label">Matricule</label>
-                        <input type="text" name="matricule"
+                        <input  type="text"
+                                name="matricule"
                                 value="<?php echo e(old('matricule')); ?>"
                                 class="field-input <?php $__errorArgs = ['matricule'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -170,7 +179,8 @@ unset($__errorArgs, $__bag); ?>
 
                     <div class="form-col form-col-full">
                         <label class="field-label">Organisation / Structure</label>
-                        <input type="text" name="organisation"
+                        <input  type="text"
+                                name="organisation"
                                 value="<?php echo e(old('organisation')); ?>"
                                 class="field-input <?php $__errorArgs = ['organisation'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -197,7 +207,9 @@ unset($__errorArgs, $__bag); ?>
                         <div class="role-group d-none" id="porteur-fields">
                             <div class="form-col">
                                 <label>Spécialité</label>
-                                <input type="text" name="specialite" class="field-input">
+                                <input  type="text"
+                                        name="specialite"
+                                        class="field-input">
                             </div>
                         </div>
 
@@ -205,11 +217,15 @@ unset($__errorArgs, $__bag); ?>
                         <div class="role-group d-none" id="approbateur-fields">
                             <div class="form-col">
                                 <label>Service</label>
-                                <input type="text" name="service" class="field-input">
+                                <input  type="text"
+                                        name="service"
+                                        class="field-input">
                             </div>
                             <div class="form-col">
                                 <label>Poste</label>
-                                <input type="text" name="poste" class="field-input">
+                                <input  type="text"
+                                        name="poste"
+                                        class="field-input">
                             </div>
                         </div>
 
@@ -217,11 +233,15 @@ unset($__errorArgs, $__bag); ?>
                         <div class="role-group d-none" id="validateur-fields">
                             <div class="form-col">
                                 <label>Date début mandat</label>
-                                <input type="date" name="dateDebutMandat" class="field-input">
+                                <input  type="date"
+                                        name="dateDebutMandat"
+                                        class="field-input">
                             </div>
                             <div class="form-col">
                                 <label>Date fin mandat</label>
-                                <input type="date" name="dateFinMandat" class="field-input">
+                                <input  type="date"
+                                        name="dateFinMandat"
+                                        class="field-input">
                             </div>
                         </div>
 
@@ -230,12 +250,12 @@ unset($__errorArgs, $__bag); ?>
                 </div>
             </div>
         </div>
-
-
+        
         <div class="form-actions">
             <a href="<?php echo e(route('admin.users.index')); ?>" class="btn-cancel">Annuler</a>
             <button type="submit" class="btn-save">
-                <i class="fas fa-save"></i> Créer l'utilisateur
+                <i class="fas fa-save"></i>
+                Créer l'utilisateur
             </button>
         </div>
 

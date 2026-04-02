@@ -85,7 +85,9 @@
                 </div>
                 <div class="info-item">
                     <span class="info-label">Créé le</span>
-                    <span class="info-value">{{ optional($user->dateCreation)->format('d/m/Y') ?? optional($user->created_at)->format('d/m/Y') ?? '—' }}</span>
+                    <span class="info-value">
+                        {{ optional($user->dateCreation)->format('d/m/Y') ?? optional($user->created_at)->format('d/m/Y') ?? '—' }}
+                    </span>
                 </div>
 
                 @if($user->role === 'porteur')
@@ -144,16 +146,35 @@
                             <th></th>
                         </tr>
                     </thead>
+                    
                     <tbody>
                         @foreach($user->projets as $projet)
                         @php
-                            $sc = ['brouillon'=>'status-gray','soumis'=>'status-blue','en_examen'=>'status-yellow','approuve'=>'status-green','valide'=>'status-teal','rejete'=>'status-red'];
-                            $sl = ['brouillon'=>'Brouillon','soumis'=>'Soumis','en_examen'=>'En examen','approuve'=>'Approuvé','valide'=>'Validé','rejete'=>'Rejeté'];
+                            $sc = [
+                                'brouillon'=>'status-gray',
+                                'soumis'=>'status-blue',
+                                'en_examen'=>'status-yellow',
+                                'approuve'=>'status-green',
+                                'valide'=>'status-teal',
+                                'rejete'=>'status-red'
+                            ];
+                            $sl = [
+                                'brouillon'=>'Brouillon',
+                                'soumis'=>'Soumis',
+                                'en_examen'=>'En examen',
+                                'approuve'=>'Approuvé',
+                                'valide'=>'Validé',
+                                'rejete'=>'Rejeté'
+                            ];
                         @endphp
                         <tr>
                             <td>{{ $projet->codeProjet }}</td>
                             <td>{{ Str::limit($projet->titre, 40) }}</td>
-                            <td><span class="status-badge {{ $sc[$projet->statutProjet] ?? 'status-gray' }}">{{ $sl[$projet->statutProjet] ?? $projet->statutProjet }}</span></td>
+                            <td>
+                                <span class="status-badge {{ $sc[$projet->statutProjet] ?? 'status-gray' }}">
+                                    {{ $sl[$projet->statutProjet] ?? $projet->statutProjet }}
+                                </span>
+                            </td>
                             <td>{{ optional($projet->dateCreation)->format('d/m/Y') ?? '—' }}</td>
                             <td>
                                 <a href="{{ route('admin.projets.show', $projet) }}" class="btn-icon">
