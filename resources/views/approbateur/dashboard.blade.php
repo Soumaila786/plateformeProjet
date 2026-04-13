@@ -13,7 +13,7 @@
     <div>
         <p class="ad-banner-sub">Bienvenue,</p>
         <h2 class="ad-banner-name">{{ Auth::user()->nomComplet }}</h2>
-        <p class="ad-banner-role">Approbateur &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+        <p class="ad-banner-role">{{ Auth::user()->email }} &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
     </div>
     <div class="ad-banner-icon"><i class="fas fa-check-double"></i></div>
     <div class="ad-banner-circle c1"></div>

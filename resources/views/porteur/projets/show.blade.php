@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    {{-- ══ BANNIÈRE REJET ══ --}}
+    {{-- BANNIÈRE REJET --}}
     @php
         $dernierRejet  = $projet->commentaires->where('typeCommentaire', 'rejet')->sortByDesc('dateEnvoi')->first();
         $derniereModif = $projet->commentaires->where('typeCommentaire', 'demande')->sortByDesc('dateEnvoi')->first();
@@ -72,7 +72,12 @@
                 <p style="font-size:.73rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#b91c1c;margin:0 0 4px;">
                     Projet rejeté — Motif
                 </p>
-                <p style="font-size:.82rem;color:#374151;margin:0 0 3px;line-height:1.5;">{{ $dernierRejet->message }}</p>
+                <p  style="font-size:.82rem;
+                    color:#374151;
+                    margin:0 0 3px;
+                    line-height:1.5;">
+                    {{ $dernierRejet->message }}
+                </p>
                 <p style="font-size:.7rem;color:#9ca3af;margin:0;">
                     Par {{ optional($dernierRejet->utilisateur)->nomComplet ?? 'Approbateur' }}
                     le {{ optional($dernierRejet->dateEnvoi)->format('d/m/Y à H:i') }}
@@ -126,7 +131,7 @@
     </div>
     @endif
 
-    {{-- ══ BARRE D'ACTIONS ══ --}}
+    {{-- BARRE D'ACTIONS --}}
     <div class="projet-actions-bar">
         {{-- Soumettre (seulement si brouillon sans rejet en attente) --}}
         @if($projet->isSubmittable())
@@ -174,7 +179,7 @@
         @endif
     </div>
 
-    {{-- ══ CONTENU PRINCIPAL ══ --}}
+    {{-- CONTENU PRINCIPAL --}}
     <div class="show-grid">
 
         {{-- Colonne gauche --}}
@@ -190,32 +195,46 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Secteur</span>
-                            <span class="info-value">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
+                            <span class="info-value">
+                                {{ optional($projet->secteur)->nomSecteur ?? '—' }}
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Durée</span>
-                            <span class="info-value">{{ $projet->duree ? $projet->duree . ' mois' : '—' }}</span>
+                            <span class="info-value">
+                                {{ $projet->duree ? $projet->duree . ' mois' : '—' }}
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de création</span>
-                            <span class="info-value">{{ optional($projet->dateCreation)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value">
+                                {{ optional($projet->dateCreation)->format('d/m/Y') ?? '—' }}
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de soumission</span>
-                            <span class="info-value">{{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value">
+                                {{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de début probable</span>
-                            <span class="info-value">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value">
+                                {{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de fin probable</span>
-                            <span class="info-value">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</span>
+                            <span class="info-value">
+                                {{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}
+                            </span>
                         </div>
                         @if($projet->dateApprobation)
                         <div class="info-item">
                             <span class="info-label">Date d'approbation</span>
-                            <span class="info-value">{{ optional($projet->dateApprobation)->format('d/m/Y') }}</span>
+                            <span class="info-value">
+                                {{ optional($projet->dateApprobation)->format('d/m/Y') }}
+                            </span>
                         </div>
                         @endif
                     </div>
@@ -239,16 +258,22 @@
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-calendar-check"></i>
-                    <span>Planification du projet ({{ $projet->planifications->count() }} activité(s))</span>
+                    <span>
+                        Planification du projet ({{ $projet->planifications->count() }} activité(s))
+                    </span>
                 </div>
                 <div class="form-card-body">
+
                     <div class="plan-cards-grid">
+
                         @foreach($projet->planifications as $plan)
                         <div class="plan-act-card">
                             <div class="plan-act-top">
                                 <div class="plan-act-num">{{ $loop->iteration }}</div>
                             </div>
-                            <h4 class="plan-act-titre">{{ $plan->activitePlanification }}</h4>
+                            <h4 class="plan-act-titre">
+                                {{ $plan->activitePlanification }}
+                            </h4>
                             <div class="plan-act-footer">
                                 @if($plan->periode)
                                 <span class="plan-act-info">

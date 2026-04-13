@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Projet extends Model
-{
+class Projet extends Model {
+
     protected $table = 'projets';
 
     protected $fillable = [
@@ -26,8 +26,8 @@ class Projet extends Model
         'messageModification',
         'dateApprobation',
         'dateValidation',
-        'validated_at',      // ← ajouté
-        'validated_by',      // ← ajouté
+        'validated_at',
+        'validated_by',
         'approbateur_id',
         'planification_demandee',
     ];
@@ -37,7 +37,7 @@ class Projet extends Model
         'dateSoumission'        => 'datetime',
         'dateApprobation'       => 'datetime',
         'dateValidation'        => 'datetime',
-        'validated_at'          => 'datetime',   // ← ajouté
+        'validated_at'          => 'datetime',
         'dateDebut'             => 'date',
         'dateFin'               => 'date',
         'budgetTotal'           => 'decimal:2',
@@ -45,18 +45,16 @@ class Projet extends Model
         'planification_demandee'=> 'boolean',
     ];
 
-    // ── Relations ──
-    public function porteur()
-    {
+    //  Relations
+    public function porteur() {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function approbateur(){
+    public function approbateur() {
         return $this->belongsTo(User::class, 'approbateur_id');
     }
 
@@ -80,34 +78,30 @@ class Projet extends Model
         return $this->hasMany(DocumentProjet::class);
     }
 
-    public function commentaires(){
+    public function commentaires() {
 
         return $this->hasMany(Commentaire::class, 'projet_id');
     }
 
-    public function planifications(){
+    public function planifications() {
 
         return $this->hasMany(Planification::class, 'projet_id');
     }
 
-    // ── Accesseurs ──
-    public function isEditable()
-    {
+    //  Accesseurs
+    public function isEditable() {
         return in_array($this->statutProjet, ['brouillon', 'soumis', 'rejete']);
     }
 
-    public function isDeletable()
-    {
+    public function isDeletable() {
         return in_array($this->statutProjet, ['brouillon', 'soumis', 'rejete']);
     }
 
-    public function isSubmittable():bool
-    {
+    public function isSubmittable():bool {
         return in_array($this->statutProjet, ['brouillon', 'rejete']);
     }
 
-    public function isApprouveAndValide()
-    {
+    public function isApprouveAndValide() {
         return in_array($this->statutProjet, ['approuve', 'valide']);
     }
 }

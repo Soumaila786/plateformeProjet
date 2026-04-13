@@ -1,0 +1,203 @@
+    .journal-page { 
+        display:flex; 
+        flex-direction:column; 
+        height:calc(100vh - 3rem); 
+        gap:0; 
+    }
+
+    /* Header fixe */
+    .journal-header {
+        flex-shrink: 0;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 16px 20px 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .journal-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .journal-title {
+        font-size: 1.1rem; font-weight: 800;
+        color: #111827; margin: 0;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .journal-title i { color: #7c3aed; }
+    .journal-count {
+        font-size: .72rem; font-weight: 700;
+        background: #f5f3ff; color: #7c3aed;
+        padding: 2px 9px; border-radius: 20px;
+    }
+
+    /* Filtres */
+    .journal-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding-bottom: 14px;
+        align-items: center;
+    }
+    .filter-search {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+    }
+    .filter-search i {
+        position: absolute;
+        left: 10px; top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af; font-size: .75rem;
+    }
+    .filter-search input {
+        width: 100%;
+        padding: 8px 10px 8px 30px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: .78rem;
+        outline: none;
+        font-family: inherit;
+    }
+    .filter-search input:focus { border-color: #7c3aed; }
+
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: .78rem;
+        color: #374151;
+        background: #fff;
+        min-width: 140px;
+        cursor: pointer;
+        outline: none;
+        font-family: inherit;
+    }
+    .filter-select:focus { border-color: #7c3aed; }
+
+    .btn-filter {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #7c3aed; color: #fff;
+        border: none; border-radius: 8px;
+        padding: 8px 16px; font-size: .78rem;
+        font-weight: 700; cursor: pointer;
+        font-family: inherit;
+    }
+    .btn-filter:hover { background: #6d28d9; }
+
+    .btn-reset {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #f3f4f6; color: #6b7280;
+        border: 1px solid #e5e7eb; border-radius: 8px;
+        padding: 8px 12px; font-size: .75rem;
+        font-weight: 600; cursor: pointer;
+        text-decoration: none; font-family: inherit;
+    }
+
+    /* Niveau pills dans filtre */
+    .level-pills {
+        display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .level-pill {
+        padding: 5px 12px; border-radius: 20px;
+        font-size: .72rem; font-weight: 700;
+        cursor: pointer; border: 1.5px solid transparent;
+        text-decoration: none;
+    }
+    .level-pill.all     { background:#f3f4f6; color:#374151; }
+    .level-pill.info    { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+    .level-pill.warning { background:#fff7ed; color:#c2410c; border-color:#fed7aa; }
+    .level-pill.error   { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+    .level-pill.debug   { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+    .level-pill.active  { box-shadow: 0 0 0 2px currentColor; }
+
+    /* Corps scrollable */
+    .journal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+    }
+
+    /* Tableau */
+    .log-table-wrap {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+    .log-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .log-table thead tr {
+        background: #1e1b4b;
+    }
+    .log-table th {
+        padding: 11px 14px;
+        font-size: .7rem; font-weight: 700;
+        color: rgba(255,255,255,.8);
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        white-space: nowrap;
+        border-bottom: none;
+    }
+    .log-table td {
+        padding: 10px 14px;
+        font-size: .8rem;
+        color: #374151;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: top;
+    }
+    .log-table tbody tr:last-child td { border-bottom: none; }
+    .log-table tbody tr:hover td { background: #fafafa; }
+
+    /* Date */
+    .log-date {
+        white-space: nowrap;
+        font-family: monospace;
+        font-size: .75rem;
+        color: #6b7280;
+    }
+
+    /* Badges niveau */
+    .log-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 3px 9px; border-radius: 20px;
+        font-size: .7rem; font-weight: 700;
+        white-space: nowrap;
+    }
+    .log-info    { background:#eff6ff; color:#1d4ed8; }
+    .log-warning { background:#fff7ed; color:#c2410c; }
+    .log-error   { background:#fef2f2; color:#b91c1c; }
+    .log-debug   { background:#f0fdf4; color:#15803d; }
+    .log-critical{ background:#4c1d95; color:#fff; }
+
+    /* Message */
+    .log-message {
+        font-size: .78rem;
+        color: #374151;
+        line-height: 1.5;
+        word-break: break-word;
+        max-width: 600px;
+    }
+    .log-message.error   { color: #b91c1c; }
+    .log-message.warning { color: #92400e; }
+
+    /* Ligne gauche colorée */
+    .log-table tbody tr.row-error   td:first-child { border-left: 3px solid #ef4444; }
+    .log-table tbody tr.row-warning td:first-child { border-left: 3px solid #f97316; }
+    .log-table tbody tr.row-info    td:first-child { border-left: 3px solid #6366f1; }
+    .log-table tbody tr.row-debug   td:first-child { border-left: 3px solid #22c55e; }
+
+    /* Empty state */
+    .log-empty {
+        text-align: center;
+        padding: 50px 20px;
+        color: #9ca3af;
+    }
+    .log-empty i { font-size: 2rem; margin-bottom: 10px; display: block; }

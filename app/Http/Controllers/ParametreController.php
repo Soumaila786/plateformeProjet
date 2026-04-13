@@ -15,92 +15,134 @@ class ParametreController extends Controller {
 
     //  Index
     public function index() {
+
         return view('parametres.index');
     }
 
     //  Profil
     public function profil() {
+
         return view('parametres.profil');
     }
 
-    public function profilUpdate(Request $request)
-    {
-        $user = Auth::user();
+    public function profilUpdate(Request $request) {
 
-        // Validation de base
-        $request->validate([
-            'nomComplet' => 'required|string|max:255',
-            'email'      => 'required|email|unique:users,email,' . $user->id,
-            'contact'    => 'nullable|string|max:50',
-        ]);
+        try{
 
-        // Mise à jour USER
-        $user->update([
-            'nomComplet' => $request->nomComplet,
-            'email'      => $request->email,
-            'contact'    => $request->contact,
-        ]);
+            $user = Auth::user();
 
-        // PORTEUR
-        if ($user->role == 'porteur') {
-            $user->porteur()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'structure'  => $request->structure,
-                    'specialite' => $request->specialite,
-                ]
-            );
+            // Validation de base
+            $request->validate([
+                'nomComplet' => 'required|string|max:255',
+                'email'      => 'required|email|unique:users,email,' . $user->id,
+                'contact'    => 'nullable|string|max:50',
+            ]);
+
+            // Mise à jour USER
+            $user->update([
+                'nomComplet' => $request->nomComplet,
+                'email'      => $request->email,
+                'contact'    => $request->contact,
+            ]);
+
+            // PORTEUR
+            if ($user->role == 'porteur') {
+                $user->porteur()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'structure'  => $request->structure,
+                        'specialite' => $request->specialite,
+                    ]
+                );
+            }
+
+            // APPROBATEUR
+            if ($user->role == 'approbateur') {
+                $user->approbateur()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'service' => $request->service,
+                        'poste'   => $request->poste,
+                    ]
+                );
+            }
+
+            // VALIDATEUR
+            if ($user->role == 'validateur') {
+                $user->validateur()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'dateDebutMandat' => $request->dateDebutMandat,
+                        'dateFinMandat'   => $request->dateFinMandat,
+                    ]
+                );
+            }
+
+            Log::notice('Mise à jour du profil utilisateur', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+                'ip' => $request->ip(),
+            ]);
+
+            return redirect()->route('parametres.profil')
+                ->with('success', 'Profil mis à jour avec succès.');
+
+        }catch (\Exception $e){
+            Log::error('Erreur lors de la mise à jour du profil', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'Une erreur est survenue');
         }
-
-        // APPROBATEUR
-        if ($user->role == 'approbateur') {
-            $user->approbateur()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'service' => $request->service,
-                    'poste'   => $request->poste,
-                ]
-            );
-        }
-
-        // VALIDATEUR
-        if ($user->role == 'validateur') {
-            $user->validateur()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'dateDebutMandat' => $request->dateDebutMandat,
-                    'dateFinMandat'   => $request->dateFinMandat,
-                ]
-            );
-        }
-
-        return redirect()->route('parametres.profil')
-            ->with('success', 'Profil mis à jour avec succès.');
     }
 
     //  Sécurité
     public function securite() {
+
         return view('parametres.securite');
     }
 
     public function securiteUpdate(Request $request) {
-        $request->validate([
-            'current_password'     => 'required',
-            'new_password'         => 'required|min:8|confirmed',
-        ]);
+        try{
 
-        if (!Hash::check($request->current_password, Auth::user()->password)) {
-            return back()->withErrors([
-                'current_password' => 'Le mot de passe actuel est incorrect.'
+            $request->validate([
+                'current_password'     => 'required',
+                'new_password'         => 'required|min:8|confirmed',
             ]);
+
+            Log::info('Tentative de modification du mot de passe', [
+                'user_id' => Auth::id(),
+                'ip' => $request->ip(),
+            ]);
+            if (!Hash::check($request->current_password, Auth::user()->password)) {
+                Log::warning('Échec de modification du mot de passe : mot de passe actuel incorrect', [
+                    'user_id' => Auth::id(),
+                    'ip' => $request->ip(),
+                ]);
+                return back()->withErrors([
+                    'current_password' => 'Le mot de passe actuel est incorrect.'
+                ]);
+            }
+
+            Auth::user()->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+            Log::warning('Mot de passe modifié avec succès', [
+                'user_id' => Auth::id(),
+                'ip' => $request->ip(),
+            ]);
+
+            return redirect()->route('parametres.securite')
+                ->with('success', 'Mot de passe mis à jour avec succès.');
+
+        }catch (\Exception $e){
+            Log::error('Erreur lors du changement du mot de passe', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'Une erreur est survenue');
         }
-
-        Auth::user()->update([
-            'password' => Hash::make($request->new_password),
-        ]);
-
-        return redirect()->route('parametres.securite')
-                            ->with('success', 'Mot de passe mis à jour avec succès.');
     }
 
     //  Notifications
@@ -110,22 +152,40 @@ class ParametreController extends Controller {
     }
 
     public function notificationsUpdate(Request $request) {
+
         return redirect()->route('parametres.notifications')
-                            ->with('success', 'Préférences de notifications mises à jour.');
+            ->with('success', 'Préférences de notifications mises à jour.');
     }
 
     //  Général
     public function general() {
+
         return view('parametres.general');
     }
 
     public function generalUpdate(Request $request) {
-        $request->validate([
-            'langue'   => 'required|in:fr,en',
-            'timezone' => 'required|string',
-        ]);
 
-        return redirect()->route('parametres.general')
-                            ->with('success', 'Paramètres généraux mis à jour.');
+        try{
+            $request->validate([
+                'langue'   => 'required|in:fr,en',
+                'timezone' => 'required|string',
+            ]);
+            Log::notice('Mise à jour des paramètres généraux', [
+                'user_id' => Auth::id(),
+                'langue' => $request->langue,
+                'timezone' => $request->timezone,
+                'ip' => $request->ip(),
+            ]);
+
+            return redirect()->route('parametres.general')
+                ->with('success', 'Paramètres généraux mis à jour.');
+
+        }catch (\Exception $e){
+            Log::error('Erreur lors de la mise à jour des paramètres généraux', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'Une erreur est survenue');
+        }
     }
 }

@@ -79,6 +79,14 @@
                     <span>Configuration système</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.logs.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}"
+                    data-tooltip="Log">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Journal des activités</span>
+                </a>
+            </li>
         @endif
 
         {{-- ══ PORTEUR ══ --}}
@@ -97,6 +105,21 @@
                     data-tooltip="Nouveau projet">
                     <i class="fas fa-plus-circle"></i>
                     <span>Nouveau projet</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                @php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                @endphp
+                <a href="{{ route($role . '.notifications.index') }}"
+                    class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    @if($notifCount > 0)
+                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                    @endif
                 </a>
             </li>
         @endif
@@ -127,6 +150,21 @@
                     <span>Mes projets</span>
                 </a>
             </li>
+            <li class="nav-item">
+                @php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                @endphp
+                <a href="{{ route($role . '.notifications.index') }}"
+                    class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    @if($notifCount > 0)
+                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                    @endif
+                </a>
+            </li>
         @endif
 
         {{-- ══ VALIDATEUR ══ --}}
@@ -155,24 +193,24 @@
                     <span>Mes projets traités</span>
                 </a>
             </li>
+            <li class="nav-item">
+                @php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                @endphp
+                <a href="{{ route($role . '.notifications.index') }}"
+                    class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    @if($notifCount > 0)
+                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                    @endif
+                </a>
+            </li>
         @endif
 
         {{-- ══ COMMUN ══ --}}
-        <li class="nav-item">
-            @php
-                $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
-                    ->where('statut', 'non_lu')->count();
-            @endphp
-            <a href="{{ route($role . '.notifications.index') }}"
-                class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
-                data-tooltip="Notifications">
-                <i class="fas fa-bell"></i>
-                <span>Notifications</span>
-                @if($notifCount > 0)
-                    <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
-                @endif
-            </a>
-        </li>
 
         <li class="nav-item">
             <a href="{{ route('parametres.index') }}"
@@ -216,7 +254,7 @@
                 </div>
                 <div class="user-info-text">
                     <div class="fw-bold">{{ Auth::user()->nomComplet }}</div>
-                    <div class="user-role">{{ ucfirst($role) }}</div>
+                    <div class="user-role">{{ Auth::user()->email }}</div>
                 </div>
             </div>
         </li>
@@ -226,7 +264,9 @@
 
 @push('scripts')
 <script>
+
 document.addEventListener('DOMContentLoaded', function () {
+
     const sidebar    = document.getElementById('mainSidebar');
     const toggleBtn  = document.getElementById('toggleSidebar');
     const toggleIcon = document.getElementById('toggleIcon');

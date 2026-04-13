@@ -82,6 +82,14 @@
                     <span>Configuration système</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="<?php echo e(route('admin.logs.index')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs('admin.logs.*') ? 'active' : ''); ?>"
+                    data-tooltip="Log">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Journal des activités</span>
+                </a>
+            </li>
         <?php endif; ?>
 
         
@@ -100,6 +108,21 @@
                     data-tooltip="Nouveau projet">
                     <i class="fas fa-plus-circle"></i>
                     <span>Nouveau projet</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <?php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                ?>
+                <a href="<?php echo e(route($role . '.notifications.index')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs($role . '.notifications*') ? 'active' : ''); ?>"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <?php if($notifCount > 0): ?>
+                        <span class="badge"><?php echo e($notifCount > 99 ? '99+' : $notifCount); ?></span>
+                    <?php endif; ?>
                 </a>
             </li>
         <?php endif; ?>
@@ -130,6 +153,21 @@
                     <span>Mes projets</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <?php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                ?>
+                <a href="<?php echo e(route($role . '.notifications.index')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs($role . '.notifications*') ? 'active' : ''); ?>"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <?php if($notifCount > 0): ?>
+                        <span class="badge"><?php echo e($notifCount > 99 ? '99+' : $notifCount); ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
         <?php endif; ?>
 
         
@@ -158,24 +196,24 @@
                     <span>Mes projets traités</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <?php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                ?>
+                <a href="<?php echo e(route($role . '.notifications.index')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs($role . '.notifications*') ? 'active' : ''); ?>"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <?php if($notifCount > 0): ?>
+                        <span class="badge"><?php echo e($notifCount > 99 ? '99+' : $notifCount); ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
         <?php endif; ?>
 
         
-        <li class="nav-item">
-            <?php
-                $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
-                    ->where('statut', 'non_lu')->count();
-            ?>
-            <a href="<?php echo e(route($role . '.notifications.index')); ?>"
-                class="nav-link <?php echo e(request()->routeIs($role . '.notifications*') ? 'active' : ''); ?>"
-                data-tooltip="Notifications">
-                <i class="fas fa-bell"></i>
-                <span>Notifications</span>
-                <?php if($notifCount > 0): ?>
-                    <span class="badge"><?php echo e($notifCount > 99 ? '99+' : $notifCount); ?></span>
-                <?php endif; ?>
-            </a>
-        </li>
 
         <li class="nav-item">
             <a href="<?php echo e(route('parametres.index')); ?>"
@@ -220,7 +258,7 @@
                 </div>
                 <div class="user-info-text">
                     <div class="fw-bold"><?php echo e(Auth::user()->nomComplet); ?></div>
-                    <div class="user-role"><?php echo e(ucfirst($role)); ?></div>
+                    <div class="user-role"><?php echo e(Auth::user()->email); ?></div>
                 </div>
             </div>
         </li>
@@ -230,7 +268,9 @@
 
 <?php $__env->startPush('scripts'); ?>
 <script>
+
 document.addEventListener('DOMContentLoaded', function () {
+
     const sidebar    = document.getElementById('mainSidebar');
     const toggleBtn  = document.getElementById('toggleSidebar');
     const toggleIcon = document.getElementById('toggleIcon');

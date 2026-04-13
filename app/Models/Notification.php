@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Notification extends Model
-{
+class Notification extends Model {
+    
     protected $table = 'notifications';
 
     protected $fillable = [
@@ -19,7 +19,7 @@ class Notification extends Model
 
     protected $dates = ['dateEnvoi'];
 
-    // ── Relations ──
+    // Relations
 
     public function destinataire()
     {
@@ -31,7 +31,7 @@ class Notification extends Model
         return $this->belongsTo(Projet::class, 'projet_id');
     }
 
-    // ── Helpers ──
+    // Helpers
 
     public function marquerLu()
     {
@@ -52,8 +52,7 @@ class Notification extends Model
         return $icons[$this->type] ?? 'fa-bell';
     }
 
-    public function couleur()
-    {
+    public function couleur() {
         $colors = [
             'statut_change' => '#2563eb',
             'approbation'   => '#16a34a',

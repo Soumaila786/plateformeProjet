@@ -11,7 +11,7 @@
     <div>
         <p class="adm-banner-sub">Bienvenue,</p>
         <h2 class="adm-banner-name"><?php echo e(Auth::user()->nomComplet); ?></h2>
-        <p class="adm-banner-role">Administrateur &middot; <?php echo e(\Carbon\Carbon::now()->translatedFormat('d F Y')); ?></p>
+        <p class="adm-banner-role"><?php echo e(Auth::user()->email); ?> &middot; <?php echo e(\Carbon\Carbon::now()->translatedFormat('d F Y')); ?></p>
     </div>
     <div class="adm-banner-icon"><i class="fas fa-shield-alt"></i></div>
     <div class="adm-banner-circle c1"></div>

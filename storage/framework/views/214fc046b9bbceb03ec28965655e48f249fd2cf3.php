@@ -13,7 +13,7 @@
             <i class="fas fa-arrow-left"></i>
         </a>
         <div>
-            <h1 class="projets-title">Modifier l'utilisateur</h1>
+            <h1 class="projets-title">Modification d'un utilisateur</h1>
             <p class="projets-subtitle"><?php echo e($user->nomComplet); ?></p>
         </div>
     </div>

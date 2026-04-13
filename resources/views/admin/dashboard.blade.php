@@ -12,7 +12,7 @@
     <div>
         <p class="adm-banner-sub">Bienvenue,</p>
         <h2 class="adm-banner-name">{{ Auth::user()->nomComplet }}</h2>
-        <p class="adm-banner-role">Administrateur &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+        <p class="adm-banner-role">{{ Auth::user()->email }} &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
     </div>
     <div class="adm-banner-icon"><i class="fas fa-shield-alt"></i></div>
     <div class="adm-banner-circle c1"></div>

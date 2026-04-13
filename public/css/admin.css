@@ -25,7 +25,11 @@
     --font:          'Outfit', sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     font-family: var(--font);
@@ -34,12 +38,23 @@ body {
     font-size: .9rem;
 }
 
-/* ══ Utilitaires Bootstrap-like ══ */
-.mt-2 { margin-top: .5rem !important; }
-.mt-3 { margin-top: 1rem !important; }
-.ms-2 { margin-left: .5rem !important; }
-.w-100 { width: 100% !important; }
-.text-muted { color: var(--gray-400); font-size: .78rem; }
+/* Utilitaires Bootstrap-like */
+.mt-2 {
+    margin-top: .5rem !important;
+}
+.mt-3 {
+    margin-top: 1rem !important;
+}
+.ms-2 {
+    margin-left: .5rem !important;
+}
+.w-100 {
+    width: 100% !important;
+}
+.text-muted {
+    color: var(--gray-400);
+    font-size: .78rem;
+}
 
 /*    PAGE WRAPPER */
 .projets-page {
@@ -111,7 +126,12 @@ body {
     transition: background .15s, transform .1s;
     white-space: nowrap;
 }
-.btn-add:hover { background: var(--primary-dark); color: var(--white); text-decoration: none; transform: translateY(-1px); }
+.btn-add:hover {
+    background: var(--primary-dark);
+    color: var(--white);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
 
 .btn-save {
     display: inline-flex;
@@ -129,7 +149,11 @@ body {
     text-decoration: none;
     transition: background .15s, border-color .15s;
 }
-.btn-save:hover { background: var(--primary-dark); border-color: var(--primary-dark); color: var(--white); }
+.btn-save:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: var(--white);
+}
 
 .btn-cancel {
     display: inline-flex;
@@ -147,7 +171,12 @@ body {
     text-decoration: none;
     transition: border-color .15s, background .15s;
 }
-.btn-cancel:hover { border-color: var(--gray-400); background: var(--gray-50); color: var(--gray-700); text-decoration: none; }
+.btn-cancel:hover {
+    border-color: var(--gray-400);
+    background: var(--gray-50);
+    color: var(--gray-700);
+    text-decoration: none;
+}
 
 .btn-danger {
     display: inline-flex;
@@ -164,9 +193,14 @@ body {
     cursor: pointer;
     transition: opacity .15s;
 }
-.btn-danger:hover { opacity: .88; }
+.btn-danger:hover {
+    opacity: .88;
+}
 
-.btn-sm { padding: 6px 13px !important; font-size: .78rem !important; }
+.btn-sm {
+    padding: 6px 13px !important;
+    font-size: .78rem !important;
+}
 
 .btn-edit-main {
     display: inline-flex;
@@ -184,7 +218,11 @@ body {
     transition: background .15s;
     cursor: pointer;
 }
-.btn-edit-main:hover { background: var(--primary-light); color: var(--primary); text-decoration: none; }
+.btn-edit-main:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    text-decoration: none;
+}
 
 .btn-back {
     display: inline-flex;
@@ -200,7 +238,11 @@ body {
     flex-shrink: 0;
     margin-top: 4px;
 }
-.btn-back:hover { border-color: var(--primary); color: var(--primary); text-decoration: none; }
+.btn-back:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    text-decoration: none;
+}
 
 /*    BOUTONS ICÔNE */
 .btn-icon {
@@ -386,14 +428,35 @@ body {
     font-weight: 600;
     white-space: nowrap;
 }
-.status-badge.status-lg { padding: 5px 14px; font-size: .8rem; }
+.status-badge.status-lg {
+    padding: 5px 14px;
+    font-size: .8rem;
+}
 
-.status-gray   { background: #f3f4f6; color: #6b7280; }
-.status-blue   { background: #eff6ff; color: #1d4ed8; }
-.status-yellow { background: #fffbeb; color: #b45309; }
-.status-green  { background: #f0fdf4; color: #15803d; }
-.status-teal   { background: #f0fdfa; color: #0f766e; }
-.status-red    { background: #fef2f2; color: #b91c1c; }
+.status-gray   {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+.status-blue   {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+.status-yellow {
+    background: #fffbeb;
+    color: #b45309;
+}
+.status-green  {
+    background: #f0fdf4;
+    color: #15803d;
+}
+.status-teal   {
+    background: #f0fdfa;
+    color: #0f766e;
+}
+.status-red    {
+    background: #fef2f2;
+    color: #b91c1c;
+}
 
 /*   BADGES RÔLE */
 .role-badge {
@@ -405,13 +468,29 @@ body {
     font-weight: 600;
     white-space: nowrap;
 }
-.role-admin       { background: #f5f3ff; color: #6d28d9; }
-.role-porteur     { background: #eff6ff; color: #1d4ed8; }
-.role-approbateur { background: #fffbeb; color: #b45309; }
-.role-validateur  { background: #f0fdfa; color: #0f766e; }
+.role-admin       {
+    background: #f5f3ff;
+    color: #6d28d9;
+}
+.role-porteur     {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+.role-approbateur {
+    background: #fffbeb;
+    color: #b45309;
+}
+.role-validateur  {
+    background: #f0fdfa;
+    color: #0f766e;
+}
 
 /*    FORMULAIRES */
-.projet-form { display: flex; flex-direction: column; gap: 20px; }
+.projet-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
 .form-card {
     background: var(--white);
@@ -492,7 +571,11 @@ body {
     gap: 16px 24px;
 }
 
-.info-item { display: flex; flex-direction: column; gap: 4px; }
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
 .info-label {
     font-size: .72rem;
@@ -507,11 +590,24 @@ body {
     font-weight: 500;
     color: var(--gray-900);
 }
-.info-value a { color: var(--primary); text-decoration: none; }
-.info-value a:hover { text-decoration: underline; }
+.info-value a {
+    color: var(--primary);
+    text-decoration: none;
+}
+.info-value a:hover {
+    text-decoration: underline;
+}
 
-.info-block { display: flex; flex-direction: column; gap: 6px; }
-.info-text { font-size: .88rem; color: var(--gray-700); line-height: 1.6; }
+.info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.info-text {
+    font-size: .88rem;
+    color: var(--gray-700);
+    line-height: 1.6;
+}
 
 .info-empty {
     font-size: .84rem;
@@ -551,7 +647,9 @@ body {
     cursor: pointer;
     transition: background .15s;
 }
-.btn-attach:hover { background: #dbeafe; }
+.btn-attach:hover {
+    background: #dbeafe;
+}
 
 .doc-type-select {
     max-width: 200px;

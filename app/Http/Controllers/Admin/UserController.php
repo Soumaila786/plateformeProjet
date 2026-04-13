@@ -11,6 +11,8 @@ use App\Services\MailService;
 use App\Helpers\PasswordGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 
 class UserController extends Controller {
@@ -25,6 +27,7 @@ class UserController extends Controller {
 
     // Liste
     public function index(Request $request){
+
         try {
             $query = User::query();
 
@@ -49,7 +52,11 @@ class UserController extends Controller {
             return view('admin.users.index', compact('users'));
 
         } catch (\Exception $e) {
-            // En cas d'erreur, on redirige avec un message d'alerte
+
+            Log::error('Erreur lors du chargement des utilisateurs', [
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id(),
+            ]);
             return back()->with('error', "Une erreur est survenue lors du chargement des utilisateurs.");
         }
     }
@@ -125,10 +132,22 @@ class UserController extends Controller {
 
             $this->mailService->envoyerCompteCreee($user, $motDePasse);
 
-            return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
+            Log::info('Email de création de compte envoyé', [
+                'user_id' => $user->id,
+                'email' => $user->email
+            ]);
+
+            return redirect()->route('admin.users.index')
+                ->with('success', 'Utilisateur créé avec succès.');
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
+
+            Log::error('Erreur lors de la création d’un utilisateur', [
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id()
+            ]);
+            return redirect()->back()
+                ->with('error', "Une erreur est survenue lors de la création de l'utilisateur");
         }
     }
 
@@ -142,25 +161,42 @@ class UserController extends Controller {
             // Ajouter des champs dynamiques selon le rôle
             if ($user->role === 'porteur') {
                 $user->detailsRole = isset($user->porteur) ? $user->porteur->structure : '—';
+
             } elseif ($user->role === 'approbateur') {
                 $user->detailsRole = isset($user->approbateur) ? $user->approbateur->poste : '—';
+
             } elseif ($user->role === 'validateur') {
+
                 if (isset($user->validateur) && $user->validateur->dateDebutMandat) {
+                    // isset return un booleen et permet de verifier si la variable existe et n'est pas null
+                    // Pour eviter les crash
                     $dateFin = isset($user->validateur->dateFinMandat)
                                 ? $user->validateur->dateFinMandat->format('d/m/Y')
                                 : '—';
+
                     $user->detailsRole = 'Mandat du ' . $user->validateur->dateDebutMandat->format('d/m/Y')
                                             . ' au ' . $dateFin;
+
                 } else {
                     $user->detailsRole = '—';
+
                 }
             } else {
                 $user->detailsRole = $user->organisation ?? '—';
+
             }
 
             return view('admin.users.show', compact('user'));
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
+
+            Log::error("Erreur lors de l’affichage d’un utilisateur", [
+                'user_id' => $user->id ?? null,
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id()
+            ]);
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue' );
         }
     }
 
@@ -191,8 +227,11 @@ class UserController extends Controller {
             }
 
             return view('admin.users.edit', compact('user'));
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue ' );
         }
     }
 
@@ -231,6 +270,9 @@ class UserController extends Controller {
             if ($request->filled('motDePasse')) {
                 $data['motDePasse'] = Hash::make($request->motDePasse);
             }
+
+            $ancienRole = $user->role;
+            $ancienEmail = $user->email;
 
             $user->update($data);
 
@@ -274,38 +316,97 @@ class UserController extends Controller {
                 if ($user->validateur) $user->validateur()->delete();
             }
 
+            Log::notice('Mise à jour d’un utilisateur', [
+                'user_id' => $user->id,
+                'ancien_role' => $ancienRole,
+                'nouveau_role' => $user->role,
+                'ancien_email' => $ancienEmail,
+                'nouveau_email' => $user->email,
+                'admin_id' => Auth::id(),
+                'ip' => $request->ip()
+            ]);
+
             return redirect()->route('admin.users.index')
                 ->with('success', 'Utilisateur mis à jour avec succès.');
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
+
+            Log::error('Erreur lors de la mise à jour d’un utilisateur', [
+                'user_id' => $user->id ?? null,
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id()
+            ]);
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue');
         }
     }
 
     // Supprimer
     public function destroy(User $user){
+
         try {
             if ($user->projets()->count() > 0) {
+
+                Log::warning('Tentative de suppression d’un utilisateur ayant des projets', [
+                    'user_id' => $user->id,
+                    'admin_id' => Auth::id(),
+                    'ip' => request()->ip()
+                ]);
+
                 return redirect()->route('admin.users.index')
-                                    ->with('error', 'Impossible de supprimer un utilisateur ayant des projets.');
+                    ->with('error', 'Impossible de supprimer un utilisateur ayant des projets.');
             }
             $user->delete();
             return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé.');
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
+
+            Log::error('Erreur lors de la suppression d’un utilisateur', [
+                'user_id' => $user->id ?? null,
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id()
+            ]);
+
+            return redirect()->route('admin.users.index')
+            ->with('error', 'Une erreur est survenue');
         }
     }
 
     // Activer / Désactiver
     public function toggleStatus(User $user) {
+
         try {
+            $ancienStatut = $user->actif;
             $user->update(['actif' => !$user->actif]);
+
+            Log::warning('Changement de statut d’un utilisateur', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ancien_statut' => $ancienStatut,
+                'nouveau_statut' => $user->actif,
+                'admin_id' => Auth::id(),
+                'ip' => request()->ip()
+            ]);
+
             $msg = $user->actif ? 'Compte activé.' : 'Compte désactivé.';
 
             $this->mailService->envoyerCompteDesactive($user);
 
+            Log::info('Notification de statut envoyée par email', [
+                'user_id' => $user->id,
+                'email' => $user->email
+            ]);
+
             return back()->with('success', $msg);
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
+            
+            Log::error('Erreur lors du changement de statut d’un utilisateur', [
+                'user_id' => $user->id ?? null,
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id()
+            ]);
+            return back()->with('error', 'Une erreur est survenue ');
         }
     }
 }

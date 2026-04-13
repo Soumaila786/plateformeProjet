@@ -5,8 +5,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Validateur extends Model
-{
+class Validateur extends Model {
+    
     protected $table = 'validateurs';
 
     protected $fillable = [

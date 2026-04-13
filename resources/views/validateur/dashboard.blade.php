@@ -12,7 +12,7 @@
     <div>
         <p class="vd-banner-sub">Bienvenue,</p>
         <h2 class="vd-banner-name">{{ Auth::user()->nomComplet }}</h2>
-        <p class="vd-banner-role">Validateur &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+        <p class="vd-banner-role">{{ Auth::user()->email }} &middot; {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
     </div>
     <div class="vd-banner-icon"><i class="fas fa-medal"></i></div>
     <div class="vd-banner-circle c1"></div>

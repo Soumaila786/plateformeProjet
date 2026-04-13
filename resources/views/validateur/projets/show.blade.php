@@ -5,11 +5,14 @@
 @endpush
 
 @section('content')
+
 <div class="vpage">
 
     {{-- Breadcrumb --}}
     <div class="breadcrumb">
-        <a href="{{ route('validateur.dashboard') }}"><i class="fas fa-home"></i></a>
+        <a href="{{ route('validateur.dashboard') }}">
+            <i class="fas fa-home"></i>
+        </a>
         <span>/</span>
         <a href="{{ route('validateur.projets.index') }}">Projets</a>
         <span>/</span>
@@ -32,17 +35,29 @@
             </span>
             <h1 class="show-title">{{ $projet->titre }}</h1>
             <div class="show-meta">
-                <span><i class="fas fa-hashtag"></i> {{ $projet->codeProjet }}</span>
-                <span><i class="fas fa-user"></i> {{ optional($projet->porteur)->nomComplet ?? '—' }}</span>
-                <span><i class="fas fa-tag"></i> {{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
-                <span><i class="fas fa-calendar"></i>
+                <span>
+                    <i class="fas fa-hashtag"></i>
+                    {{ $projet->codeProjet }}
+                </span>
+                <span>
+                    <i class="fas fa-user"></i>
+                    {{ optional($projet->porteur)->nomComplet ?? '—' }}
+                </span>
+                <span>
+                    <i class="fas fa-tag"></i>
+                    {{ optional($projet->secteur)->nomSecteur ?? '—' }}
+                </span>
+                <span>
+                    <i class="fas fa-calendar"></i>
                     {{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }} →
                     {{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}
                 </span>
             </div>
         </div>
-        <a href="{{ route('validateur.projets.index') }}" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Retour
+        <a  href="{{ route('validateur.projets.index') }}"
+            class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Retour
         </a>
     </div>
 
@@ -54,32 +69,66 @@
 
             {{-- Objectif --}}
             <div class="info-card">
-                <h4 class="info-title"><i class="fas fa-bullseye"></i> Objectif</h4>
-                <p class="info-text">{{ $projet->objectif ?? 'Non renseigné.' }}</p>
+
+                <h4 class="info-title">
+                    <i class="fas fa-bullseye"></i>
+                    Objectif
+                </h4>
+                <p class="info-text">
+                    {{ $projet->objectif ?? 'Non renseigné.' }}
+                </p>
             </div>
 
             {{-- Description --}}
             @if($projet->description)
             <div class="info-card">
-                <h4 class="info-title"><i class="fas fa-align-left"></i> Description</h4>
-                <p class="info-text" style="white-space:pre-line;">{{ $projet->description }}</p>
+                <h4 class="info-title">
+                    <i class="fas fa-align-left"></i>
+                        Description
+                    </h4>
+                <p  class="info-text"
+                    style="white-space:pre-line;">
+                    {{ $projet->description }}
+                </p>
             </div>
             @endif
 
-            {{-- activites --}}
-            @if($projet->activites && $projet->activites->count())
-            <div class="info-card">
-                <h4 class="info-title"><i class="fas fa-tasks"></i> Planification</h4>
-                <div class="planif-list">
-                    @foreach($projet->activites as $pl)
-                    <div class="planif-item">
+            {{-- Planification des activites --}}
+            @if($projet->planifications->count())
+            <div class="info-card mb-2">
+                <h4 class="info-title ">
+                    <i class="fas fa-tasks"></i>
+                    Planification du projet ({{ $projet->planifications->count() }} activité(s))
+                </h4>
+
+                <div class="planif-list m-3">
+
+                    @foreach($projet->planifications as $pl)
+                    <div class="planif-item mt-4">
                         <div class="planif-dot"></div>
                         <div>
-                            <p class="planif-name">{{ $pl->activite ?? $pl->titre ?? '—' }}</p>
-                            <p class="planif-date">
-                                {{ optional($pl->dateDebut)->format('d/m/Y') ?? '—' }} →
-                                {{ optional($pl->dateFin)->format('d/m/Y') ?? '—' }}
+                            <p class="planif-name">
+                                {{ $pl->activitePlanification }}
                             </p>
+                            <p class="planif-date">
+                                <span class="planif-value"> Période : </span>
+                                {{ $pl->periode }}
+                            </p>
+
+                            @if ($pl->coutEstimatif)
+                                <p class="planif-date">
+                                    <span class="planif-value"> Coût estimatif : </span>
+                                    {{ number_format($pl->coutEstimatif, 0, ',', ' ') }} F CFA
+                                </p>
+                            @endif
+
+                            @if ($pl->indicateur)
+                                <p class="planif-date">
+                                    <span class="planif-value"> Indicateur : </span>
+                                    Indicateur : {{ $pl->indicateur }}
+                                    @if ($pl->uniteIndicateur) ( {{ $pl->uniteIndicateur }} )@endif
+                                </p>
+                            @endif
                         </div>
                     </div>
                     @endforeach
@@ -90,12 +139,19 @@
             {{-- Documents --}}
             @if($projet->documents && $projet->documents->count())
             <div class="info-card">
-                <h4 class="info-title"><i class="fas fa-paperclip"></i> Documents joints</h4>
+                <h4 class="info-title">
+                    <i class="fas fa-paperclip"></i>
+                    Documents joints
+                </h4>
                 <div class="docs-list">
                     @foreach($projet->documents as $doc)
-                    <a href="{{ asset('storage/' . $doc->cheminFichier) }}" target="_blank" class="doc-item">
+                    <a  href="{{ asset('storage/' . $doc->cheminFichier) }}"
+                        target="_blank"
+                        class="doc-item">
                         <i class="fas fa-file-alt"></i>
-                        <span>{{ $doc->nomFichier ?? basename($doc->cheminFichier) }}</span>
+                        <span>
+                            {{ $doc->nomFichier ?? basename($doc->cheminFichier) }}
+                        </span>
                         <i class="fas fa-external-link-alt doc-ext"></i>
                     </a>
                     @endforeach

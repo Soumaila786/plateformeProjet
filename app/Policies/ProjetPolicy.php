@@ -5,12 +5,13 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\Projet;
 
-class ProjetPolicy
-{
+class ProjetPolicy {
+
     // Voir un projet
-    public function view(User $user, Projet $projet){
+    public function view(User $user, Projet $projet) {
 
         switch ($user->role) {
+
             case 'admin':
             case 'approbateur':
             case 'validateur':
@@ -147,7 +148,7 @@ class ProjetPolicy
 
     // Voir la planification
     public function voirPlanification(User $user, Projet $projet) {
-        
+
         switch ($user->role) {
             case 'approbateur':
             case 'admin':

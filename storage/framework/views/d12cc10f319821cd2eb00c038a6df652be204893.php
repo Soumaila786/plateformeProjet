@@ -70,7 +70,13 @@
                 <p style="font-size:.73rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#b91c1c;margin:0 0 4px;">
                     Projet rejeté — Motif
                 </p>
-                <p style="font-size:.82rem;color:#374151;margin:0 0 3px;line-height:1.5;"><?php echo e($dernierRejet->message); ?></p>
+                <p  style="font-size:.82rem;
+                    color:#374151;
+                    margin:0 0 3px;
+                    line-height:1.5;">
+                    <?php echo e($dernierRejet->message); ?>
+
+                </p>
                 <p style="font-size:.7rem;color:#9ca3af;margin:0;">
                     Par <?php echo e(optional($dernierRejet->utilisateur)->nomComplet ?? 'Approbateur'); ?>
 
@@ -191,32 +197,53 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Secteur</span>
-                            <span class="info-value"><?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?></span>
+                            <span class="info-value">
+                                <?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?>
+
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Durée</span>
-                            <span class="info-value"><?php echo e($projet->duree ? $projet->duree . ' mois' : '—'); ?></span>
+                            <span class="info-value">
+                                <?php echo e($projet->duree ? $projet->duree . ' mois' : '—'); ?>
+
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de création</span>
-                            <span class="info-value"><?php echo e(optional($projet->dateCreation)->format('d/m/Y') ?? '—'); ?></span>
+                            <span class="info-value">
+                                <?php echo e(optional($projet->dateCreation)->format('d/m/Y') ?? '—'); ?>
+
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de soumission</span>
-                            <span class="info-value"><?php echo e(optional($projet->dateSoumission)->format('d/m/Y') ?? '—'); ?></span>
+                            <span class="info-value">
+                                <?php echo e(optional($projet->dateSoumission)->format('d/m/Y') ?? '—'); ?>
+
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de début probable</span>
-                            <span class="info-value"><?php echo e(optional($projet->dateDebut)->format('d/m/Y') ?? '—'); ?></span>
+                            <span class="info-value">
+                                <?php echo e(optional($projet->dateDebut)->format('d/m/Y') ?? '—'); ?>
+
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de fin probable</span>
-                            <span class="info-value"><?php echo e(optional($projet->dateFin)->format('d/m/Y') ?? '—'); ?></span>
+                            <span class="info-value">
+                                <?php echo e(optional($projet->dateFin)->format('d/m/Y') ?? '—'); ?>
+
+                            </span>
                         </div>
                         <?php if($projet->dateApprobation): ?>
                         <div class="info-item">
                             <span class="info-label">Date d'approbation</span>
-                            <span class="info-value"><?php echo e(optional($projet->dateApprobation)->format('d/m/Y')); ?></span>
+                            <span class="info-value">
+                                <?php echo e(optional($projet->dateApprobation)->format('d/m/Y')); ?>
+
+                            </span>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -240,16 +267,23 @@
             <div class="form-card">
                 <div class="form-card-header">
                     <i class="fas fa-calendar-check"></i>
-                    <span>Planification du projet (<?php echo e($projet->planifications->count()); ?> activité(s))</span>
+                    <span>
+                        Planification du projet (<?php echo e($projet->planifications->count()); ?> activité(s))
+                    </span>
                 </div>
                 <div class="form-card-body">
+
                     <div class="plan-cards-grid">
+
                         <?php $__currentLoopData = $projet->planifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $plan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="plan-act-card">
                             <div class="plan-act-top">
                                 <div class="plan-act-num"><?php echo e($loop->iteration); ?></div>
                             </div>
-                            <h4 class="plan-act-titre"><?php echo e($plan->activitePlanification); ?></h4>
+                            <h4 class="plan-act-titre">
+                                <?php echo e($plan->activitePlanification); ?>
+
+                            </h4>
                             <div class="plan-act-footer">
                                 <?php if($plan->periode): ?>
                                 <span class="plan-act-info">

@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DocumentProjet extends Model
-{
+class DocumentProjet extends Model {
+    
     protected $table = 'document_projets';
 
     protected $fillable = [

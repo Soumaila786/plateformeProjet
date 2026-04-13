@@ -10,11 +10,16 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     public function index() {
+
+    try{
+
         $user = Auth::user();
 
         // Compteurs statuts
         $base = Projet::where('user_id', $user->id);
-
+        // clone sert à :eviter de modifier la requête originale
+        // exécuter plusieurs requêtes différentes à partir d’une même base
+        // garantir des résultats corrects
         $total     = (clone $base)->count();
         $brouillon = (clone $base)->where('statutProjet', 'brouillon')->count();
         $soumis    = (clone $base)->where('statutProjet', 'soumis')->count();
@@ -31,8 +36,8 @@ class DashboardController extends Controller
 
         // Projets récents (max 5)
         $projetsRecents = Projet::where('user_id', $user->id)
-            ->with('secteur')
-            ->latest('updated_at')
+        ->with('secteur')
+        ->latest('updated_at')
             ->take(5)
             ->get();
 
@@ -42,11 +47,23 @@ class DashboardController extends Controller
             ->take(2)
             ->get();
 
-        return view('porteur.dashboard', compact(
-            'total', 'brouillon', 'soumis', 'enExamen',
-            'approuve', 'valide', 'rejete', 'finance',
-            'budgetTotal', 'montantDemande', 'montantFinance',
-            'projetsRecents', 'notifications'
-        ));
+            return view('porteur.dashboard', compact(
+                'total',
+                'brouillon',
+                'soumis',
+                'enExamen',
+                'approuve',
+                'valide',
+                'rejete',
+                'finance',
+                'budgetTotal',
+                'montantDemande',
+                'montantFinance',
+                'projetsRecents',
+                'notifications'
+                ));
+    }catch (\Exception $e){
+        return view('error', 'Une erreur est survenue', $e->getMessage());
+    }
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SecteurController;
 use App\Http\Controllers\Admin\ProjetController;
 use App\Http\Controllers\Admin\ActiviteController;
 use App\Http\Controllers\ParametreController;
+use App\Http\Controllers\Admin\LogController;
 
 
 // Porteur
@@ -101,6 +102,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/configuration',  [App\Http\Controllers\Admin\ConfigurationController::class, 'update'])->name('configuration.update');
         Route::post('/configuration/{cle}/reset', [App\Http\Controllers\Admin\ConfigurationController::class, 'reset']) ->name('configuration.reset');
 
+        // Les logs
+        Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/toutes-lues', [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');

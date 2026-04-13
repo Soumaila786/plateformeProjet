@@ -11,7 +11,7 @@
     <div>
         <p class="vd-banner-sub">Bienvenue,</p>
         <h2 class="vd-banner-name"><?php echo e(Auth::user()->nomComplet); ?></h2>
-        <p class="vd-banner-role">Validateur &middot; <?php echo e(\Carbon\Carbon::now()->translatedFormat('d F Y')); ?></p>
+        <p class="vd-banner-role"><?php echo e(Auth::user()->email); ?> &middot; <?php echo e(\Carbon\Carbon::now()->translatedFormat('d F Y')); ?></p>
     </div>
     <div class="vd-banner-icon"><i class="fas fa-medal"></i></div>
     <div class="vd-banner-circle c1"></div>
