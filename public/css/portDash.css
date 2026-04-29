@@ -82,11 +82,11 @@
     border:1px solid #e5e7eb;
     border-radius:12px;
     padding:16px;
-    box-shadow:0 2px 8px rgba(0,0,0,.06);
+    box-shadow:0 2px 8px rgba(9,9,9,.20);
     transition:box-shadow .15s;
 }
 .stat-card:hover {
-    box-shadow:0 4px 16px rgba(0,0,0,.1);
+    box-shadow:0 4px 16px rgba(9,9,9,.20);
 }
 
 .stat-top {
@@ -145,7 +145,7 @@
     border:1px solid #e5e7eb;
     border-radius:12px;
     overflow:hidden;
-    box-shadow:0 2px 8px rgba(0,0,0,.06);
+    box-shadow:0 2px 8px rgba(9,9,9,.20);
 }
 .card-head {
     display:flex;
@@ -406,7 +406,7 @@
     display:flex;
     gap:12px;
     align-items:flex-start;
-    box-shadow:0 2px 8px rgba(0,0,0,.06);
+    box-shadow:0 2px 8px rgba(9,9,9,.20);
     transition:box-shadow .15s;
 }
 .finance-card:hover {

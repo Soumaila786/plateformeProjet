@@ -26,10 +26,13 @@ class ProjetController extends Controller {
 
         try{
 
-            $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
+            $secteurs = SecteurActivite::where('statutSecteur', true)
+                                        ->orderBy('nomSecteur')
+                                        ->get();
 
             $query = Projet::with(['secteur', 'porteur'])
-            ->whereIn('statutProjet', ['soumis', 'en_examen', 'approuve', 'rejete']);
+                            ->whereIn('statutProjet',
+                            ['soumis', 'en_examen', 'approuve', 'rejete']);
 
             if ($request->filled('search')) {
             $s = $request->search;
@@ -47,7 +50,7 @@ class ProjetController extends Controller {
                 $query->where('secteur_id', $request->secteur_id);
                 }
 
-                $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
+                $projets = $query->orderBy('updated_at', 'desc')->paginate(4);
 
                 return view('approbateur.projets.index', compact('projets', 'secteurs'));
 
@@ -86,7 +89,7 @@ class ProjetController extends Controller {
                 $query->where('secteur_id', $request->secteur_id);
             }
 
-            $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
+            $projets = $query->orderBy('updated_at', 'desc')->paginate(4);
 
             // Motif rejet depuis commentaires
             $projets->getCollection()->transform(function ($projet) {

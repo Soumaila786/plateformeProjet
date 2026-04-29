@@ -45,7 +45,7 @@ class ProjetController extends Controller {
             }
 
             $projets = $query->orderBy('updated_at', 'asc')
-                            ->paginate(10);
+                            ->paginate(4);
 
             return view('validateur.projets.index', compact('projets', 'secteurs'));
 

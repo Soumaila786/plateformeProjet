@@ -17,7 +17,7 @@ class NotificationController extends Controller {
             $notifications = Notification::where('destinataire_id', Auth::id())
                 ->with('projet')
                 ->orderBy('dateEnvoi', 'desc')
-                ->paginate(15);
+                ->paginate(4);
 
             // Marquer toutes comme lues à l'ouverture
             Notification::where('destinataire_id', Auth::id())

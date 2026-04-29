@@ -66,4 +66,31 @@ class LogController extends Controller {
             'message' => $matches[4] ?? $line,
         ];
     }
+
+    public function getCount() {
+    try {
+        $path = storage_path('logs/laravel.log');
+        
+        if (!File::exists($path)) {
+            return response()->json(['count' => 0]);
+        }
+        
+        $lines = file($path);
+        $lines = array_reverse($lines);
+        $count = 0;
+        
+        foreach ($lines as $line) {
+            if (trim($line) !== '' && $count < 100) {
+                // Compter uniquement les ERROR et WARNING
+                if (str_contains($line, 'ERROR') || str_contains($line, 'WARNING')) {
+                    $count++;
+                }
+            }
+        }
+        
+        return response()->json(['count' => $count]);
+    } catch (\Exception $e) {
+        return response()->json(['count' => 0]);
+    }
+}
 }

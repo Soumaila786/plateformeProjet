@@ -80,7 +80,6 @@ class LoginController extends Controller {
             ]);
 
             $email = $request->email;
-
             Log::info('Tentative de connexion', [
                 'email' => $email,
                 'ip' => $request->ip()
@@ -98,7 +97,6 @@ class LoginController extends Controller {
                 Cache::forget($blockKey);
                 Cache::forget($cacheKey);
                 Cache::forget('block_count_' . $email);
-
                 session()->forget([
                     'blocked_email',
                     'block_expires_at',
@@ -108,12 +106,10 @@ class LoginController extends Controller {
 
             // Blocage temporaire
             if (Cache::has($blockKey)) {
-
                 Log::warning('Tentative de connexion sur un compte temporairement bloqué', [
                     'email' => $email,
                     'ip' => $request->ip()
                 ]);
-
                 return back()->withErrors([
                     'email' => 'Compte temporairement suspendu. Réessayez plus tard.',
                 ])->onlyInput('email');
@@ -121,17 +117,14 @@ class LoginController extends Controller {
 
             // Compte désactivé
             if ($user && !$user->actif) {
-
                 Log::warning('Tentative de connexion sur un compte désactivé', [
                     'email' => $email,
                     'ip' => $request->ip()
                 ]);
-
                 session([
                     'permanent_block' => true,
                     'blocked_email'   => $email
                     ]);
-
                 return back()->withErrors([
                     'email' => 'Compte désactivé. Contactez l’administrateur.',
                 ])->onlyInput('email');
@@ -139,14 +132,16 @@ class LoginController extends Controller {
 
             // Mauvais identifiants
             if (!$user || !Hash::check($request->password, $user->motDePasse)) {
-
                 Log::warning('Echec de connexion : Identifiants incorrects', [
                     'email' => $email,
                     'ip'    => $request->ip()
                 ]);
-
-                $this->incrementAttempts($cacheKey, $blockKey, $permanentBlockKey, $email);
-
+                $this->incrementAttempts(
+                    $cacheKey,
+                    $blockKey,
+                    $permanentBlockKey,
+                    $email
+                );
                 return back()->withErrors([
                     'email' => 'Email ou mot de passe incorrect.',
                 ])->onlyInput('email');
@@ -155,34 +150,31 @@ class LoginController extends Controller {
             // Connexion réussie
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
-
             Log::info('Connexion réussie', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'role' => $user->role,
                 'ip' => $request->ip()
             ]);
-
             // Reset sécurité
             Cache::forget($cacheKey);
             Cache::forget($blockKey);
             Cache::forget($permanentBlockKey);
             Cache::forget('block_count_' . $email);
-
             session()->forget([
                 'blocked_email',
                 'block_expires_at',
                 'permanent_block'
-                ]);
+            ]);
 
-                return redirect($this->redirectTo($user->role));
+            return redirect($this->redirectTo($user->role));
 
         }catch(\Exception $e){
             Log::error('Erreur lors de la connexion',[
                 'message' => $e->getMessage(),
             ]);
             return redirect()->back()
-            ->with('error', 'Une erreur est survenue ');
+                ->with('error', 'Une erreur est survenue ');
         }
     }
 
@@ -200,54 +192,43 @@ class LoginController extends Controller {
             Cache::put($cacheKey, $attempts, now()->addMinutes(30));
 
             if ($attempts >= $maxAttempts) {
-
                 $blockCountKey = 'block_count_' . $email;
                 $blockCount = Cache::get($blockCountKey, 0) + 1;
-
                 Cache::put($blockCountKey, $blockCount, now()->addDays(7));
                 Cache::forget($cacheKey);
-
                 // Blocage définitif
                 if ($blockCount >= $maxBlocks) {
-
                     Log::critical('Blocage définitif du compte', [
                         'email' => $email,
                         'nombre_blocages' => $blockCount
                     ]);
-
                     Cache::put($permanentBlockKey, true, now()->addYears(10));
-
                     User::where('email', $email)->update(['actif' => false]);
-
                     session([
                         'permanent_block' => true,
                         'blocked_email'   => $email
                     ]);
-
                     return;
-                    }
-
+                }
                 // Blocage temporaire
                 $expiresAt = now()->addMinutes($blockDuration)->timestamp;
-
                 Log::warning('Blocage temporaire du compte', [
                     'email' => $email,
                     'duree' => $blockDuration . ' minutes',
                     'ip' => request()->ip()
                 ]);
-
                 Cache::put($blockKey, true, now()->addMinutes($blockDuration));
-
                 session([
                     'blocked_email'    => $email,
                     'block_expires_at' => $expiresAt,
                 ]);
-                }
-            }catch(\Exception $e){
-                Log::error("Erreur lors de l'incrementation du temps", [
-                    'message' => $e->getMessage()
-                ]);
             }
+            
+        }catch(\Exception $e){
+            Log::error("Erreur lors de l'incrementation du temps", [
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     private function redirectTo($role) {
@@ -267,6 +248,10 @@ class LoginController extends Controller {
 
             case 'porteur':
                 $redirect = '/porteur/dashboard';
+                break;
+            
+            case 'planificateur':
+                $redirect = '/planificateur/dashboard';
                 break;
 
             default:

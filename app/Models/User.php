@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
-{
+class User extends Authenticatable {
+
     use HasRoles;
 
     protected $table = 'users';
@@ -40,6 +40,7 @@ class User extends Authenticatable
         static::deleting(function ($user) {
             $user->porteur()->delete();
             $user->approbateur()->delete();
+            $user->planificateur()->delete();
             $user->validateur()->delete();
         });
     }
@@ -68,5 +69,10 @@ class User extends Authenticatable
         return $this->hasOne(Validateur::class, 'user_id');
     }
 
+    public function planificateur() {
+        
+        return $this->hasOne(Planificateur::class, 'user_id');
+    }
+    
 
 }

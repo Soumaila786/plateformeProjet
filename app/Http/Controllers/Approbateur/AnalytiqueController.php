@@ -63,7 +63,7 @@ class AnalytiqueController extends Controller {
             // Délai moyen soumission → approbation
             $delaiMoyenAppro = Projet::whereNotNull('dateApprobation')
             ->whereNotNull('dateSoumission')
-            ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
+            ->selectRaw('AVG(ABS(DATEDIFF(dateApprobation, dateSoumission))) as moy')
                 ->value('moy') ?? 0;
 
             //================== ANALYSE BUDGÉTAIRE =============================================================
@@ -93,12 +93,12 @@ class AnalytiqueController extends Controller {
            //================ DÉLAIS =============================================================
             $delaiAppro = round(Projet::whereNotNull('dateApprobation')
                 ->whereNotNull('dateSoumission')
-                ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(dateApprobation, dateSoumission))) as moy')
                 ->value('moy') ?? 0, 1);
 
             $delaiValid = round(Projet::whereNotNull('validated_at')
                 ->whereNotNull('dateApprobation')
-                ->selectRaw('AVG(DATEDIFF(validated_at, dateApprobation)) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(validated_at, dateApprobation))) as moy')
                 ->value('moy') ?? 0, 1);
 
                 $retard30 = Projet::whereIn('statutProjet', ['soumis','en_examen'])

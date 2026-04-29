@@ -33,7 +33,7 @@ class ProjetController extends Controller {
                         ->orWhere('codeProjet', 'like', '%' . $search . '%'); });
             }
 
-            $projets = $query->orderBy('created_at', 'desc')->paginate(10);
+            $projets = $query->orderBy('created_at', 'desc')->paginate(4);
 
             return view('porteur.projets.index', compact('projets'));
 
@@ -380,36 +380,35 @@ class ProjetController extends Controller {
     }
 
 
-    public function demanderPlanification($id){
-
-        try{
-
+    public function demanderPlanification($id) {
+        try {
             $projet = Projet::findOrFail($id);
-            $projet->update([ 'planification_demandee' => 1 ]);
-            Log::notice('Demande de planification envoyée', [
-                'projet_id' => $projet->id,
-                'code_projet' => $projet->codeProjet,
-                'user_id' => Auth::id(),
-                'ip' => request()->ip(),
+            $projet->update([
+                'planification_demandee' => true,
             ]);
 
-            // Notifier les approbateurs
-            NotificationService::notifierApprobateurs(
-                'Un nouveau projet « ' . $projet->titre . ' » ('. $projet->codeProjet .') besoin de planification.',
-                'soumission',
+            // Notifier les PLANIFICATEURS (plus les approbateurs)
+            NotificationService::notifierPlanificateurs(
+                'Le porteur demande une planification pour le projet « ' . $projet->titre . ' » (' . $projet->codeProjet . ').',
+                'info',
                 $projet->id
             );
 
-            return back()->with('success', 'Demande envoyée');
+            Log::notice('Demande de planification envoyée', [
+                'projet_id'  => $projet->id,
+                'code_projet'=> $projet->codeProjet,
+                'user_id'    => Auth::id(),
+            ]);
 
-        }catch(\Exception $e){
+            return back()->with('success', 'Demande de planification envoyée aux planificateurs.');
+
+        } catch (\Exception $e) {
             Log::error('Erreur lors de la demande de planification', [
                 'projet_id' => $id,
-                'message' => $e->getMessage(),
-                'user_id' => Auth::id(),
+                'message'   => $e->getMessage(),
+                'user_id'   => Auth::id(),
             ]);
-            return redirect()->route('porteur.projets.show', $projet)
-                ->with('error', 'Une erreur est survenue ');
+            return back()->with('error', 'Une erreur est survenue.');
         }
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 
@@ -8,7 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SecteurController;
 use App\Http\Controllers\Admin\ProjetController;
-use App\Http\Controllers\Admin\ActiviteController;
+// use App\Http\Controllers\Admin\ActiviteController;
 use App\Http\Controllers\ParametreController;
 use App\Http\Controllers\Admin\LogController;
 
@@ -16,7 +17,7 @@ use App\Http\Controllers\Admin\LogController;
 // Porteur
 use App\Http\Controllers\Porteur\DashboardController      as PorteurDashboardController;
 use App\Http\Controllers\Porteur\ProjetController         as PorteurProjetController;
-use App\Http\Controllers\Porteur\ActiviteController  as PorteurActiviteController;
+use App\Http\Controllers\Porteur\PlanificationController  as PorteurPlanificationController;
 
 // Approbateur
 use App\Http\Controllers\Approbateur\DashboardController  as ApprobateurDashboardController;
@@ -27,6 +28,10 @@ use App\Http\Controllers\Approbateur\ExportController  as ApprobateurExportContr
 // Validateur
 use App\Http\Controllers\Validateur\DashboardController   as ValidateurDashboardController;
 use App\Http\Controllers\Validateur\ProjetController      as ValidateurProjetController;
+
+use App\Http\Controllers\Planificateur\DashboardController as PlanificateurDashboardController;
+use App\Http\Controllers\Planificateur\PlanificationController as PlanificateurPlanificationController;
+
 
 // Notifications (partagé)
 use App\Http\Controllers\NotificationController;
@@ -39,15 +44,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 });
 
-Route::post('/logout', [LoginController::class, 'logout'])
-    ->name('logout')
-    ->middleware('auth');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 //  ============================================================== ROUTES PROTÉGÉES ==============================================================
 
 Route::middleware(['auth'])->group(function () {
 
-    // ── Paramètres communs à tous les rôles ──
+    //  Paramètres communs à tous les rôles
     Route::middleware(['auth'])->prefix('parametres')->name('parametres.')->group(function () {
         Route::get('/',             [ParametreController::class, 'index'])               ->name('index');
         Route::get('/profil',       [ParametreController::class, 'profil'])              ->name('profil');
@@ -68,33 +71,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/analytique',  [App\Http\Controllers\Admin\AnalytiqueController::class, 'index'])->name('analytique');
 
-
         // Utilisateurs
         Route::resource('users', UserController::class);
-        Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
-            ->name('users.toggle-status');
+        Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
         // Secteurs
         Route::resource('secteurs', SecteurController::class);
-        Route::post('secteurs/{secteur}/toggle-status', [SecteurController::class, 'toggleStatus'])
-            ->name('secteurs.toggle-status');
+        Route::post('secteurs/{secteur}/toggle-status', [SecteurController::class, 'toggleStatus'])->name('secteurs.toggle-status');
 
         // Projets
         Route::resource('projets', ProjetController::class)->only(['index', 'show', 'destroy']);
-        Route::post('projets/{projet}/statut', [ProjetController::class, 'changerStatut'])
-            ->name('projets.statut');
+        Route::post('projets/{projet}/statut', [ProjetController::class, 'changerStatut'])->name('projets.statut');
 
         // Documents
-        Route::delete('projets/{projet}/documents/{document}', [ProjetController::class, 'destroyDocument'])
-            ->name('projets.documents.destroy');
-        Route::get('projets/{projet}/documents/{document}/download', [ProjetController::class, 'downloadDocument'])
-            ->name('projets.documents.download');
+        Route::delete('projets/{projet}/documents/{document}', [ProjetController::class, 'destroyDocument'])->name('projets.documents.destroy');
+        Route::get('projets/{projet}/documents/{document}/download', [ProjetController::class, 'downloadDocument'])->name('projets.documents.download');
 
         // activites
-        Route::post('projets/{projet}/activites', [ActiviteController::class, 'store'])
-            ->name('projets.activites.store');
-        Route::delete('projets/{projet}/activites/{activite}', [ActiviteController::class, 'destroy'])
-            ->name('projets.activites.destroy');
+        // Route::post('projets/{projet}/activites', [ActiviteController::class, 'store'])
+        //     ->name('projets.activites.store');
+        // Route::delete('projets/{projet}/activites/{activite}', [ActiviteController::class, 'destroy'])
+        //     ->name('projets.activites.destroy');
 
         // Configuration du système
 
@@ -104,6 +101,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Les logs
         Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
+
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/toutes-lues', [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');
@@ -143,10 +141,11 @@ Route::middleware(['auth'])->group(function () {
             ->name('projets.documents.download');
 
         // activites
-        Route::post('projets/{projet}/activites', [PorteurActiviteController::class, 'store'])
-            ->name('projets.activites.store');
-        Route::delete('projets/{projet}/activites/{activite}', [PorteurActiviteController::class, 'destroy'])
-            ->name('projets.activites.destroy');
+        Route::get('projets/{projet}/planifications/creer',                    [PorteurPlanificationController::class, 'create'])->name('planifications.create');
+        Route::post('projets/{projet}/planifications',                         [PorteurPlanificationController::class, 'store'])->name('planifications.store');
+        Route::get('projets/{projet}/planifications/{planification}/modifier', [PorteurPlanificationController::class, 'edit'])->name('planifications.edit');
+        Route::put('projets/{projet}/planifications/{planification}',          [PorteurPlanificationController::class, 'update'])->name('planifications.update');
+        Route::delete('projets/{projet}/planifications/{planification}',       [PorteurPlanificationController::class, 'destroy'])->name('planifications.destroy');
 
         // Notifications
         Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
@@ -177,23 +176,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('projets/{projet}/documents/{document}/download', [ApprobateurProjetController::class, 'downloadDocument'])
             ->name('projets.documents.download');
 
-        // Planification
-        Route::get('/projets/{projet}/planification/creer', [ApprobateurPlanificationController::class, 'create'])
-            ->name('planification.create');
 
-        Route::post('/projets/{projet}/planification', [ApprobateurPlanificationController::class, 'store'])
-            ->name('planification.store');
-
-        Route::get('/projets/{projet}/planification/{planification}/modifier', [ApprobateurPlanificationController::class, 'edit'])
-            ->name('planification.edit');
-
-        Route::put('/projets/{projet}/planification/{planification}', [ApprobateurPlanificationController::class, 'update'])
-            ->name('planification.update');
-
-        Route::delete('/projets/{projet}/planification/{planification}', [ApprobateurPlanificationController::class, 'destroy'])
-            ->name('planification.destroy');
-
-        // Dans routes/web.php — groupe approbateur
+        // Export du projet
         Route::get('/projets/{projet}/export/pdf', [ApprobateurExportController::class, 'exportPdf'])->name('projets.export.pdf');
 
         // Notifications
@@ -208,8 +192,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('validateur')->name('validateur.')->middleware(['auth', 'role:validateur'])->group(function () {
 
-        Route::get('/dashboard', [App\Http\Controllers\Validateur\DashboardController::class, 'index'])->name('dashboard');
-
+        Route::get('/dashboard',   [App\Http\Controllers\Validateur\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/analytique',  [App\Http\Controllers\Validateur\AnalytiqueController::class, 'index'])->name('analytique');
 
         Route::get('/chart/bar',   [App\Http\Controllers\Validateur\DashboardController::class, 'chartBar'])->name('chart.bar');
@@ -223,10 +206,35 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/projets/{projet}/rejeter',  [App\Http\Controllers\Validateur\ProjetController::class, 'rejeter'])->name('projets.rejeter');
 
         // Notifications
-        Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
-        Route::post('/notifications/toutes-lues', [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');
-        Route::delete('/notifications/lues',      [NotificationController::class, 'destroyLues'])->name('notifications.destroy-lues');
+        Route::get('/notifications',                   [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/toutes-lues',      [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');
+        Route::delete('/notifications/lues',           [NotificationController::class, 'destroyLues'])->name('notifications.destroy-lues');
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
+    });
+    
+
+    // Planificateur
+    Route::middleware('role:planificateur')->prefix('planificateur')->name('planificateur.')->group(function () {
+
+        Route::get('/dashboard', [PlanificateurDashboardController::class, 'index'])->name('dashboard');
+
+        // Projets avec demande de planification
+        Route::get('/projets/traites', [PlanificateurPlanificationController::class, 'traites'])->name('projets.traites');
+        Route::get('/projets',         [PlanificateurPlanificationController::class, 'index'])->name('projets.index');
+        Route::get('/projets/{projet}', [PlanificateurPlanificationController::class, 'show'])->name('projets.show');
+
+        // CRUD planification
+        Route::get('/projets/{projet}/planifications/creer',                        [PlanificateurPlanificationController::class, 'create'])->name('planifications.create');
+        Route::post('/projets/{projet}/planifications',                             [PlanificateurPlanificationController::class, 'store'])->name('planifications.store');
+        Route::get('/projets/{projet}/planifications/{planification}/modifier',     [PlanificateurPlanificationController::class, 'edit'])->name('planifications.edit');
+        Route::put('/projets/{projet}/planifications/{planification}',              [PlanificateurPlanificationController::class, 'update'])->name('planifications.update');
+        Route::delete('/projets/{projet}/planifications/{planification}',           [PlanificateurPlanificationController::class, 'destroy'])->name('planifications.destroy');
+
+        // Notifications
+        Route::get('/notifications',                   [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/toutes-lues',      [NotificationController::class, 'marquerToutesLues'])->name('notifications.toutes-lues');
+        Route::delete('/notifications/lues',           [NotificationController::class, 'destroyLues'])->name('notifications.destroy-lues');
+        Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 });

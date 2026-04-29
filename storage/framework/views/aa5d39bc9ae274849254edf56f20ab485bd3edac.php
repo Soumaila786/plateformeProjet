@@ -124,7 +124,7 @@
                         <span class="badge"><?php echo e($notifCount > 99 ? '99+' : $notifCount); ?></span>
                     <?php endif; ?>
                 </a>
-            </li>
+            </li> 
         <?php endif; ?>
 
         
@@ -203,6 +203,41 @@
                 ?>
                 <a href="<?php echo e(route($role . '.notifications.index')); ?>"
                     class="nav-link <?php echo e(request()->routeIs($role . '.notifications*') ? 'active' : ''); ?>"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <?php if($notifCount > 0): ?>
+                        <span class="badge"><?php echo e($notifCount > 99 ? '99+' : $notifCount); ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+        <?php endif; ?>
+
+        
+        <?php if($role === 'planificateur'): ?>
+            <li class="nav-item">
+                <a href="<?php echo e(route('planificateur.projets.index')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs('planificateur.projets.index') ? 'active' : ''); ?>"
+                    data-tooltip="Projets à traiter">
+                    <i class="fas fa-inbox"></i>
+                    <span>Projets à traiter</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?php echo e(route('planificateur.projets.traites')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs('planificateur.projets.traites') ? 'active' : ''); ?>"
+                    data-tooltip="Projets traités">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Projets traités</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <?php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                ?>
+                <a href="<?php echo e(route('planificateur.notifications.index')); ?>"
+                    class="nav-link <?php echo e(request()->routeIs('planificateur.notifications*') ? 'active' : ''); ?>"
                     data-tooltip="Notifications">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>

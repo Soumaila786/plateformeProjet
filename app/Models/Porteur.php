@@ -5,8 +5,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Porteur extends Model
-{
+class Porteur extends Model {
+    
     protected $table = 'porteurs';
 
     protected $fillable = [

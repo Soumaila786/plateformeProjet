@@ -29,7 +29,14 @@
                     placeholder="Rechercher par nom, email..." value="{{ request('search') }}">
         </div>
         <div class="ulist-role-filters">
-            @foreach(['' => 'Tous', 'admin' => 'Admin', 'porteur' => 'Porteur', 'approbateur' => 'Approbateur', 'validateur' => 'Validateur'] as $val => $label)
+            @foreach([
+                '' => 'Tous',
+                'admin' => 'Admin',
+                'porteur' => 'Porteur',
+                'approbateur' => 'Approbateur',
+                'planificateur' => 'Planificateur',
+                'validateur' => 'Validateur'
+            ] as $val => $label)
             <a href="{{ route('admin.users.index', array_merge(request()->query(), ['role' => $val])) }}"
                 class="ulist-role-pill {{ request('role', '') === $val ? 'active' : '' }}">
                 {{ $label }}

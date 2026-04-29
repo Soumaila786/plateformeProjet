@@ -259,9 +259,19 @@ body {
     text-decoration: none;
     transition: background .15s, color .15s, border-color .15s;
 }
-.btn-icon:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
-.btn-icon-danger { color: var(--danger) !important; }
-.btn-icon-danger:hover { background: #fef2f2 !important; border-color: var(--danger) !important; color: var(--danger) !important; }
+.btn-icon:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.btn-icon-danger {
+    color: var(--danger) !important;
+}
+.btn-icon-danger:hover {
+    background: #fef2f2 !important;
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+}
 .btn-icon-warning { color: var(--warning) !important; }
 .btn-icon-warning:hover { background: #fffbeb !important; border-color: var(--warning) !important; }
 .btn-icon-success { color: var(--success) !important; }

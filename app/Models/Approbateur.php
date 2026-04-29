@@ -5,8 +5,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Approbateur extends Model
-{
+class Approbateur extends Model {
+
     protected $table = 'approbateurs';
 
     protected $fillable = [
@@ -15,14 +15,12 @@ class Approbateur extends Model
         'poste'
     ];
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class);
     }
 
     // Relations avec les projets
-    public function projetsExamines()
-    {
+    public function projetsExamines() {
         return $this->hasMany(Projet::class, 'approbateur_id');
     }
 }

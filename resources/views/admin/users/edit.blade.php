@@ -53,6 +53,7 @@
                         <select name="role" class="field-input @error('role') is-invalid @enderror" required>
                             <option value="admin"       {{ old('role', $user->role) === 'admin'       ? 'selected' : '' }}>Administrateur</option>
                             <option value="porteur"     {{ old('role', $user->role) === 'porteur'     ? 'selected' : '' }}>Porteur de projet</option>
+                            <option value="planificateur" {{ old('role', $user->role) === 'planificateur' ? 'selected' : '' }}>Planificateur</option>
                             <option value="approbateur" {{ old('role', $user->role) === 'approbateur' ? 'selected' : '' }}>Approbateur</option>
                             <option value="validateur"  {{ old('role', $user->role) === 'validateur'  ? 'selected' : '' }}>Validateur</option>
                         </select>
@@ -97,6 +98,16 @@
                                 value="{{ old('specialite', optional($user->porteur)->specialite) }}"
                                 class="field-input @error('specialite') is-invalid @enderror">
                             @error('specialite')<span class="field-error">{{ $message }}</span>@enderror
+                        </div>
+                    @endif
+
+                    @if ($user->role === 'planificateur')
+                        <div class="form-col form-col-full">
+                            <label class="field-label">Service</label>
+                            <input type="text" name="service"
+                                value="{{ old('service', optional($user->planificateur)->service) }}"
+                                class="field-input @error('service') is-invalid @enderror">
+                            @error('poste')<span class="field-error">{{ $message }}</span>@enderror
                         </div>
                     @endif
 

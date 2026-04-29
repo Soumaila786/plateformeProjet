@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Porteur;
+use App\Models\Planificateur;
 use App\Models\Approbateur;
 use App\Models\Validateur;
 use App\Services\MailService;
@@ -74,7 +75,7 @@ class UserController extends Controller {
             $request->validate([
                 'nomComplet'  => 'required|string|max:255',
                 'email'       => 'required|email|unique:users,email',
-                'role'        => 'required|in:admin,porteur,approbateur,validateur',
+                'role'        => 'required|in:admin,porteur,approbateur,validateur,planificateur',
                 'fonction'    => 'nullable|string|max:100',
                 'matricule'   => 'nullable|string|max:100',
                 'contact'     => 'nullable|string|max:20',
@@ -109,6 +110,15 @@ class UserController extends Controller {
                 Porteur::create([
                     'user_id'    => $user->id,
                     'specialite' => $request->specialite,
+                ]);
+            }
+
+            // Planificateur
+            if($request->role === 'planificateur'){
+
+                Planificateur::create([
+                    'user_id' =>$user->id,
+                    'service' => $request->service
                 ]);
             }
             // APPROBATEUR
@@ -156,13 +166,16 @@ class UserController extends Controller {
 
         try {
             // Charger toutes les relations possibles
-            $user->load('porteur', 'approbateur', 'validateur');
+            $user->load('porteur', 'approbateur', 'validateur','planificateur');
 
             // Ajouter des champs dynamiques selon le rôle
             if ($user->role === 'porteur') {
                 $user->detailsRole = isset($user->porteur) ? $user->porteur->structure : '—';
 
-            } elseif ($user->role === 'approbateur') {
+            } elseif($user->role === 'planificateur'){
+                $user->detailsRole = isset($user->planificateur) ? $user->planificateur->service : '—';
+
+            }elseif ($user->role === 'approbateur') {
                 $user->detailsRole = isset($user->approbateur) ? $user->approbateur->poste : '—';
 
             } elseif ($user->role === 'validateur') {
@@ -205,13 +218,18 @@ class UserController extends Controller {
 
         try {
             // Charger toutes les relations possibles
-            $user->load('porteur', 'approbateur', 'validateur');
+            $user->load('porteur', 'approbateur', 'validateur','planificateur');
 
             // Ajouter des champs dynamiques selon le rôle
             if ($user->role === 'porteur') {
                 $user->detailsRole = isset($user->porteur) ? $user->porteur->structure : '—';
-            } elseif ($user->role === 'approbateur') {
+
+            } elseif ($user->role === 'planificateur') {
+                $user->detailsRole = isset($user->planificateur) ? $user->planificateur->service : '—';
+
+            }elseif ($user->role === 'approbateur') {
                 $user->detailsRole = isset($user->approbateur) ? $user->approbateur->poste : '—';
+
             } elseif ($user->role === 'validateur') {
                 if (isset($user->validateur) && $user->validateur->dateDebutMandat) {
                     $dateFin = isset($user->validateur->dateFinMandat)
@@ -281,12 +299,15 @@ class UserController extends Controller {
                 $user->porteur()->updateOrCreate(
                     ['user_id' => $user->id], [ 'specialite' => $request->specialite, ]
                 );
+            } elseif ($request->role == 'planificateur') {
+                $user->planificateur()->updateOrCreate(
+                    ['user_id' => $user->id], [ 'service' => $request->service, ]
+                );
             } elseif ($request->role == 'approbateur') {
                 // APPROBATEUR
                 $user->approbateur()->updateOrCreate(
                     ['user_id' => $user->id],
-                    [
-                        'service' => $request->service,
+                    ['service' => $request->service,
                         'poste'   => $request->poste,
                     ]
                 );
@@ -307,11 +328,13 @@ class UserController extends Controller {
 
                 // Supprimer les autres relations si le rôle change
                 if ($user->porteur) $user->porteur()->delete();
+                if ($user->planificateur) $user->planificateur()->delete();
                 if ($user->approbateur) $user->approbateur()->delete();
 
             } else {
                 // Pour le rôle admin, supprimer toutes les relations spécifiques
                 if ($user->porteur) $user->porteur()->delete();
+                if ($user->planificateur) $user->planificateur()->delete();
                 if ($user->approbateur) $user->approbateur()->delete();
                 if ($user->validateur) $user->validateur()->delete();
             }
@@ -400,7 +423,7 @@ class UserController extends Controller {
             return back()->with('success', $msg);
 
         } catch (\Exception $e) {
-            
+
             Log::error('Erreur lors du changement de statut d’un utilisateur', [
                 'user_id' => $user->id ?? null,
                 'message' => $e->getMessage(),

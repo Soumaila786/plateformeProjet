@@ -61,10 +61,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'documents.download',
 
             // Activite
-            'activites.view',
-            'activites.create',
-            'activites.edit',
-            'activites.delete',
+            // 'activites.view',
+            // 'activites.create',
+            // 'activites.edit',
+            // 'activites.delete',
 
             // Dashboard
             'dashboard.admin',

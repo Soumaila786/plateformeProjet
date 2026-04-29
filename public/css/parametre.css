@@ -1,6 +1,4 @@
-/* ═══════════════════════════════════════════════
-   PARAMÈTRES CSS — ProjetGov
-═══════════════════════════════════════════════ */
+/*    PARAMÈTRES CSS  */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
@@ -21,17 +19,19 @@
     --white:         #ffffff;
     --radius:        10px;
     --radius-sm:     6px;
-    --shadow:        0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+    --shadow:        0 1px 4px rgba(9,9,9,.20), 0 4px 16px rgba(9,9,9,.20);
     --font:          'Outfit', sans-serif;
 }
 
-/* ── Page principale ── */
+/*  Page principale  */
 .parametres-page {
     max-width: 680px;
     padding: 28px 32px;
 }
 
-.param-header { margin-bottom: 24px; }
+.param-header {
+    margin-bottom: 24px;
+}
 
 .param-title {
     font-size: 1.3rem;
@@ -46,7 +46,7 @@
     margin: 0;
 }
 
-/* ── Liste des cartes ── */
+/*  Liste des cartes  */
 .param-list {
     display: flex;
     flex-direction: column;
@@ -112,7 +112,7 @@
     padding: 28px 32px;
 }
 
-/* ── Header sous-page ── */
+/*  Header sous-page  */
 .param-subpage-header {
     display: flex;
     align-items: center;
@@ -146,7 +146,7 @@
     margin: 0;
 }
 
-/* ── Card section ── */
+/*  Card section  */
 .param-section-card {
     background: var(--white);
     border-radius: var(--radius);
@@ -172,7 +172,7 @@
 }
 .param-section-body { padding: 20px; }
 
-/* ── Avatar ── */
+/*  Avatar  */
 .param-avatar-row {
     display: flex;
     align-items: center;
@@ -204,7 +204,7 @@
     text-transform: capitalize;
 }
 
-/* ── Grille champs ── */
+/*  Grille champs  */
 .param-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -253,7 +253,7 @@
     margin-top: 2px;
 }
 
-/* ── Info box ── */
+/*  Info box  */
 .param-info-box {
     display: flex;
     align-items: center;
@@ -266,7 +266,7 @@
     margin-bottom: 18px;
 }
 
-/* ── Alertes ── */
+/*  Alertes  */
 .param-alert-success {
     display: flex;
     align-items: center;
@@ -294,7 +294,7 @@
     margin-bottom: 16px;
 }
 
-/* ── Toggle switch ── */
+/*  Toggle switch  */
 .param-toggle-list { display: flex; flex-direction: column; }
 .param-toggle-item {
     display: flex;
@@ -346,7 +346,7 @@
 .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
 .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
 
-/* ── Actions ── */
+/*  Actions  */
 .param-form-actions {
     display: flex;
     gap: 10px;
@@ -391,7 +391,7 @@
 }
 .param-btn-cancel:hover { border-color: var(--gray-300); color: var(--gray-700); }
 
-/* ── Responsive ── */
+/*  Responsive  */
 @media(max-width:640px) {
     .parametres-page  { padding: 16px; }
     .param-subpage    { padding: 16px; }

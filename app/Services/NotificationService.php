@@ -49,4 +49,11 @@ class NotificationService {
             self::envoyer($validateur->id, $message, $type, $projetId);
         }
     }
+
+    public static function notifierPlanificateurs($message, $type = 'info', $projetId = null) {
+        $planificateurs = User::where('role', 'planificateur')->where('actif', true)->get();
+        foreach ($planificateurs as $planificateur) {
+            self::envoyer($planificateur->id, $message, $type, $projetId);
+        }
+    }
 }

@@ -109,7 +109,9 @@
     </div>
 
     @if($notifications->hasPages())
-    {{-- <div class="notif-pagination">{{ $notifications->links() }}</div> --}}
+    <div class="notif-pagination">
+        {{ $notifications->links() }}
+    </div>
     @endif
 
     @else

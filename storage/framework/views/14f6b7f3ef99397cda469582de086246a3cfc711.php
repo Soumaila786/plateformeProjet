@@ -111,7 +111,10 @@
     </div>
 
     <?php if($notifications->hasPages()): ?>
-    
+    <div class="notif-pagination">
+        <?php echo e($notifications->links()); ?>
+
+    </div>
     <?php endif; ?>
 
     <?php else: ?>

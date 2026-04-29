@@ -18,6 +18,7 @@ class RedirectIfAuthenticated
                 case 'approbateur': return redirect('/approbateur/dashboard');
                 case 'validateur':  return redirect('/validateur/dashboard');
                 case 'porteur':     return redirect('/porteur/dashboard');
+                case 'planificateur': return redirect('/planificateur/dashboard');
                 default:            return redirect('/');
             }
         }

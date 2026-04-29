@@ -61,6 +61,7 @@
                             <option value="">— Sélectionner le rôle —</option>
                             {{-- <option value="admin"        {{ old('role') === 'admin'        ? 'selected' : '' }}>Administrateur</option> --}}
                             <option value="porteur"      {{ old('role') === 'porteur'      ? 'selected' : '' }}>Porteur de projet</option>
+                            <option value="planificateur" {{ old('role') === 'planificateur'      ? 'selected' : '' }}>Planificateur</option>
                             <option value="approbateur"  {{ old('role') === 'approbateur'  ? 'selected' : '' }}>Approbateur</option>
                             <option value="validateur"   {{ old('role') === 'validateur'   ? 'selected' : '' }}>Validateur</option>
                         </select>
@@ -133,6 +134,15 @@
                             </div>
                         </div>
 
+                        <div class="role-group d-none" id="planificateur-fields">
+                            <div class="form-col">
+                                <label>Service</label>
+                                <input  type="text"
+                                        name="service"
+                                        class="field-input">
+                            </div>
+                        </div>
+
                         {{-- VALIDATEUR --}}
                         <div class="role-group d-none" id="validateur-fields">
                             <div class="form-col">
@@ -174,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const groups = {
         porteur: document.getElementById('porteur-fields'),
         approbateur: document.getElementById('approbateur-fields'),
+        planificateur: document.getElementById('planificateur-fields'),
         validateur: document.getElementById('validateur-fields')
     };
 

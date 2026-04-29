@@ -20,7 +20,7 @@
 </div>
 
 
-<div class="kpi-grid">
+<div class="kpi-grid mt-3">
     <?php
         $kpiItems = [
             ['lbl'=>'Total projets', 'val'=>$kpis['total'],     'icon'=>'fa-folder',       'cls'=>''],
@@ -46,11 +46,11 @@
 </div>
 
 
-<div class="delai-grid">
+<div class="delai-grid mt-3">
     <div class="delai-card">
-        <i class="fas fa-stopwatch delai-ic"></i>
+        <i class="fas fa-stopwatch delai-ic mb-2"></i>
         <div>
-            <p class="delai-lbl">
+            <p class="delai-lbl mb-2">
                 Délai moyen approbation
             </p>
             <p class="delai-val">
@@ -62,23 +62,23 @@
     </div>
 
     <div class="delai-card">
-        <i class="fas fa-hourglass-half delai-ic"></i>
+        <i class="fas fa-hourglass-half delai-ic mb-2"></i>
         <div>
-            <p class="delai-lbl">Délai moyen validation</p>
+            <p class="delai-lbl mb-2">Délai moyen validation</p>
             <p class="delai-val"><?php echo e($delaiValid); ?><span> jours</span></p>
         </div>
     </div>
     <div class="delai-card delai-total">
-        <i class="fas fa-flag-checkered delai-ic"></i>
+        <i class="fas fa-flag-checkered delai-ic mb-2"></i>
         <div>
             <p class="delai-lbl">Délai total (soumission → validation)</p>
-            <p class="delai-val"><?php echo e($delaiTotal); ?><span> jours</span></p>
+            <p class="delai-val mt-2"><?php echo e($delaiTotal); ?><span> jours</span></p>
         </div>
     </div>
 </div>
 
 
-<div class="an-row-2">
+<div class="an-row-2 mt-3">
 
     
     <div class="an-card an-card-lg">
@@ -137,7 +137,7 @@
 </div>
 
 
-<div class="an-row-2">
+<div class="an-row-2 mt-3">
 
     
     <div class="an-card">
@@ -164,7 +164,7 @@
 </div>
 
 
-<div class="an-card">
+<div class="an-card mt-3">
     <div class="an-card-head">
         <h3 class="an-card-title">Top secteurs d'activité</h3>
         <p class="an-card-sub">Nombre de projets et montants demandés par secteur</p>
@@ -175,7 +175,7 @@
 </div>
 
 
-<div class="an-row-2">
+<div class="an-row-2 mt-3">
 
     
     <div class="an-card">
@@ -224,7 +224,7 @@
 </div>
 
 
-<div class="an-card" style="margin-bottom:0;">
+<div class="an-card mt-3" style="margin-bottom:0;">
     <div class="an-card-head">
         <h3 class="an-card-title">
             Projets en attente critique

@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\File;
+use Illuminate\Pagination\Paginator;
 use App\Models\Configuration;
 
 class AppServiceProvider extends ServiceProvider {
@@ -13,9 +15,11 @@ class AppServiceProvider extends ServiceProvider {
     }
 
     public function boot() {
-        
+
         // Fix: clé trop longue avec MySQL < 5.7.7
         Schema::defaultStringLength(191);
+
+        Paginator::useBootstrap();
 
         // Charger la config système et la partager avec TOUTES les vues
         try {
@@ -28,5 +32,6 @@ class AppServiceProvider extends ServiceProvider {
         } catch (\Exception $e) {
             View::share('sysConfig', collect());
         }
+
     }
 }

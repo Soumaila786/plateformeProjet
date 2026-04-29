@@ -1,14 +1,14 @@
 @extends('layouts.app')
 @section('title', 'Examen — ' . $projet->titre)
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/approbDash.css') }}">
+<link rel="stylesheet" href="{{ asset('css/approbateur.css') }}">
 @endpush
 
 @section('content')
-    <div class="vpage">
+<div class="aprob-page">
 
     {{-- Breadcrumb --}}
-    <div class="breadcrumb mb-3">
+    <div class="aprob-breadcrumb">
         <a href="{{ route('approbateur.dashboard') }}"><i class="fas fa-home"></i></a>
         <span>/</span>
         <a href="{{ route('approbateur.projets.index') }}">Projets</a>
@@ -16,207 +16,182 @@
         <span>{{ $projet->codeProjet }}</span>
     </div>
 
+    {{-- Flash --}}
+    @if(session('success'))
+    <div class="aprob-alert aprob-alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+    @endif
+
     {{-- Header --}}
     @php
-        $map = [
-            'soumis'    => ['lbl'=>'Soumis',   'dot'=>'#6366f1','bg'=>'#eef2ff','color'=>'#4338ca'],
-            'en_examen' => ['lbl'=>'En examen','dot'=>'#f97316','bg'=>'#fff7ed','color'=>'#c2410c'],
-            'approuve'  => ['lbl'=>'Approuvé', 'dot'=>'#22c55e','bg'=>'#f0fdf4','color'=>'#15803d'],
-            'rejete'    => ['lbl'=>'Rejeté',   'dot'=>'#ef4444','bg'=>'#fef2f2','color'=>'#b91c1c'],
-            'valide'    => ['lbl'=>'Validé',   'dot'=>'#0d9488','bg'=>'#f0fdfa','color'=>'#0f766e'],
-            'brouillon' => ['lbl'=>'Brouillon','dot'=>'#9ca3af','bg'=>'#f3f4f6','color'=>'#6b7280'],
+        $stMap = [
+            'soumis'    => ['lbl'=>'Soumis',    'cls'=>'aprob-badge-soumis',    'dot'=>'#6366f1'],
+            'en_examen' => ['lbl'=>'En examen', 'cls'=>'aprob-badge-en_examen', 'dot'=>'#f97316'],
+            'approuve'  => ['lbl'=>'Approuvé',  'cls'=>'aprob-badge-approuve',  'dot'=>'#22c55e'],
+            'rejete'    => ['lbl'=>'Rejeté',    'cls'=>'aprob-badge-rejete',    'dot'=>'#ef4444'],
+            'valide'    => ['lbl'=>'Validé',    'cls'=>'aprob-badge-valide',    'dot'=>'#0d9488'],
+            'brouillon' => ['lbl'=>'Brouillon', 'cls'=>'aprob-badge-brouillon', 'dot'=>'#9ca3af'],
         ];
-        $s = $map[$projet->statutProjet] ?? $map['soumis'];
+        $s = $stMap[$projet->statutProjet] ?? $stMap['soumis'];
     @endphp
 
-    <div class="show-header mb-4 mt-4">
+    <div class="aprob-header">
         <div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-                <span class="proj-code">{{ $projet->codeProjet }}</span>
-                <span class="status-badge" style="background:{{ $s['bg'] }};color:{{ $s['color'] }};">
-                    <span class="dot" style="background:{{ $s['dot'] }};"></span>{{ $s['lbl'] }}
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+                <span style="font-size:.7rem;font-weight:700;color:var(--aprob-text-light);
+                             text-transform:uppercase;letter-spacing:.05em;
+                             background:var(--aprob-bg-gray);padding:3px 10px;border-radius:20px;">
+                    {{ $projet->codeProjet }}
+                </span>
+                <span class="aprob-badge {{ $s['cls'] }}">
+                    <span class="aprob-dot" style="background:{{ $s['dot'] }};"></span>
+                    {{ $s['lbl'] }}
                 </span>
             </div>
-            <h1 class="show-title">{{ $projet->titre }}</h1>
-            <div class="show-meta">
-                <span><i class="fas fa-user"></i> {{ optional($projet->porteur)->nomComplet ?? '—' }}</span>
-                <span><i class="fas fa-tag"></i> {{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
-                <span><i class="fas fa-calendar"></i> Soumis le {{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</span>
-            </div>
+            <h1 class="aprob-header-title">{{ $projet->titre }}</h1>
+            <p class="aprob-header-sub" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:4px;">
+                <span><i class="fas fa-user" style="margin-right:4px;"></i>{{ optional($projet->porteur)->nomComplet ?? '—' }}</span>
+                <span><i class="fas fa-tag" style="margin-right:4px;"></i>{{ optional($projet->secteur)->nomSecteur ?? '—' }}</span>
+                @if($projet->dateSoumission)
+                <span><i class="fas fa-calendar" style="margin-right:4px;"></i>Soumis le {{ $projet->dateSoumission->format('d/m/Y') }}</span>
+                @endif
+            </p>
         </div>
-        <a href="{{ route('approbateur.projets.index') }}" class="btn-back">
+        <a href="{{ route('approbateur.projets.index') }}" class="aprob-btn-back">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
     </div>
 
     {{-- Barre d'actions --}}
-    <div class="actions-bar mb-4 mt-4">
+    <div class="aprob-actions-bar">
         @can('examiner', $projet)
         <form method="POST" action="{{ route('approbateur.projets.examiner', $projet) }}">
             @csrf
-            <button type="submit" class="action-btn action-orange">
+            <button type="submit" class="aprob-btn aprob-btn-orange">
                 <i class="fas fa-search"></i> Mettre en examen
             </button>
         </form>
         @endcan
 
         @can('approuver', $projet)
-        <button type="button" class="action-btn action-green" onclick="openModal('modalApprouver')">
+        <button type="button" class="aprob-btn aprob-btn-green"
+                onclick="openModal('modalApprouver')">
             <i class="fas fa-check-circle"></i> Approuver
         </button>
         @endcan
 
         @can('rejeter', $projet)
-        <button type="button" class="action-btn action-red" onclick="openModal('modalRejeter')">
+        <button type="button" class="aprob-btn aprob-btn-red"
+                onclick="openModal('modalRejeter')">
             <i class="fas fa-times-circle"></i> Rejeter
         </button>
         @endcan
 
-        @can('gererPlanification', $projet)
-        <a href="{{ route('approbateur.planification.create', $projet) }}" class="action-btn action-indigo">
-            <i class="fas fa-plus"></i> Ajouter une activité
-        </a>
-        @endcan
-
-        {{-- Export PDF --}}
         <a href="{{ route('approbateur.projets.export.pdf', $projet) }}"
-            class="action-btn" style="background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;"
-            target="_blank">
+           class="aprob-btn aprob-btn-gray" target="_blank">
             <i class="fas fa-file-pdf"></i> Exporter PDF
         </a>
     </div>
 
     {{-- Grille principale --}}
-    <div class="show-grid">
+    <div class="aprob-show-grid">
 
         {{-- Colonne principale --}}
-        <div class="show-main">
+        <div class="aprob-show-main">
 
             {{-- Infos générales --}}
-            <div class="info-card">
-                <h4 class="info-title"><i class="fas fa-info-circle"></i> Informations générales</h4>
-                <div class="info-grid-2">
-                    <div class="info-item">
-                        <p class="info-lbl">Secteur</p>
-                        <p class="info-val">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</p>
+            <div class="aprob-info-card">
+                <div class="aprob-info-card-head">
+                    <span class="aprob-info-card-title">
+                        <i class="fas fa-info-circle"></i> Informations générales
+                    </span>
+                </div>
+                <div class="aprob-info-grid">
+                    <div>
+                        <p class="aprob-info-lbl">Secteur</p>
+                        <p class="aprob-info-val">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</p>
                     </div>
-                    <div class="info-item">
-                        <p class="info-lbl">Durée</p>
-                        <p class="info-val">{{ $projet->duree ? $projet->duree.' mois' : '—' }}</p>
+                    <div>
+                        <p class="aprob-info-lbl">Durée</p>
+                        <p class="aprob-info-val">{{ $projet->duree ? $projet->duree.' mois' : '—' }}</p>
                     </div>
-                    <div class="info-item">
-                        <p class="info-lbl">Date début</p>
-                        <p class="info-val">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</p>
+                    <div>
+                        <p class="aprob-info-lbl">Date début</p>
+                        <p class="aprob-info-val">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</p>
                     </div>
-                    <div class="info-item">
-                        <p class="info-lbl">Date fin</p>
-                        <p class="info-val">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</p>
+                    <div>
+                        <p class="aprob-info-lbl">Date fin</p>
+                        <p class="aprob-info-val">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</p>
                     </div>
-                    <div class="info-item info-full">
-                        <p class="info-lbl">Objectif</p>
-                        <p class="info-val">{{ $projet->objectif ?? '—' }}</p>
+                    @if($projet->objectif)
+                    <div class="aprob-info-full">
+                        <p class="aprob-info-lbl">Objectif</p>
+                        <p class="aprob-info-val">{{ $projet->objectif }}</p>
                     </div>
-                    <div class="info-item info-full">
-                        <p class="info-lbl">Description</p>
-                        <p class="info-val" style="white-space:pre-line;">{{ $projet->description ?? '—' }}</p>
+                    @endif
+                    <div class="aprob-info-full">
+                        <p class="aprob-info-lbl">Description</p>
+                        <p class="aprob-info-val" style="white-space:pre-line;">{{ $projet->description ?? '—' }}</p>
                     </div>
                 </div>
             </div>
 
-            {{-- Planifications (activités) --}}
-            <div class="info-card">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <h4 class="info-title" style="margin:0;">
+            {{-- Planification — activités en CARDS avec border-left --}}
+            <div class="aprob-info-card">
+                <div class="aprob-info-card-head">
+                    <span class="aprob-info-card-title">
                         <i class="fas fa-tasks"></i> Planification
-                        <span class="info-count">{{ $projet->planifications->count() }}</span>
-                    </h4>
-                    @can('gererPlanification', $projet)
-                    <a href="{{ route('approbateur.planification.create', $projet) }}"
-                        class="btn-voir" style="background:#eef2ff;color:#6366f1;width:auto;padding:5px 10px;border-radius:7px;font-size:.74rem;font-weight:700;text-decoration:none;">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </a>
-                    @endcan
+                        <span class="aprob-info-count">{{ $projet->planifications->count() }}</span>
+                    </span>
                 </div>
 
                 @forelse($projet->planifications as $plan)
-                <div class="activite-item">
-                    <div class="activite-head">
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <div class="activite-num">{{ $loop->iteration }}</div>
-                            <p class="activite-titre">{{ $plan->activitePlanification }}</p>
-                        </div>
-                        @can('gererPlanification', $projet)
-                        <div style="display:flex;gap:6px;">
-                            <a href="{{ route('approbateur.planification.edit', [$projet, $plan]) }}"
-                                class="btn-voir" style="background:#eef2ff;color:#6366f1;">
-                                <i class="fas fa-pencil-alt"></i>
-                            </a>
-                            <form method="POST"
-                                    action="{{ route('approbateur.planification.destroy', [$projet, $plan]) }}"
-                                    onsubmit="return confirm('Supprimer cette activité ?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn-voir" style="background:#fef2f2;color:#dc2626;border:none;cursor:pointer;">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                        @endcan
+                <div class="aprob-activite-card">
+                    <div class="aprob-activite-head">
+                        <div class="aprob-activite-num">{{ $loop->iteration }}</div>
+                        <p class="aprob-activite-titre">{{ $plan->activitePlanification }}</p>
+                        @if($plan->coutEstimatif)
+                        <span class="aprob-activite-cout">
+                            <i class="fas fa-coins" style="font-size:.6rem;"></i>
+                            {{ number_format($plan->coutEstimatif, 0, ',', ' ') }} F CFA
+                        </span>
+                        @endif
                     </div>
 
-                    <div class="info-grid-2" style="margin-top:8px;">
+                    <div class="aprob-activite-details">
                         @if($plan->indicateur)
-                        <div class="info-item">
-                            <p class="info-lbl">Indicateur</p>
-                            <p class="info-val">{{ $plan->indicateur }}</p>
-                        </div>
-                        @endif
-                        @if($plan->uniteIndicateur)
-                        <div class="info-item">
-                            <p class="info-lbl">Unité</p>
-                            <p class="info-val">{{ $plan->uniteIndicateur }}</p>
+                        <div>
+                            <span class="aprob-activite-detail-lbl">Indicateur : </span>
+                            <span class="aprob-activite-detail-val">
+                                {{ $plan->indicateur }}
+                                @if($plan->uniteIndicateur) ({{ $plan->uniteIndicateur }}) @endif
+                            </span>
                         </div>
                         @endif
                         @if($plan->periode)
-                        <div class="info-item">
-                            <p class="info-lbl">Période</p>
-                            <p class="info-val">{{ $plan->periode }}</p>
-                        </div>
-                        @endif
-                        @if($plan->coutEstimatif)
-                        <div class="info-item">
-                            <p class="info-lbl">Coût estimatif</p>
-                            <p class="info-val" style="font-weight:700;">
-                                {{ number_format($plan->coutEstimatif, 0, ',', ' ') }} F CFA
-                            </p>
+                        <div>
+                            <span class="aprob-activite-detail-lbl">Période : </span>
+                            <span class="aprob-activite-detail-val">{{ $plan->periode }}</span>
                         </div>
                         @endif
                         @if($plan->resultatsAttendues)
-                        <div class="info-item info-full">
-                            <p class="info-lbl">Résultats attendus</p>
-                            <p class="info-val">{{ $plan->resultatsAttendues }}</p>
+                        <div class="aprob-activite-detail-full">
+                            <span class="aprob-activite-detail-lbl">Résultats attendus : </span>
+                            <span class="aprob-activite-detail-val">{{ $plan->resultatsAttendues }}</span>
                         </div>
                         @endif
                     </div>
                 </div>
                 @empty
-                <div class="empty-state" style="padding:20px;">
+                <div class="aprob-empty" style="padding:24px;">
                     <i class="fas fa-calendar-plus"></i>
                     <p>Aucune activité planifiée pour ce projet.</p>
-                    @can('gererPlanification', $projet)
-                    <a href="{{ route('approbateur.planification.create', $projet) }}"
-                        class="btn-valider" style="width:auto;padding:8px 16px;margin-top:8px;">
-                        <i class="fas fa-plus"></i> Ajouter une activité
-                    </a>
-                    @endcan
                 </div>
                 @endforelse
 
-                {{-- Total coût --}}
                 @if($projet->planifications->count() > 0)
-                <div style="margin-top:10px;padding-top:10px;border-top:1px solid #f3f4f6;
-                            display:flex;justify-content:flex-end;">
-                    <span style="font-size:.8rem;color:#6b7280;">Total estimé :&nbsp;</span>
-                    <span style="font-size:.85rem;font-weight:800;color:#111827;">
+                <div class="aprob-total-bar">
+                    <span class="aprob-total-label">Total estimé :</span>
+                    <span class="aprob-total-val">
                         {{ number_format($projet->planifications->sum('coutEstimatif'), 0, ',', ' ') }} F CFA
                     </span>
                 </div>
@@ -225,54 +200,55 @@
 
             {{-- Documents --}}
             @if($projet->documents->count())
-            <div class="info-card">
-                <h4 class="info-title">
-                    <i class="fas fa-paperclip"></i> Documents
-                    <span class="info-count">{{ $projet->documents->count() }}</span>
-                </h4>
-                <div class="docs-list">
+            <div class="aprob-info-card">
+                <div class="aprob-info-card-head">
+                    <span class="aprob-info-card-title">
+                        <i class="fas fa-paperclip"></i> Documents
+                        <span class="aprob-info-count">{{ $projet->documents->count() }}</span>
+                    </span>
+                </div>
+                <div class="aprob-docs-list">
                     @foreach($projet->documents as $doc)
-                    <a href="{{ asset('storage/'.$doc->cheminFichier) }}" target="_blank" class="doc-item">
+                    <a href="{{ asset('storage/'.$doc->cheminFichier) }}" target="_blank" class="aprob-doc-item">
                         <i class="fas fa-file-alt"></i>
                         <span>{{ $doc->nomFichier ?? basename($doc->cheminFichier) }}</span>
-                        <i class="fas fa-external-link-alt doc-ext"></i>
+                        <i class="fas fa-external-link-alt" style="font-size:.65rem;color:var(--aprob-text-light);"></i>
                     </a>
                     @endforeach
                 </div>
             </div>
             @endif
 
-            {{-- Historique commentaires --}}
+            {{-- Commentaires --}}
             @if($projet->commentaires->count())
-            <div class="info-card">
-                <h4 class="info-title">
-                    <i class="fas fa-comments"></i> Historique des commentaires du projet
-                    <span class="info-count">{{ $projet->commentaires->count() }}</span>
-                </h4>
-                <div class="comments-list">
+            <div class="aprob-info-card">
+                <div class="aprob-info-card-head">
+                    <span class="aprob-info-card-title">
+                        <i class="fas fa-comments"></i> Historique
+                        <span class="aprob-info-count">{{ $projet->commentaires->count() }}</span>
+                    </span>
+                </div>
+                <div class="aprob-comments-list">
                     @foreach($projet->commentaires->sortByDesc('dateEnvoi') as $com)
                     @php
                         $comMap = [
-                            'approbation' => ['icon'=>'fa-check-circle',      'color'=>'#16a34a'],
-                            'rejet'       => ['icon'=>'fa-times-circle',      'color'=>'#dc2626'],
-                            'demande'     => ['icon'=>'fa-exclamation-circle','color'=>'#d97706'],
-                            'examen'      => ['icon'=>'fa-search',            'color'=>'#6366f1'],
-                            'info'        => ['icon'=>'fa-info-circle',       'color'=>'#2563eb'],
+                            'approbation' => ['icon'=>'fa-check-circle',       'color'=>'#16a34a'],
+                            'rejet'       => ['icon'=>'fa-times-circle',       'color'=>'#dc2626'],
+                            'demande'     => ['icon'=>'fa-exclamation-circle', 'color'=>'#d97706'],
+                            'info'        => ['icon'=>'fa-info-circle',        'color'=>'#2563eb'],
                         ];
                         $cm = $comMap[$com->typeCommentaire] ?? ['icon'=>'fa-comment','color'=>'#6b7280'];
                     @endphp
-                    <div class="comment-item">
-                        <div class="comment-avatar" style="background:{{ $cm['color'] }}18;color:{{ $cm['color'] }};">
+                    <div class="aprob-comment-item">
+                        <div class="aprob-comment-avatar" style="background:{{ $cm['color'] }}18;color:{{ $cm['color'] }};">
                             <i class="fas {{ $cm['icon'] }}"></i>
                         </div>
-                        <div class="comment-body">
-                            <div class="comment-head">
-                                <span class="comment-author">
-                                    <small style="color:#9ca3af;font-weight:400;">· {{ optional($com->utilisateur)->role ?? '' }}</small>
-                                </span>
-                                <span class="comment-date">{{ optional($com->dateEnvoi)->format('d/m/Y H:i') }}</span>
+                        <div class="aprob-comment-body">
+                            <div class="aprob-comment-head">
+                                <span class="aprob-comment-role">{{ optional($com->utilisateur)->role ?? '—' }}</span>
+                                <span class="aprob-comment-date">{{ optional($com->dateEnvoi)->format('d/m/Y H:i') }}</span>
                             </div>
-                            <p class="comment-text">{{ $com->message }}</p>
+                            <p class="aprob-comment-text">{{ $com->message }}</p>
                         </div>
                     </div>
                     @endforeach
@@ -282,64 +258,70 @@
 
         </div>
 
-        {{-- Sidebar --}}
-        <div class="show-aside">
+        {{-- Aside --}}
+        <div class="aprob-show-aside">
 
             {{-- Budget --}}
-            <div class="aside-card">
-                <h4 class="info-title"><i class="fas fa-wallet"></i> Budget</h4>
-                <div class="fin-rows">
-                    <div class="fin-row">
-                        <span>Budget total : </span>
+            <div class="aprob-aside-card">
+                <p class="aprob-aside-title"><i class="fas fa-wallet"></i> Budget</p>
+                <div class="aprob-fin-rows">
+                    <div class="aprob-fin-row">
+                        <span>Budget total</span>
                         <strong>{{ number_format($projet->budgetTotal ?? 0, 0, ',', ' ') }} F CFA</strong>
                     </div>
-                    <div class="fin-row">
-                        <span>Montant demandé : </span>
+                    <div class="aprob-fin-row">
+                        <span>Montant demandé</span>
                         <strong>{{ number_format($projet->montantDemande ?? 0, 0, ',', ' ') }} F CFA</strong>
                     </div>
-                    <div class="fin-row">
-                        <span>Durée : </span>
+                    <div class="aprob-fin-row">
+                        <span>Durée</span>
                         <strong>{{ $projet->duree ?? '—' }} mois</strong>
                     </div>
                     @if($projet->planifications->count())
-                    <div class="fin-row">
-                        <span>Coût planifié : </span>
-                        <strong>{{ number_format($projet->planifications->sum('coutEstimatif'), 0, ',', ' ') }} F CFA</strong>
+                    <div class="aprob-fin-row">
+                        <span>Coût planifié</span>
+                        <strong style="color:var(--aprob-primary);">
+                            {{ number_format($projet->planifications->sum('coutEstimatif'), 0, ',', ' ') }} F CFA
+                        </strong>
                     </div>
                     @endif
                 </div>
             </div>
 
             {{-- Porteur --}}
-            <div class="aside-card">
-                <h4 class="info-title"><i class="fas fa-user"></i> Porteur</h4>
-                <div class="porteur-block">
-                    <div class="porteur-avatar">
+            <div class="aprob-aside-card">
+                <p class="aprob-aside-title"><i class="fas fa-user"></i> Porteur</p>
+                <div class="aprob-porteur-block">
+                    <div class="aprob-porteur-avatar">
                         {{ strtoupper(substr(optional($projet->porteur)->nomComplet ?? 'P', 0, 1)) }}
                     </div>
                     <div>
-                        <p class="porteur-name">{{ optional($projet->porteur)->nomComplet ?? '—' }}</p>
-                        <p class="porteur-email">{{ optional($projet->porteur)->email ?? '—' }}</p>
+                        <p class="aprob-porteur-name">{{ optional($projet->porteur)->nomComplet ?? '—' }}</p>
+                        <p class="aprob-porteur-email">{{ optional($projet->porteur)->email ?? '—' }}</p>
                     </div>
                 </div>
             </div>
 
             {{-- Zone décision --}}
             @if(in_array($projet->statutProjet, ['soumis','en_examen']))
-            <div class="aside-card" style="border-color:#e0e7ff;">
-                <h4 class="info-title" style="color:#4338ca;">
-                    <i class="fas fa-gavel" style="color:#6366f1;"></i> Décision
-                </h4>
-                <p style="font-size:.74rem;color:#9ca3af;margin:0 0 12px;">
+            <div class="aprob-aside-card aprob-decision-card">
+                <p class="aprob-aside-title" style="color:var(--aprob-primary-hover);">
+                    <i class="fas fa-gavel"></i> Décision
+                </p>
+                <p style="font-size:.73rem;color:var(--aprob-text-muted);margin:0 0 10px;">
                     Approuvez ou rejetez après examen complet.
                 </p>
                 @can('approuver', $projet)
-                <button onclick="openModal('modalApprouver')" class="btn-valider" style="margin-bottom:8px;">
+                <button onclick="openModal('modalApprouver')"
+                        class="aprob-btn aprob-btn-green"
+                        style="width:100%;justify-content:center;margin-bottom:8px;">
                     <i class="fas fa-check-circle"></i> Approuver
                 </button>
                 @endcan
                 @can('rejeter', $projet)
-                <button onclick="openModal('modalRejeter')" class="btn-rejeter">
+                <button onclick="openModal('modalRejeter')"
+                        class="aprob-btn aprob-btn-red"
+                        style="width:100%;justify-content:center;">
                     <i class="fas fa-times-circle"></i> Rejeter
                 </button>
                 @endcan
@@ -348,14 +330,14 @@
 
             {{-- Statut final --}}
             @if(in_array($projet->statutProjet, ['approuve','rejete','valide']))
-            <div class="aside-card">
-                <h4 class="info-title"><i class="fas fa-flag-checkered"></i> Décision</h4>
-                <div class="decision-badge {{ in_array($projet->statutProjet, ['approuve','valide']) ? 'decision-valide' : 'decision-rejete' }}">
+            <div class="aprob-aside-card">
+                <p class="aprob-aside-title"><i class="fas fa-flag-checkered"></i> Décision finale</p>
+                <div class="aprob-decision-badge {{ in_array($projet->statutProjet, ['approuve','valide']) ? 'aprob-decision-valide' : 'aprob-decision-rejete' }}">
                     <i class="fas {{ $projet->statutProjet === 'rejete' ? 'fa-times-circle' : 'fa-check-circle' }}"></i>
                     Projet {{ $s['lbl'] }}
                 </div>
                 @if($projet->dateApprobation)
-                <p class="decision-date">
+                <p class="aprob-decision-date">
                     <i class="fas fa-calendar-check"></i>
                     {{ optional($projet->dateApprobation)->format('d/m/Y') }}
                 </p>
@@ -366,77 +348,87 @@
         </div>
     </div>
 
-    </div>
+</div>
 
-    {{-- Modal Approuver --}}
-    <div id="modalApprouver" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-head">
-                <h3 class="modal-title"><i class="fas fa-check-circle" style="color:#22c55e;"></i> Approuver le projet</h3>
-                <button onclick="closeModal('modalApprouver')" class="modal-close"><i class="fas fa-times"></i></button>
-            </div>
-            <form method="POST" action="{{ route('approbateur.projets.approuver', $projet) }}">
-                @csrf
-                <div class="modal-body">
-                    <p style="font-size:.82rem;color:#6b7280;margin:0 0 12px;">
-                        Le projet sera transmis au validateur.
-                    </p>
-                    <div class="form-group">
-                        <label class="form-label">Commentaire (optionnel)</label>
-                        <textarea name="commentaire" class="form-textarea" rows="3"
-                                    placeholder="Observations..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-foot">
-                    <button type="button" onclick="closeModal('modalApprouver')" class="btn-cancel">Annuler</button>
-                    <button type="submit" class="btn-valider" style="width:auto;padding:9px 20px;">
-                        <i class="fas fa-check-circle"></i> Confirmer
-                    </button>
-                </div>
-            </form>
+{{-- Modal Approuver --}}
+<div id="modalApprouver" class="aprob-modal-overlay">
+    <div class="aprob-modal-box">
+        <div class="aprob-modal-head">
+            <h3 class="aprob-modal-title">
+                <i class="fas fa-check-circle" style="color:#22c55e;"></i> Approuver le projet
+            </h3>
+            <button onclick="closeModal('modalApprouver')" class="aprob-modal-close">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-    </div>
-
-    {{-- Modal Rejeter --}}
-    <div id="modalRejeter" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-head">
-                <h3 class="modal-title"><i class="fas fa-times-circle" style="color:#ef4444;"></i> Rejeter le projet</h3>
-                <button onclick="closeModal('modalRejeter')" class="modal-close"><i class="fas fa-times"></i></button>
+        <form method="POST" action="{{ route('approbateur.projets.approuver', $projet) }}">
+            @csrf
+            <div class="aprob-modal-body">
+                <p style="font-size:.82rem;color:#6b7280;margin:0;">
+                    Le projet sera transmis au validateur.
+                </p>
+                <div class="aprob-form-group">
+                    <label class="aprob-form-label">Commentaire (optionnel)</label>
+                    <textarea name="commentaire" class="aprob-form-textarea" rows="3"
+                              placeholder="Observations..."></textarea>
+                </div>
             </div>
-            <form method="POST" action="{{ route('approbateur.projets.rejeter', $projet) }}">
-                @csrf
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Motif du rejet <span style="color:#ef4444;">*</span></label>
-                        <textarea name="motifRejet" class="form-textarea form-textarea-danger" rows="3"
-                                    placeholder="Expliquez le motif..." required></textarea>
-                        @error('motifRejet')<p class="form-error">{{ $message }}</p>@enderror
-                    </div>
-                </div>
-                <div class="modal-foot">
-                    <button type="button" onclick="closeModal('modalRejeter')" class="btn-cancel">Annuler</button>
-                    <button type="submit" class="btn-rejeter" style="width:auto;">
-                        <i class="fas fa-times-circle"></i> Confirmer le rejet
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="aprob-modal-foot">
+                <button type="button" onclick="closeModal('modalApprouver')"
+                        class="aprob-btn aprob-btn-gray">Annuler</button>
+                <button type="submit" class="aprob-btn aprob-btn-green">
+                    <i class="fas fa-check-circle"></i> Confirmer
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
-    @push('scripts')
-        <script>
-            function openModal(id) {
-                document.getElementById(id).classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-            function closeModal(id) {
-                document.getElementById(id).classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            document.querySelectorAll('.modal-overlay').forEach(m => {
-                m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
-            });
-        </script>
-    @endpush
+{{-- Modal Rejeter --}}
+<div id="modalRejeter" class="aprob-modal-overlay">
+    <div class="aprob-modal-box">
+        <div class="aprob-modal-head">
+            <h3 class="aprob-modal-title">
+                <i class="fas fa-times-circle" style="color:#ef4444;"></i> Rejeter le projet
+            </h3>
+            <button onclick="closeModal('modalRejeter')" class="aprob-modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form method="POST" action="{{ route('approbateur.projets.rejeter', $projet) }}">
+            @csrf
+            <div class="aprob-modal-body">
+                <div class="aprob-form-group">
+                    <label class="aprob-form-label">Motif du rejet <span style="color:#ef4444;">*</span></label>
+                    <textarea name="motifRejet" class="aprob-form-textarea danger" rows="3"
+                              placeholder="Expliquez le motif..." required></textarea>
+                    @error('motifRejet')<p class="aprob-form-error">{{ $message }}</p>@enderror
+                </div>
+            </div>
+            <div class="aprob-modal-foot">
+                <button type="button" onclick="closeModal('modalRejeter')"
+                        class="aprob-btn aprob-btn-gray">Annuler</button>
+                <button type="submit" class="aprob-btn aprob-btn-red">
+                    <i class="fas fa-times-circle"></i> Confirmer le rejet
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    document.body.style.overflow = '';
+}
+document.querySelectorAll('.aprob-modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+});
+</script>
+@endpush
 @endsection

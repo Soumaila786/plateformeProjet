@@ -165,6 +165,7 @@
 
                 @endif
 
+
                 @if ($user->role === 'approbateur')
                 <div class="info-item">
                     <span class="info-label">Service</span>
@@ -180,6 +181,15 @@
                     </span>
                 </div>
 
+                @endif
+
+                @if ($user->role === 'planificateur')
+                    <div class="info-item">
+                        <span class="info-label">Service</span>
+                        <span class="info-value">
+                            {{ $user->planificateur->service ?? '—' }}
+                        </span>
+                    </div>
                 @endif
 
             </div>

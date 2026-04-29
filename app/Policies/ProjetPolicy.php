@@ -18,6 +18,8 @@ class ProjetPolicy {
                 return true;
             case 'porteur':
                 return $projet->user_id === $user->id;
+            case 'planificateur':
+                return true;
             default:
                 return false;
         }
@@ -138,14 +140,20 @@ class ProjetPolicy {
             && !in_array($projet->statutProjet, ['approuve', 'valide']);
     }
 
-    // Gérer la PLANIFICATION (approbateur seulement)
+    // Gérer la planification
     public function gererPlanification(User $user, Projet $projet) {
-
-        // L'approbateur planifie sur les projets soumis, en examen ou approuvés
-        return $user->role === 'approbateur'
-            && in_array($projet->statutProjet, ['soumis', 'en_examen', 'approuve']);
+        if ($user->role === 'porteur') {
+            return $projet->user_id === $user->id
+                && !in_array($projet->statutProjet, ['approuve', 'valide']);
+        }
+        // Planificateur : peut planifier tant que la demande a été faite
+        // On ne vérifie plus planification_demandee ici — on le gère dans le controller
+        if ($user->role === 'planificateur') {
+            return true; // accès filtré par le controller (index = demandes, show = tous)
+        }
+        return false;
     }
-
+    
     // Voir la planification
     public function voirPlanification(User $user, Projet $projet) {
 

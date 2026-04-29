@@ -37,7 +37,7 @@
             </a>
         </li>
 
-        {{-- ══ ADMIN ══ --}}
+        {{-- ADMIN --}}
         @if($role === 'admin')
             <li class="nav-item">
                 <a href="{{ route('admin.analytique') }}"
@@ -89,7 +89,7 @@
             </li>
         @endif
 
-        {{-- ══ PORTEUR ══ --}}
+        {{-- PORTEUR --}}
         @if($role === 'porteur')
             <li class="nav-item">
                 <a href="{{ route('porteur.projets.index') }}"
@@ -121,10 +121,10 @@
                         <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
                     @endif
                 </a>
-            </li>
+            </li> 
         @endif
 
-        {{-- ══ APPROBATEUR ══ --}}
+        {{-- APPROBATEUR --}}
         @if($role === 'approbateur')
             <li class="nav-item">
                 <a href="{{ route('approbateur.analytique') }}"
@@ -167,7 +167,7 @@
             </li>
         @endif
 
-        {{-- ══ VALIDATEUR ══ --}}
+        {{-- VALIDATEUR --}}
         @if($role === 'validateur')
             <li class="nav-item">
                 <a href="{{ route('validateur.analytique') }}"
@@ -210,7 +210,42 @@
             </li>
         @endif
 
-        {{-- ══ COMMUN ══ --}}
+        {{-- PLANIFICATEUR --}}
+        @if($role === 'planificateur')
+            <li class="nav-item">
+                <a href="{{ route('planificateur.projets.index') }}"
+                    class="nav-link {{ request()->routeIs('planificateur.projets.index') ? 'active' : '' }}"
+                    data-tooltip="Projets à traiter">
+                    <i class="fas fa-inbox"></i>
+                    <span>Projets à traiter</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('planificateur.projets.traites') }}"
+                    class="nav-link {{ request()->routeIs('planificateur.projets.traites') ? 'active' : '' }}"
+                    data-tooltip="Projets traités">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Projets traités</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                @php
+                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
+                        ->where('statut', 'non_lu')->count();
+                @endphp
+                <a href="{{ route('planificateur.notifications.index') }}"
+                    class="nav-link {{ request()->routeIs('planificateur.notifications*') ? 'active' : '' }}"
+                    data-tooltip="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    @if($notifCount > 0)
+                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                    @endif
+                </a>
+            </li>
+        @endif
+
+        {{-- COMMUN --}}
 
         <li class="nav-item">
             <a href="{{ route('parametres.index') }}"

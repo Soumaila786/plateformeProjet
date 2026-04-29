@@ -27,7 +27,14 @@
                     placeholder="Rechercher par nom, email..." value="<?php echo e(request('search')); ?>">
         </div>
         <div class="ulist-role-filters">
-            <?php $__currentLoopData = ['' => 'Tous', 'admin' => 'Admin', 'porteur' => 'Porteur', 'approbateur' => 'Approbateur', 'validateur' => 'Validateur']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php $__currentLoopData = [
+                '' => 'Tous',
+                'admin' => 'Admin',
+                'porteur' => 'Porteur',
+                'approbateur' => 'Approbateur',
+                'planificateur' => 'Planificateur',
+                'validateur' => 'Validateur'
+            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <a href="<?php echo e(route('admin.users.index', array_merge(request()->query(), ['role' => $val]))); ?>"
                 class="ulist-role-pill <?php echo e(request('role', '') === $val ? 'active' : ''); ?>">
                 <?php echo e($label); ?>

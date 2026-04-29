@@ -20,7 +20,7 @@
 </div>
 
 {{-- Stats projets --}}
-<div class="adm-stats">
+<div class="adm-stats mb-2">
     @php
         $statItems = [
             ['lbl'=>'Total projets', 'val'=>$totalProjets,     'icon'=>'fa-folder',       'hint'=>'Tous confondus'],

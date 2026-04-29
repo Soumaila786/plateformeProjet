@@ -18,13 +18,13 @@ class AnalytiqueController extends Controller {
 
             // 1. KPIs
             $kpis = [
-            'total'     => Projet::count(),
-            'brouillon' => Projet::where('statutProjet', 'brouillon')->count(),
-            'soumis'    => Projet::where('statutProjet', 'soumis')->count(),
-            'en_examen' => Projet::where('statutProjet', 'en_examen')->count(),
-            'approuve'  => Projet::where('statutProjet', 'approuve')->count(),
-            'rejete'    => Projet::where('statutProjet', 'rejete')->count(),
-            'valide'    => Projet::where('statutProjet', 'valide')->count(),
+                'total'     => Projet::count(),
+                'brouillon' => Projet::where('statutProjet', 'brouillon')->count(),
+                'soumis'    => Projet::where('statutProjet', 'soumis')->count(),
+                'en_examen' => Projet::where('statutProjet', 'en_examen')->count(),
+                'approuve'  => Projet::where('statutProjet', 'approuve')->count(),
+                'rejete'    => Projet::where('statutProjet', 'rejete')->count(),
+                'valide'    => Projet::where('statutProjet', 'valide')->count(),
             ];
 
             // 2. ENTONNOIR
@@ -85,19 +85,20 @@ class AnalytiqueController extends Controller {
             // 6. DÉLAIS MOYENS
             $rawAppro = Projet::whereNotNull('dateApprobation')
                 ->whereNotNull('dateSoumission')
-                ->selectRaw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(dateApprobation, dateSoumission))) as moy')
                 ->value('moy');
+
             $delaiAppro = round((float)($rawAppro ?? 0), 1);
 
             $rawValid = Projet::whereNotNull('validated_at')
                 ->whereNotNull('dateApprobation')
-                ->selectRaw('AVG(DATEDIFF(validated_at, dateApprobation)) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(validated_at, dateApprobation))) as moy')
                 ->value('moy');
             $delaiValid = round((float)($rawValid ?? 0), 1);
 
             $rawTotal = Projet::whereNotNull('validated_at')
                 ->whereNotNull('dateSoumission')
-                ->selectRaw('AVG(DATEDIFF(validated_at, dateSoumission)) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(validated_at, dateSoumission))) as moy')
                 ->value('moy');
             $delaiTotal = round((float)($rawTotal ?? 0), 1);
 
