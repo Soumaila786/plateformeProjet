@@ -17,8 +17,7 @@ class ProjetController extends Controller {
     public function index(Request $request) {
 
         try{
-            $query = Projet::with('secteur')
-                        ->where('user_id', Auth::id());
+            $query = Projet::with('secteur')->where('user_id', Auth::id());
 
             // Filtre statut
             if ($request->filled('statut')) {
@@ -387,9 +386,11 @@ class ProjetController extends Controller {
                 'planification_demandee' => true,
             ]);
 
+            $user = Auth::user();
+
             // Notifier les PLANIFICATEURS (plus les approbateurs)
             NotificationService::notifierPlanificateurs(
-                'Le porteur demande une planification pour le projet « ' . $projet->titre . ' » (' . $projet->codeProjet . ').',
+                $user->nomComplet.' demande une planification pour le projet « ' . $projet->titre . ' » (' . $projet->codeProjet . ').',
                 'info',
                 $projet->id
             );

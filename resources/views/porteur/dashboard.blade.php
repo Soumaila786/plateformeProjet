@@ -1,5 +1,7 @@
 @extends('layouts.app')
+
 @section('title', 'Tableau de bord')
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/porteur.css') }}">
 @endpush

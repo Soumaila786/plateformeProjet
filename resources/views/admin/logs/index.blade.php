@@ -43,7 +43,6 @@
                         'info'    => ['lbl'=>'INFO',    'cls'=>'lp-info'],
                         'warning' => ['lbl'=>'WARNING', 'cls'=>'lp-warning'],
                         'error'   => ['lbl'=>'ERROR',   'cls'=>'lp-error'],
-                        'debug'   => ['lbl'=>'DEBUG',   'cls'=>'lp-debug'],
                     ];
                 @endphp
                 @foreach($niveaux as $val => $n)

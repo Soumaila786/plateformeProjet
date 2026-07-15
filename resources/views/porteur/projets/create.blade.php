@@ -40,22 +40,22 @@
                     <div class="form-col form-col-full">
                         <label class="field-label">Titre <span class="required">*</span></label>
                         <input type="text" name="titre" value="{{ old('titre') }}"
-                                class="field-input @error('titre') is-invalid @enderror"
-                                placeholder="Titre du projet" required>
+                            class="field-input @error('titre') is-invalid @enderror"
+                            placeholder="Titre du projet" required>
                         @error('titre')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-col form-col-full">
                         <label class="field-label">Description <span class="required">*</span></label>
                         <textarea name="description" rows="3"
-                                    class="field-input field-textarea @error('description') is-invalid @enderror"
-                                    placeholder="Description du projet..." required>{{ old('description') }}</textarea>
+                            class="field-input field-textarea @error('description') is-invalid @enderror"
+                            placeholder="Description du projet..." required>{{ old('description') }}</textarea>
                         @error('description')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-col form-col-full">
                         <label class="field-label">Objectif</label>
                         <textarea name="objectif" rows="2"
-                                    class="field-input field-textarea @error('objectif') is-invalid @enderror"
-                                    placeholder="Objectif principal...">{{ old('objectif') }}</textarea>
+                            class="field-input field-textarea @error('objectif') is-invalid @enderror"
+                            placeholder="Objectif principal...">{{ old('objectif') }}</textarea>
                         @error('objectif')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="form-col">
@@ -155,12 +155,12 @@
         {{-- Les actions --}}
         <div class="form-actions">
             <a href="{{ route('porteur.projets.index') }}" class="btn-cancel">Annuler</a>
-            <button type="submit" name="action" value="brouillon" class="btn-cancel">
+            {{-- <button type="submit" name="action" value="brouillon" class="btn-cancel">
                 <i class="fas fa-save"></i> Enregistrer en brouillon
-            </button>
-            <button type="submit" name="action" value="soumettre" class="btn-save"
-                    onclick="return confirm('Soumettre ce projet ? Vous ne pourrez plus le modifier.')">
-                <i class="fas fa-paper-plane"></i> Enregistrer et soumettre
+            </button> --}}
+            <button type="submit" name="action" value="brouillon" class="btn-save"
+                    onclick="return confirm('Enregistrer ce projet.')">
+                <i class="fas fa-paper-plane"></i> Enregistrer projet
             </button>
         </div>
 

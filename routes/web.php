@@ -9,7 +9,6 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SecteurController;
 use App\Http\Controllers\Admin\ProjetController;
-// use App\Http\Controllers\Admin\ActiviteController;
 use App\Http\Controllers\ParametreController;
 use App\Http\Controllers\Admin\LogController;
 
@@ -87,14 +86,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('projets/{projet}/documents/{document}', [ProjetController::class, 'destroyDocument'])->name('projets.documents.destroy');
         Route::get('projets/{projet}/documents/{document}/download', [ProjetController::class, 'downloadDocument'])->name('projets.documents.download');
 
-        // activites
-        // Route::post('projets/{projet}/activites', [ActiviteController::class, 'store'])
-        //     ->name('projets.activites.store');
-        // Route::delete('projets/{projet}/activites/{activite}', [ActiviteController::class, 'destroy'])
-        //     ->name('projets.activites.destroy');
-
         // Configuration du système
-
         Route::get('/configuration',  [App\Http\Controllers\Admin\ConfigurationController::class, 'index'])->name('configuration.index');
         Route::put('/configuration',  [App\Http\Controllers\Admin\ConfigurationController::class, 'update'])->name('configuration.update');
         Route::post('/configuration/{cle}/reset', [App\Http\Controllers\Admin\ConfigurationController::class, 'reset']) ->name('configuration.reset');
@@ -212,7 +204,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     });
-    
+
 
     // Planificateur
     Route::middleware('role:planificateur')->prefix('planificateur')->name('planificateur.')->group(function () {

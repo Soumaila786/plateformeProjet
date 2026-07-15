@@ -42,7 +42,6 @@
                         'info'    => ['lbl'=>'INFO',    'cls'=>'lp-info'],
                         'warning' => ['lbl'=>'WARNING', 'cls'=>'lp-warning'],
                         'error'   => ['lbl'=>'ERROR',   'cls'=>'lp-error'],
-                        'debug'   => ['lbl'=>'DEBUG',   'cls'=>'lp-debug'],
                     ];
                 ?>
                 <?php $__currentLoopData = $niveaux; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $val => $n): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -198,4 +197,5 @@
 
 </div>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/admin/logs/index.blade.php ENDPATH**/ ?>

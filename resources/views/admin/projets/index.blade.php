@@ -10,15 +10,17 @@
 
 <div class="projets-page">
 
-    {{-- ── Header ── --}}
+    {{--Header--}}
     <div class="projets-header">
         <div>
             <h1 class="projets-title">Projets</h1>
-            <p class="projets-subtitle">{{ $projets->total() }} projet{{ $projets->total() > 1 ? 's' : '' }} au total</p>
+            <p class="projets-subtitle">
+                {{ $projets->total() }} projet{{ $projets->total() > 1 ? 's' : '' }} au total
+            </p>
         </div>
     </div>
 
-    {{-- ── Filtres ── --}}
+    {{--Filtres--}}
     <div class="projets-filters">
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
@@ -47,7 +49,7 @@
         </div>
     </div>
 
-    {{-- ── Cards ── --}}
+    {{--Cards--}}
     @forelse($projets as $projet)
     @php
         $sc = [
@@ -128,16 +130,9 @@
     </div>
     @endforelse
 
-    {{-- @if($projets->hasPages())
-    <div class="projets-pagination">
-        {{ $projets->withQueryString()->links() }}
-    </div>
-    @endif --}}
-
 </div>
 
-{{-- ── Modal Changer Statut ── --}}
-<div class="modal-overlay" id="modalStatut">
+{{--Modal Changer Statut<div class="modal-overlay" id="modalStatut">
     <div class="modal-box">
         <div class="modal-header">
             <h3>Changer le statut</h3>
@@ -166,7 +161,7 @@
             </div>
         </form>
     </div>
-</div>
+</div> --}}
 
 @push('scripts')
 <script>

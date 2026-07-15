@@ -42,8 +42,8 @@
         <div class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input type="text" id="searchInput" class="search-input"
-                   placeholder="Rechercher par titre ou code..."
-                   value="{{ request('search') }}">
+                placeholder="Rechercher par titre ou code..."
+                value="{{ request('search') }}">
         </div>
         <div class="status-filters">
             @php
@@ -59,7 +59,7 @@
             @endphp
             @foreach($statuts as $val => $label)
             <a href="{{ route('porteur.projets.index', array_merge(request()->query(), ['statut'=>$val,'search'=>request('search')])) }}"
-               class="status-filter {{ request('statut','') === $val ? 'active' : '' }}">
+                class="status-filter {{ request('statut','') === $val ? 'active' : '' }}">
                 {{ $label }}
             </a>
             @endforeach
@@ -87,7 +87,7 @@
                 'rejete'    => 'Rejeté',
             ][$projet->statutProjet] ?? $projet->statutProjet;
             $hasModification = $projet->statutProjet === 'brouillon' &&
-                               $projet->commentaires->where('typeCommentaire','rejet')->isNotEmpty();
+                                $projet->commentaires->where('typeCommentaire','rejet')->isNotEmpty();
         @endphp
 
         <div class="projet-card">
@@ -139,7 +139,7 @@
                     @endif
                     @if($projet->isSubmittable())
                     <form method="POST" action="{{ route('porteur.projets.soumettre', $projet) }}"
-                          onsubmit="return confirm('Soumettre ce projet pour approbation ?')" style="display:inline;">
+                        onsubmit="return confirm('Soumettre ce projet pour approbation ?')" style="display:inline;">
                         @csrf
                         <button type="submit" class="action-icon action-icon-success" title="Soumettre">
                             <i class="fas fa-paper-plane"></i>
@@ -148,7 +148,7 @@
                     @endif
                     @if($projet->isDeletable())
                     <form method="POST" action="{{ route('porteur.projets.destroy', $projet) }}"
-                          onsubmit="return confirm('Supprimer définitivement ce projet ?')" style="display:inline;">
+                        onsubmit="return confirm('Supprimer définitivement ce projet ?')" style="display:inline;">
                         @csrf @method('DELETE')
                         <button type="submit" class="action-icon action-icon-danger" title="Supprimer">
                             <i class="fas fa-trash"></i>
@@ -160,8 +160,8 @@
         </div>
         @empty
         <div class="td-empty" style="background:var(--port-bg-white);border-radius:var(--port-radius-xl);
-                                     border:1px solid var(--port-border);padding:48px 20px;text-align:center;
-                                     color:var(--port-text-light);">
+                                    border:1px solid var(--port-border);padding:48px 20px;text-align:center;
+                                    color:var(--port-text-light);">
             <i class="fas fa-folder-open" style="font-size:2rem;display:block;margin-bottom:10px;color:var(--port-border);"></i>
             <p style="font-size:.82rem;margin:0 0 12px;">
                 @if(request('statut') || request('search'))

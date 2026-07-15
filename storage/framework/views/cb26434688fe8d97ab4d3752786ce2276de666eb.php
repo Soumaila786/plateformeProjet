@@ -7,13 +7,13 @@
         font-family: 'Poppins';
         font-style: normal;
         font-weight: normal;
-        src: url("{{ storage_path('fonts/Poppins-Regular.ttf') }}") format('truetype');
+        src: url("<?php echo e(storage_path('fonts/Poppins-Regular.ttf')); ?>") format('truetype');
     }
     @font-face {
         font-family: 'Poppins';
         font-style: normal;
         font-weight: bold;
-        src: url("{{ storage_path('fonts/Poppins-Bold.ttf') }}") format('truetype');
+        src: url("<?php echo e(storage_path('fonts/Poppins-Bold.ttf')); ?>") format('truetype');
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -122,7 +122,7 @@
 </head>
 <body>
 
-{{--HEADER--}}
+
 <table class="header-table">
     <tr>
         <td style="width:30%;">
@@ -135,25 +135,26 @@
         </td>
         <td style="width:30%;">
             <div class="export-info">
-                Exporté le : {{ $exportedAt }}
+                Exporté le : <?php echo e($exportedAt); ?>
+
             </div>
         </td>
     </tr>
 </table>
 
-{{--INFOS PROJET (2 colonnes)--}}
+
 <table class="section-wrap">
     <tr>
         <td>
             <table class="info-table">
                 <tr><td colspan="2" class="info-head">Informations du projet</td></tr>
-                <tr><td class="lbl">Code projet</td><td class="val">{{ $projet->codeProjet }}</td></tr>
-                <tr><td class="lbl">Titre</td><td class="val">{{ $projet->titre }}</td></tr>
-                <tr><td class="lbl">Date début probable</td><td class="val">{{ optional($projet->dateDebut)->format('d/m/Y') ?? '—' }}</td></tr>
-                <tr><td class="lbl">Date fin probable</td><td class="val">{{ optional($projet->dateFin)->format('d/m/Y') ?? '—' }}</td></tr>
-                <tr><td class="lbl">Budget total</td><td class="val">{{ $projet->budgetTotal ? number_format($projet->budgetTotal,0,',',' ').' F CFA' : '—' }}</td></tr>
-                <tr><td class="lbl">Montant demandé</td><td class="val">{{ $projet->montantDemande ? number_format($projet->montantDemande,0,',',' ').' F CFA' : '—' }}</td></tr>
-                <tr><td class="lbl">Secteur</td><td class="val">{{ optional($projet->secteur)->nomSecteur ?? '—' }}</td></tr>
+                <tr><td class="lbl">Code projet</td><td class="val"><?php echo e($projet->codeProjet); ?></td></tr>
+                <tr><td class="lbl">Titre</td><td class="val"><?php echo e($projet->titre); ?></td></tr>
+                <tr><td class="lbl">Date début probable</td><td class="val"><?php echo e(optional($projet->dateDebut)->format('d/m/Y') ?? '—'); ?></td></tr>
+                <tr><td class="lbl">Date fin probable</td><td class="val"><?php echo e(optional($projet->dateFin)->format('d/m/Y') ?? '—'); ?></td></tr>
+                <tr><td class="lbl">Budget total</td><td class="val"><?php echo e($projet->budgetTotal ? number_format($projet->budgetTotal,0,',',' ').' F CFA' : '—'); ?></td></tr>
+                <tr><td class="lbl">Montant demandé</td><td class="val"><?php echo e($projet->montantDemande ? number_format($projet->montantDemande,0,',',' ').' F CFA' : '—'); ?></td></tr>
+                <tr><td class="lbl">Secteur</td><td class="val"><?php echo e(optional($projet->secteur)->nomSecteur ?? '—'); ?></td></tr>
             </table>
         </td>
     </tr>
@@ -162,23 +163,23 @@
         <td style="padding-top:10px;">
             <table class="info-table">
                 <tr><td colspan="2" class="info-head">Porteur &amp; Suivi</td></tr>
-                <tr><td class="lbl">Nom du porteur</td><td class="val">{{ optional($projet->porteur)->nomComplet ?? '—' }}</td></tr>
-                <tr><td class="lbl">Email</td><td class="val">{{ optional($projet->porteur)->email ?? '—' }}</td></tr>
-                <tr><td class="lbl">Date soumission</td><td class="val">{{ optional($projet->dateSoumission)->format('d/m/Y') ?? '—' }}</td></tr>
-                <tr><td class="lbl">Date approbation</td><td class="val">{{ optional($projet->dateApprobation)->format('d/m/Y') ?? '—' }}</td></tr>
-                <tr><td class="lbl">Durée</td><td class="val">{{ $projet->duree ? $projet->duree.' mois' : '—' }}</td></tr>
-                <tr><td class="lbl">Objectif</td><td class="val">{{ $projet->objectif ?? '—' }}</td></tr>
+                <tr><td class="lbl">Nom du porteur</td><td class="val"><?php echo e(optional($projet->porteur)->nomComplet ?? '—'); ?></td></tr>
+                <tr><td class="lbl">Email</td><td class="val"><?php echo e(optional($projet->porteur)->email ?? '—'); ?></td></tr>
+                <tr><td class="lbl">Date soumission</td><td class="val"><?php echo e(optional($projet->dateSoumission)->format('d/m/Y') ?? '—'); ?></td></tr>
+                <tr><td class="lbl">Date approbation</td><td class="val"><?php echo e(optional($projet->dateApprobation)->format('d/m/Y') ?? '—'); ?></td></tr>
+                <tr><td class="lbl">Durée</td><td class="val"><?php echo e($projet->duree ? $projet->duree.' mois' : '—'); ?></td></tr>
+                <tr><td class="lbl">Objectif</td><td class="val"><?php echo e($projet->objectif ?? '—'); ?></td></tr>
             </table>
         </td>
     </tr>
 </table>
 
-{{--TABLEAU PLANIFICATIONS--}}
+
 <div class="plan-wrap">
     <div class="plan-title">
-        Planification du projet — Activités ({{ $projet->planifications->count() }})
+        Planification du projet — Activités (<?php echo e($projet->planifications->count()); ?>)
     </div>
-    @if($projet->planifications->count())
+    <?php if($projet->planifications->count()): ?>
     <table class="plan-table">
         <thead>
             <tr>
@@ -192,41 +193,43 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($projet->planifications as $plan)
+            <?php $__currentLoopData = $projet->planifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $plan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <tr>
-                <td class="t-num">{{ $loop->iteration }}</td>
-                <td class="t-act"><strong>{{ $plan->activitePlanification }}</strong></td>
+                <td class="t-num"><?php echo e($loop->iteration); ?></td>
+                <td class="t-act"><strong><?php echo e($plan->activitePlanification); ?></strong></td>
                 <td class="t-ind">
-                    {{ $plan->indicateur ?? '—' }}
-                    @if($plan->uniteIndicateur) ({{ $plan->uniteIndicateur }}) @endif
+                    <?php echo e($plan->indicateur ?? '—'); ?>
+
+                    <?php if($plan->uniteIndicateur): ?> (<?php echo e($plan->uniteIndicateur); ?>) <?php endif; ?>
                 </td>
-                <td class="t-prd">{{ $plan->periode ?? '—' }}</td>
-                <td class="t-cout">{{ $plan->coutEstimatif ? number_format($plan->coutEstimatif,0,',',' ').' F CFA' : '—' }}</td>
+                <td class="t-prd"><?php echo e($plan->periode ?? '—'); ?></td>
+                <td class="t-cout"><?php echo e($plan->coutEstimatif ? number_format($plan->coutEstimatif,0,',',' ').' F CFA' : '—'); ?></td>
                 <td class="t-sign"><span class="sign-line"></span></td>
                 <td class="t-sign"><span class="sign-line"></span></td>
             </tr>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </tbody>
     </table>
     <div class="total-row">
-        Total estimé : {{ number_format($projet->planifications->sum('coutEstimatif'),0,',',' ') }} F CFA
+        Total estimé : <?php echo e(number_format($projet->planifications->sum('coutEstimatif'),0,',',' ')); ?> F CFA
     </div>
-    @else
+    <?php else: ?>
     <div class="empty-row">Aucune activité planifiée pour ce projet.</div>
-    @endif
+    <?php endif; ?>
 </div>
 
-{{--FOOTER--}}
+
 <table class="footer-table">
     <tr>
         <td>
             <div class="footer-note">
                 Toute reproduction non autorisée est strictement interdite.
             </div>
-            <div class="footer-copy">&copy; {{ date('Y') }} GesProjet &mdash; Tous droits réservés</div>
+            <div class="footer-copy">&copy; <?php echo e(date('Y')); ?> GesProjet &mdash; Tous droits réservés</div>
         </td>
     </tr>
 </table>
 
 </body>
 </html>
+<?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/approbateur/exports/projet_pdf.blade.php ENDPATH**/ ?>

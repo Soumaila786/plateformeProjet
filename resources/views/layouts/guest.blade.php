@@ -17,7 +17,7 @@
     @stack('styles')
 </head>
 <body>
-
+    
     @yield('content')
 
     @stack('scripts')

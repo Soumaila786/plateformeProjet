@@ -12,7 +12,9 @@
     <div class="projets-header">
         <div>
             <h1 class="projets-title">Projets</h1>
-            <p class="projets-subtitle"><?php echo e($projets->total()); ?> projet<?php echo e($projets->total() > 1 ? 's' : ''); ?> au total</p>
+            <p class="projets-subtitle">
+                <?php echo e($projets->total()); ?> projet<?php echo e($projets->total() > 1 ? 's' : ''); ?> au total
+            </p>
         </div>
     </div>
 
@@ -131,41 +133,9 @@
     </div>
     <?php endif; ?>
 
-    
-
 </div>
 
 
-<div class="modal-overlay" id="modalStatut">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3>Changer le statut</h3>
-            <button type="button" class="modal-close" onclick="closeModal('modalStatut')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <form method="POST" id="formStatut" action="">
-            <?php echo csrf_field(); ?>
-            <div class="modal-body">
-                <label class="field-label">Nouveau statut</label>
-                <select name="statut" id="selectStatut" class="field-input" required>
-                    <option value="brouillon">Brouillon</option>
-                    <option value="soumis">Soumis</option>
-                    <option value="en_examen">En examen</option>
-                    <option value="approuve">Approuvé</option>
-                    <option value="valide">Validé</option>
-                    <option value="rejete">Rejeté</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeModal('modalStatut')">Annuler</button>
-                <button type="submit" class="btn-save">
-                    <i class="fas fa-exchange-alt"></i> Appliquer
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <?php $__env->startPush('scripts'); ?>
 <script>

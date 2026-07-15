@@ -100,55 +100,55 @@ class ProjetController extends Controller {
         }
     }
 
-    public function changerStatut(Request $request, Projet $projet) {
+    // public function changerStatut(Request $request, Projet $projet) {
 
-        try{
+    //     try{
 
-            $request->validate([
-                'statut' => 'required|in:brouillon,soumis,en_examen,approuve,valide,rejete',
-            ]);
+    //         $request->validate([
+    //             'statut' => 'required|in:brouillon,soumis,en_examen,approuve,valide,rejete',
+    //         ]);
 
-            $ancienStatut = $projet->statutProjet;
-            $projet->update(['statutProjet' => $request->statut]);
+    //         $ancienStatut = $projet->statutProjet;
+    //         $projet->update(['statutProjet' => $request->statut]);
 
-            $labels = [
-                'brouillon' => 'Brouillon', 'soumis'    => 'Soumis',
-                'en_examen' => 'En examen', 'approuve'  => 'Approuvé',
-                'valide'    => 'Validé',    'rejete'     => 'Rejeté',
-            ];
+    //         $labels = [
+    //             'brouillon' => 'Brouillon', 'soumis'    => 'Soumis',
+    //             'en_examen' => 'En examen', 'approuve'  => 'Approuvé',
+    //             'valide'    => 'Validé',    'rejete'     => 'Rejeté',
+    //         ];
 
-            // Notification au porteur
-            NotificationService::notifierPorteur(
-                $projet,
-                'Le statut de votre projet « ' . $projet->titre .
-                ' » a été modifié de « ' . ($labels[$ancienStatut] ?? $ancienStatut) .
-                ' » à « ' . ($labels[$request->statut] ?? $request->statut) .
-                ' » par l\'administrateur.',
-                'statut_change'
-            );
+    //         // Notification au porteur
+    //         NotificationService::notifierPorteur(
+    //             $projet,
+    //             'Le statut de votre projet « ' . $projet->titre .
+    //             ' » a été modifié de « ' . ($labels[$ancienStatut] ?? $ancienStatut) .
+    //             ' » à « ' . ($labels[$request->statut] ?? $request->statut) .
+    //             ' » par l\'administrateur.',
+    //             'statut_change'
+    //         );
 
-            Log::notice('Changement de statut d’un projet', [
-                'projet_id' => $projet->id,
-                'titre' => $projet->titre,
-                'ancien_statut' => $ancienStatut,
-                'nouveau_statut' => $request->statut,
-                'admin_id' => Auth::id(),
-                'ip' => $request->ip()
-            ]);
+    //         Log::notice('Changement de statut d’un projet', [
+    //             'projet_id' => $projet->id,
+    //             'titre' => $projet->titre,
+    //             'ancien_statut' => $ancienStatut,
+    //             'nouveau_statut' => $request->statut,
+    //             'admin_id' => Auth::id(),
+    //             'ip' => $request->ip()
+    //         ]);
 
-            return redirect()->route('admin.projets.show', $projet)->with('success', 'Statut mis à jour.');
+    //         return redirect()->route('admin.projets.show', $projet)->with('success', 'Statut mis à jour.');
 
-        }catch(\Exception $e){
+    //     }catch(\Exception $e){
 
-            Log::error('Erreur lors du changement de statut',[
-                'projet_id' => $projet->id,
-                'message' => $e->getMessage(),
-                'admin_id' => Auth::id()
-            ]);
-            return redirect()->route('admin.projets.show', $projet)
-                ->with('error', 'Une erreur est survenue ');
-        }
-    }
+    //         Log::error('Erreur lors du changement de statut',[
+    //             'projet_id' => $projet->id,
+    //             'message' => $e->getMessage(),
+    //             'admin_id' => Auth::id()
+    //         ]);
+    //         return redirect()->route('admin.projets.show', $projet)
+    //             ->with('error', 'Une erreur est survenue ');
+    //     }
+    // }
 
     public function downloadDocument(Projet $projet, DocumentProjet $document){
 
@@ -171,7 +171,7 @@ class ProjetController extends Controller {
             'admin_id' => Auth::id(),
             'ip' => request()->ip()
         ]);
-        
+
         return response()->download($path, $document->nomFichier);
     }
 }

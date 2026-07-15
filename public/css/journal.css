@@ -23,7 +23,7 @@
     --color-indigo: #6366f1;
     --color-indigo-light: #eef2ff;
     --color-purple: #7c3aed;
-    
+
     /* Couleurs de texte */
     --text-dark: #111827;
     --text-gray: #374151;
@@ -31,7 +31,7 @@
     --text-light: #9ca3af;
     --text-white: #fff;
     --text-white-muted: rgba(255,255,255,.75);
-    
+
     /* Couleurs de fond */
     --bg-white: #fff;
     --bg-gray-light: #f3f4f6;
@@ -43,7 +43,7 @@
     --bg-orange-light: #fffbf5;
     --bg-orange-soft: #fff7ed;
     --bg-purple-soft: #fdf4ff;
-    
+
     /* Bordures */
     --border-light: #e5e7eb;
     --border-lighter: #f1f5f9;
@@ -52,11 +52,11 @@
     --border-orange-light: #fed7aa;
     --border-red-light: #fecaca;
     --border-green-light: #bbf7d0;
-    
+
     /* Ombres */
     --shadow-sm: 0 2px 8px rgba(0,0,0,.04);
     --shadow-md: 0 2px 8px rgba(0,0,0,.05);
-    
+
     /* Espacements */
     --gap-xs: 2px;
     --gap-sm: 3px;
@@ -69,7 +69,7 @@
     --gap-5xl: 14px;
     --gap-6xl: 16px;
     --gap-7xl: 20px;
-    
+
     /* Rayons de bordure */
     --radius-sm: 4px;
     --radius-md: 8px;
@@ -77,7 +77,7 @@
     --radius-xl: 12px;
     --radius-2xl: 20px;
     --radius-full: 50%;
-    
+
     /* Tailles de police */
     --font-xs: .68rem;
     --font-sm: .7rem;
@@ -90,7 +90,7 @@
     --font-4xl: .9rem;
     --font-5xl: 1.1rem;
     --font-6xl: 2rem;
-    
+
     /* Transitions */
     --transition-fast: .12s;
     --transition-slow: .15s;
@@ -185,8 +185,11 @@
 .filter-search input:focus { border-color: var(--color-primary); }
 
 /* Pills niveau */
-.level-pills { display: flex; gap: var(--gap-lg); flex-wrap: wrap; }
-
+.level-pills {
+    display: flex;
+    gap: var(--gap-lg);
+    flex-wrap: wrap;
+}
 .level-pill {
     padding: var(--gap-lg) var(--gap-4xl);
     border-radius: var(--radius-2xl);
@@ -198,13 +201,38 @@
     transition: all var(--transition-fast);
     white-space: nowrap;
 }
-.level-pill:hover { opacity: .8; }
-.lp-all     { background: var(--bg-gray-light); color: var(--text-gray); border-color: var(--border-light); }
-.lp-info    { background: var(--color-blue-light); color: var(--color-blue); border-color: var(--border-blue-light); }
-.lp-warning { background: var(--color-orange-light); color: var(--color-orange-dark); border-color: var(--border-orange-light); }
-.lp-error   { background: var(--color-red-light); color: var(--color-red-dark); border-color: var(--border-red-light); }
-.lp-debug   { background: var(--color-green-light); color: var(--color-green-dark); border-color: var(--border-green-light); }
-.level-pill.active { box-shadow: 0 0 0 2px currentColor; font-weight: 800; }
+.level-pill:hover {
+    opacity: .8;
+}
+.lp-all     {
+    background: var(--bg-gray-light);
+    color: var(--text-gray);
+    border-color: var(--border-light);
+}
+.lp-info    {
+    background: var(--color-blue-light);
+    color: var(--color-blue);
+    border-color: var(--border-blue-light);
+}
+.lp-warning {
+    background: var(--color-orange-light);
+    color: var(--color-orange-dark);
+    border-color: var(--border-orange-light);
+}
+.lp-error   {
+    background: var(--color-red-light);
+    color: var(--color-red-dark);
+    border-color: var(--border-red-light);
+}
+.lp-debug   {
+    background: var(--color-green-light);
+    color: var(--color-green-dark);
+    border-color: var(--border-green-light);
+}
+.level-pill.active {
+    box-shadow: 0 0 0 2px currentColor;
+    font-weight: 800;
+}
 
 /* Boutons */
 .btn-filter {
