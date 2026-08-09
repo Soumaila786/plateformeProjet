@@ -12,17 +12,19 @@ class SecteurController extends Controller {
 
     public function index() {
 
+        $this->authorize('viewAny', SecteurActivite::class);
+
         try{
 
-            $secteurs = SecteurActivite::with('projets')->get();
-            return view('admin.secteurs.index', compact('secteurs'));
+            $secteurs = SecteurActivite::with('projets')->paginate(5);
+            return view('secteurs.index', compact('secteurs'));
 
-            }catch(\Exception $e){
+        }catch(\Exception $e){
 
-                Log::error('Erreur lors de la récupération des secteurs', [
-                    'message' => $e->getMessage(),
-                    'admin_id' => Auth::id()
-                ]);
+            Log::error('Erreur lors de la récupération des secteurs', [
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id()
+            ]);
 
             return back()->with('error', 'Une erreur est survenue ');
         }
@@ -30,10 +32,14 @@ class SecteurController extends Controller {
 
     public function create() {
 
+        $this->authorize('manage', SecteurActivite::class);
+
         return view('admin.secteurs.create');
     }
 
     public function store(Request $request) {
+
+        $this->authorize('manage', SecteurActivite::class);
 
         try{
             $request->validate([
@@ -41,10 +47,10 @@ class SecteurController extends Controller {
                 'description' => 'nullable|string|max:500',
             ]);
 
-            SecteurActivite::create([
-                'nomSecteur'  => $request->nomSecteur,
-                'description' => $request->description,
-                'statutSecteur'      => $request->has('statutSecteur'),
+            $secteur = SecteurActivite::create([
+                'nomSecteur'    => $request->nomSecteur,
+                'description'   => $request->description,
+                'statutSecteur' => $request->has('statutSecteur'),
             ]);
 
             Log::info('Création d’un secteur d’activité', [
@@ -70,10 +76,15 @@ class SecteurController extends Controller {
 
     public function edit(SecteurActivite $secteur) {
 
+        $this->authorize('manage', SecteurActivite::class);
+
         return view('admin.secteurs.edit', compact('secteur'));
     }
 
     public function update(Request $request, SecteurActivite $secteur) {
+
+        $this->authorize('manage', SecteurActivite::class);
+
         try{
 
             $request->validate([
@@ -84,9 +95,9 @@ class SecteurController extends Controller {
             $ancienNom = $secteur->nomSecteur;
 
             $secteur->update([
-                'nomSecteur'  => $request->nomSecteur,
-                'description' => $request->description,
-                'statutSecteur'      => $request->has('statutSecteur'),
+                'nomSecteur'    => $request->nomSecteur,
+                'description'   => $request->description,
+                'statutSecteur' => $request->has('statutSecteur'),
             ]);
 
             Log::notice("Mise à jour d'un secteur d'activité",[
@@ -114,6 +125,8 @@ class SecteurController extends Controller {
     }
 
     public function destroy(SecteurActivite $secteur) {
+
+        $this->authorize('manage', SecteurActivite::class);
 
         try{
 
@@ -156,6 +169,8 @@ class SecteurController extends Controller {
 
     public function toggleStatus(SecteurActivite $secteur) {
 
+        $this->authorize('manage', SecteurActivite::class);
+
         try {
             $ancienStatut = $secteur->statutSecteur;
 
@@ -177,7 +192,7 @@ class SecteurController extends Controller {
             return back()->with('success', $msg);
 
         } catch (\Exception $e) {
-            
+
             Log::error('Erreur lors du changement de statut d’un secteur', [
                 'secteur_id' => $secteur->id ?? null,
                 'message' => $e->getMessage(),

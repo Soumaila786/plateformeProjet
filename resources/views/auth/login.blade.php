@@ -10,54 +10,39 @@
 <div class="login-wrapper">
     <div class="login-card">
 
-        {{-- En-tête --}}
+        {{-- En-tête (logo retiré à la demande — affiché uniquement sur la page d'accueil) --}}
         <div class="login-header">
-            <div class="login-logo">GP</div>
             <h1 class="login-title">{{ config('app.name') }}</h1>
             <p class="login-subtitle">Gestion de projets — Accès réservé</p>
         </div>
 
         <div class="login-body">
 
-            {{-- ── Blocage définitif (email bloqué seulement) ── --}}
-            @if(isset($permanentBlock) && $permanentBlock)
-            <div class="alert-block alert-permanent">
-                <div class="alert-icon"><i class="fas fa-ban"></i></div>
-                <div class="alert-content">
-                    <p class="alert-title">Compte désactivé</p>
-                    <p class="alert-text">Ce compte a été désactivé suite à de trop nombreuses tentatives. Contactez l'administrateur système.</p>
-                </div>
-            </div>
-            @endif
+            {{--
+                NOTE : le blocage temporaire/définitif après tentatives échouées
+                (alert-permanent / alert-temp / countdown) est désactivé pour
+                l'instant — il reposait sur $permanentBlock/$blockExpiresAt
+                fournis par l'ancien LoginController custom. À réintégrer dans
+                AuthenticatedSessionController::store() une fois la logique
+                d'origine récupérée.
+            --}}
 
-            {{-- ── Blocage temporaire (email bloqué seulement) ── --}}
-            @if(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp)
-            <div class="alert-block alert-temp">
-                <div class="alert-icon"><i class="fas fa-lock"></i></div>
-                <div class="alert-content">
-                    <p class="alert-title">Accès temporairement suspendu</p>
-                    <p class="alert-text">Trop de tentatives incorrectes. Réessayez dans :</p>
-                    <div class="countdown-wrap">
-                        <span class="countdown-timer" id="countdown">--:--</span>
-                    </div>
-                    <div class="countdown-bar-wrap">
-                        <div class="countdown-bar" id="countdownBar"></div>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            {{-- ── Erreur normale ── --}}
-            @if($errors->any() && !(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp))
+            {{-- ── Erreur normale (identifiants invalides, etc.) ── --}}
+            @if($errors->any())
             <div class="login-alert">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>{{ $errors->first() }}</span>
             </div>
             @endif
 
-            {{-- ── Formulaire TOUJOURS visible sauf blocage temporaire actif ── --}}
-            @if(!(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp))
-            <form method="POST" action="{{ route('login.post') }}">
+            @if(session('status'))
+            <div class="login-alert" style="background:#f0fdf4;color:#15803d;border-color:#bbf7d0;">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ session('status') }}</span>
+            </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}">
                 @csrf
 
                 {{-- Email --}}
@@ -95,7 +80,7 @@
                         <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
                         <span>Se souvenir de moi</span>
                     </label>
-                    <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+                    <a href="{{ route('password.request') }}" class="forgot-link">Mot de passe oublié ?</a>
                 </div>
 
                 <button type="submit" class="btn-submit">
@@ -103,7 +88,6 @@
                 </button>
 
             </form>
-            @endif
 
         </div>
 
@@ -117,7 +101,6 @@
 
 @push('scripts')
 <script>
-    // ── Afficher/masquer mot de passe ──
     function togglePassword() {
         const input = document.getElementById('password');
         const icon  = document.getElementById('togglePasswordIcon');
@@ -129,44 +112,6 @@
             icon.classList.replace('fa-eye-slash', 'fa-eye');
         }
     }
-
-
-
-    // ── Compte à rebours basé sur le timestamp réel ──
-    @if(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp)
-    (function() {
-        const expiresAt  = {{ $blockExpiresAt }};        // timestamp Unix côté serveur
-        const totalSecs  = expiresAt - Math.floor(Date.now() / 1000);
-        const timerEl    = document.getElementById('countdown');
-        const barEl      = document.getElementById('countdownBar');
-
-        if (!timerEl || totalSecs <= 0) {
-            location.reload();
-            return;
-        }
-
-        function tick() {
-            const remaining = expiresAt - Math.floor(Date.now() / 1000);
-
-            if (remaining <= 0) {
-                // Blocage expiré → recharger proprement
-                location.reload();
-                return;
-            }
-
-            const m = Math.floor(remaining / 60).toString().padStart(2, '0');
-            const s = (remaining % 60).toString().padStart(2, '0');
-            timerEl.textContent = m + ':' + s;
-
-            const pct = Math.max(0, (remaining / totalSecs) * 100);
-            barEl.style.width = pct + '%';
-
-            setTimeout(tick, 1000);
-        }
-
-        tick();
-    })();
-    @endif
 </script>
 @endpush
 

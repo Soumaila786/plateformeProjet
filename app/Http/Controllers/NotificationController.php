@@ -30,9 +30,13 @@ class NotificationController extends Controller {
 
         }catch(\Exception $e){
             Log::error("Erreur lors de l'affichage des notifications", [
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'user_id' => Auth::id(),
             ]);
-            return view('Erreur de recupération ');
+            // NOTE : avant cette correction, le catch tentait de charger une vue nommée
+            // littéralement "Erreur de recupération " (qui n'existe pas) → plantage
+            // en cascade au lieu d'un simple message d'erreur.
+            return back()->with('error', 'Une erreur est survenue lors du chargement des notifications.');
         }
     }
 
@@ -118,7 +122,9 @@ class NotificationController extends Controller {
             Log::error('Erreur lors de la récuperation du nombre de notifications',[
                 'message' => $e->getMessage()
             ]);
-            return back()->with('error', 'Une erreur est survenue');
+            // NOTE : cette route est appelée en AJAX (badge sidebar) — il faut donc
+            // toujours répondre en JSON, même en cas d'erreur, jamais un back()->with().
+            return response()->json(['count' => 0], 500);
         }
     }
 }

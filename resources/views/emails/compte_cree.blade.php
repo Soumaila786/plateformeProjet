@@ -27,7 +27,7 @@
         <span class="info-label">Adresse email</span>
         <span class="info-value">{{ $user->email }}</span>
     </div>
-    
+
 
     @if($user->matricule)
         <div class="info-row">
@@ -48,7 +48,7 @@
     <div class="password-icon"></div>
     <div>
         <div class="password-label">Mot de passe temporaire</div>
-        <div class="password-value">{{ $motDePasse }}</div>
+        <div class="password-value">{{ $password }}</div>
     </div>
 </div>
 

@@ -13,7 +13,6 @@ class ExportController extends Controller {
     public function exportPdf(Projet $projet) {
 
         try {
-            // Vérification de l'autorisation
             $this->authorize('view', $projet);
 
             Log::info('Tentative d’exportation PDF d’un projet', [
@@ -23,29 +22,24 @@ class ExportController extends Controller {
                 'ip' => request()->ip()
             ]);
 
-            // Augmenter le temps d'exécution
             set_time_limit(300);
-
-            // Optimiser la mémoire
             ini_set('memory_limit', '512M');
 
-            // Charger les relations nécessaires
+            // NOTE : 'planifications' retirée (relation supprimée, fusionnée dans 'activites',
+            // déjà présente dans cette liste — c'était un doublon)
             $projet->load([
                 'secteur',
                 'porteur',
                 'activites',
-                'planifications',
                 'commentaires.utilisateur',
             ]);
 
-            // Génération du PDF
             $pdf = Pdf::loadView('approbateur.exports.projet_pdf', [
                 'projet'     => $projet,
                 'exportedBy' => Auth::user(),
                 'exportedAt' => now()->format('d/m/Y à H:i'),
             ]);
 
-            // Configuration du document
             $pdf->setPaper('A4', 'portrait');
             $pdf->setOptions([
                 'defaultFont' => 'DejaVu Sans',
@@ -66,7 +60,6 @@ class ExportController extends Controller {
                 'nom_fichier' => 'projet-' . $projet->codeProjet . '.pdf'
             ]);
 
-            // Télécharger le PDF
             return $pdf->download('projet-' . $projet->codeProjet . '.pdf');
 
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {

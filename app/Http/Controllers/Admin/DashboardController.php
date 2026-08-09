@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Projet;
 use App\Models\SecteurActivite;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller {
 
@@ -49,7 +51,7 @@ class DashboardController extends Controller {
             //  Utilisateurs récents
             $usersRecents = User::latest()->take(5)->get();
 
-            return view('admin.dashboard', compact(
+            return view('dashboard.index', compact(
                 'totalProjets','projetsBrouillon','projetsSoumis','projetsEnExamen',
                 'projetsApprouves','projetsValides','projetsRejetes',
                 'totalUsers','usersActifs','usersInactifs','usersByRole',
@@ -59,7 +61,15 @@ class DashboardController extends Controller {
 
         }catch(\Exception $e){
 
-            return back()->with('error', 'Une erreur est survenue ', $e->getMessage());
+            // NOTE : avant cette correction, l'erreur n'était ni loguée ni réellement
+            // affichée (with() ne prend que 2 arguments, le 3e était silencieusement
+            // ignoré) — un plantage ici passait totalement inaperçu.
+            Log::error('Erreur lors du chargement du dashboard admin', [
+                'message' => $e->getMessage(),
+                'admin_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue ');
         }
     }
 }

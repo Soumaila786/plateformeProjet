@@ -17,62 +17,60 @@ class User extends Authenticatable {
         'matricule',
         'fonction',
         'contact',
-        'motDePasse',
+        'password',
         'role',
         'actif',
-        'dateCreation',
         'organisation',
+        'photo',
+        // Champs fusionnés depuis les anciennes tables satellites par rôle
+        'datePriseFonction',
+        'service',
+        'poste',
+        'dateDebutMandat',
+        'dateFinMandat',
+        'specialite',
     ];
 
     protected $hidden = [
-        'motDePasse',
+        'password',
+        'rememberToken',
     ];
 
     protected $casts = [
-        'actif'        => 'boolean',
-        'dateCreation' => 'datetime',
+        'actif'             => 'boolean',
+        'datePriseFonction' => 'date',
+        'dateDebutMandat'   => 'date',
+        'dateFinMandat'     => 'date',
     ];
-
-    protected static function boot() {
-
-        parent::boot();
-
-        static::deleting(function ($user) {
-            $user->porteur()->delete();
-            $user->approbateur()->delete();
-            $user->planificateur()->delete();
-            $user->validateur()->delete();
-        });
-    }
-
-    // Spatie utilise 'password' par défaut — on pointe vers motDePasse
-    public function getAuthPassword() {
-
-        return $this->motDePasse;
-    }
 
     // Relations
     public function projets() {
-
         return $this->hasMany(Projet::class);
     }
 
-    public function porteur() {
-        return $this->hasOne(Porteur::class, 'user_id');
+    /**
+     * URL de la photo de profil si elle existe, sinon null (à gérer côté vue
+     * avec le component <x-avatars.user> qui affiche les initiales en repli).
+     */
+    public function getPhotoUrlAttribute(): ?string
+    {
+        return $this->photo ? asset('storage/' . $this->photo) : null;
     }
 
-    public function approbateur() {
-        return $this->hasOne(Approbateur::class, 'user_id');
+    public function getInitialesAttribute(): string
+    {
+        return strtoupper(substr($this->nomComplet ?? 'U', 0, 2));
     }
 
-    public function validateur() {
-        return $this->hasOne(Validateur::class, 'user_id');
-    }
+    /**
+     * Envoie l'email de réinitialisation de mot de passe avec notre propre
+     * template (cohérent avec le reste des emails de l'application), plutôt
+     * que la notification par défaut de Laravel.
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $url = url(route('password.reset', ['token' => $token, 'email' => $this->email], false));
 
-    public function planificateur() {
-        
-        return $this->hasOne(Planificateur::class, 'user_id');
+        \Illuminate\Support\Facades\Mail::to($this->email)->send(new \App\Mail\ResetPasswordMail($this, $url));
     }
-    
-
 }

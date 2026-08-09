@@ -9,84 +9,74 @@ class ProjetPolicy {
 
     // Voir un projet
     public function view(User $user, Projet $projet) {
-
-        switch ($user->role) {
-
-            case 'admin':
-            case 'approbateur':
-            case 'validateur':
-                return true;
-            case 'porteur':
-                return $projet->user_id === $user->id;
-            case 'planificateur':
-                return true;
-            default:
-                return false;
+        if (!$user->can('projets.voir')) {
+            return false;
         }
+        // Le porteur ne voit que ses propres projets, les autres rôles voient tout
+        if ($user->hasRole('porteur')) {
+            return $projet->user_id === $user->id;
+        }
+        return true;
     }
 
     // Créer un projet
     public function create(User $user) {
-
-        return $user->role === 'porteur';
+        return $user->can('projets.creer');
     }
 
     // Modifier un projet
+    // NOTE : un projet 'rejete' est verrouillé définitivement (lecture seule).
     public function update(User $user, Projet $projet){
-
-        switch ($user->role) {
-            case 'porteur':
-                return $projet->user_id === $user->id
-                    && !in_array($projet->statutProjet, ['approuve', 'valide']);
-            case 'admin':
-                return true;
-            default:
-                return false;
+        if ($user->hasRole('admin')) {
+            return true;
         }
+        if (!$user->can('projets.modifier')) {
+            return false;
+        }
+        return $projet->user_id === $user->id
+            && !in_array($projet->statutProjet, ['approuve', 'valide', 'rejete']);
     }
 
     // Supprimer un projet
     public function delete(User $user, Projet $projet){
-
-        switch ($user->role) {
-            case 'porteur':
-                return $projet->user_id === $user->id
-                    && in_array($projet->statutProjet, ['brouillon', 'soumis']);
-            case 'admin':
-                return true;
-            default:
-                return false;
+        if ($user->hasRole('admin')) {
+            return true;
         }
+        if (!$user->can('projets.supprimer')) {
+            return false;
+        }
+        return $projet->user_id === $user->id
+            && in_array($projet->statutProjet, ['brouillon', 'soumis']);
     }
 
     // Soumettre un projet
     public function soumettre(User $user, Projet $projet) {
-
-        return $projet->user_id === $user->id
-            && in_array($projet->statutProjet, ['brouillon', 'rejete']);
+        return $user->can('projets.soumettre')
+            && $projet->user_id === $user->id
+            && $projet->statutProjet === 'brouillon';
     }
 
     // Mettre en examen
     public function examiner(User $user, Projet $projet) {
-
-        return $user->role === 'approbateur'
+        return $user->can('projets.examiner')
             && $projet->statutProjet === 'soumis';
     }
 
     // Approuver
     public function approuver(User $user, Projet $projet) {
-
-        return $user->role === 'approbateur'
+        return $user->can('projets.approuver')
             && $projet->statutProjet === 'en_examen';
     }
 
-    // Rejeter
+    // Rejeter (approbateur : soumis/en_examen -- validateur : approuve)
     public function rejeter(User $user, Projet $projet) {
-
-        if ($user->role === 'approbateur') {
+        if (!$user->can('projets.rejeter')) {
+            return false;
+        }
+        if ($user->hasRole('approbateur')) {
             return in_array($projet->statutProjet, ['soumis', 'en_examen']);
         }
-        if ($user->role === 'validateur') {
+        if ($user->hasRole('validateur')) {
             return $projet->statutProjet === 'approuve';
         }
         return false;
@@ -94,79 +84,76 @@ class ProjetPolicy {
 
     // Valider
     public function valider(User $user, Projet $projet) {
-
-        return $user->role === 'validateur'
+        return $user->can('projets.valider')
             && $projet->statutProjet === 'approuve';
     }
 
-    // Demande de modification
+    // Demande de modification (approbateur : soumis/en_examen -- validateur : approuve)
     public function demandeModification(User $user, Projet $projet) {
-
-        return $user->role === 'approbateur'
-            && in_array($projet->statutProjet, ['soumis', 'en_examen']);
+        if (!$user->can('projets.demander_modification')) {
+            return false;
+        }
+        if ($user->hasRole('approbateur')) {
+            return in_array($projet->statutProjet, ['soumis', 'en_examen']);
+        }
+        if ($user->hasRole('validateur')) {
+            return $projet->statutProjet === 'approuve';
+        }
+        return false;
     }
 
     // Documents
     public function uploadDocument(User $user, Projet $projet) {
-
-        switch ($user->role) {
-            case 'porteur':
-                return $projet->user_id === $user->id;
-            case 'admin':
-                return true;
-            default:
-                return false;
+        if ($user->hasRole('admin')) {
+            return true;
         }
+        return $user->can('documents.upload')
+            && $projet->user_id === $user->id;
     }
 
     public function deleteDocument(User $user, Projet $projet) {
-
-        switch ($user->role) {
-            case 'porteur':
-                return $projet->user_id === $user->id;
-            case 'admin':
-                return true;
-            default:
-                return false;
+        if ($user->hasRole('admin')) {
+            return true;
         }
+        return $user->can('documents.supprimer')
+            && $projet->user_id === $user->id;
     }
 
     // Gérer les ACTIVITÉS (porteur seulement)
     public function gererActivite(User $user, Projet $projet) {
-
-        // Seul le porteur gère ses activités, tant que le projet n'est pas approuvé/validé
-        return $user->role === 'porteur'
+        return $user->can('projets.gerer_activite')
             && $projet->user_id === $user->id
-            && !in_array($projet->statutProjet, ['approuve', 'valide']);
+            && !in_array($projet->statutProjet, ['approuve', 'valide', 'rejete']);
     }
 
-    // Gérer la planification
+    // Gérer la planification (pilote le Model Activite)
     public function gererPlanification(User $user, Projet $projet) {
-        if ($user->role === 'porteur') {
-            return $projet->user_id === $user->id
-                && !in_array($projet->statutProjet, ['approuve', 'valide']);
+        if (!$user->can('projets.gerer_planification')) {
+            return false;
         }
-        // Planificateur : peut planifier tant que la demande a été faite
-        // On ne vérifie plus planification_demandee ici — on le gère dans le controller
-        if ($user->role === 'planificateur') {
-            return true; // accès filtré par le controller (index = demandes, show = tous)
+        if ($user->hasRole('porteur')) {
+            return $projet->user_id === $user->id
+                && !in_array($projet->statutProjet, ['approuve', 'valide', 'rejete']);
+        }
+        // Planificateur : accès filtré par le controller (index = demandes, show = tous)
+        if ($user->hasRole('planificateur')) {
+            return true;
         }
         return false;
     }
-    
+
     // Voir la planification
     public function voirPlanification(User $user, Projet $projet) {
-
-        switch ($user->role) {
-            case 'approbateur':
-            case 'admin':
-                return true;
-            case 'validateur':
-                return in_array($projet->statutProjet, ['approuve', 'valide']);
-            case 'porteur':
-                return $projet->user_id === $user->id;
-            default:
-                return false;
+        if (!$user->can('projets.voir_planification')) {
+            return false;
         }
+        if ($user->hasRole('porteur')) {
+            return $projet->user_id === $user->id;
+        }
+        if ($user->hasRole('validateur')) {
+            return in_array($projet->statutProjet, ['approuve', 'valide']);
+        }
+        // admin, approbateur, planificateur : la permission suffit
+        return true;
     }
 }

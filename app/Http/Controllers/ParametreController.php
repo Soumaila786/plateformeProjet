@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ParametreController extends Controller {
 
@@ -31,52 +32,43 @@ class ParametreController extends Controller {
 
             $user = Auth::user();
 
-            // Validation de base
             $request->validate([
                 'nomComplet' => 'required|string|max:255',
                 'email'      => 'required|email|unique:users,email,' . $user->id,
                 'contact'    => 'nullable|string|max:50',
+                // Champs spécifiques au rôle (directement sur users, plus de tables satellites)
+                'specialite'      => 'nullable|string|max:255',
+                'service'         => 'nullable|string|max:255',
+                'poste'           => 'nullable|string|max:255',
+                'dateDebutMandat' => 'nullable|date',
+                'dateFinMandat'   => 'nullable|date',
             ]);
 
-            // Mise à jour USER
-            $user->update([
+            $data = [
                 'nomComplet' => $request->nomComplet,
                 'email'      => $request->email,
                 'contact'    => $request->contact,
-            ]);
+            ];
 
-            // PORTEUR
-            if ($user->role == 'porteur') {
-                $user->porteur()->updateOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'structure'  => $request->structure,
-                        'specialite' => $request->specialite,
-                    ]
-                );
+            // NOTE : porteur()/approbateur()/validateur() n'existent plus (tables satellites
+            // fusionnées dans users). On met à jour directement les colonnes concernées,
+            // selon le rôle de l'utilisateur.
+            if ($user->role === 'porteur') {
+                $data['specialite'] = $request->specialite;
+
+            } elseif ($user->role === 'approbateur') {
+                $data['service'] = $request->service;
+                $data['poste']   = $request->poste;
+
+            } elseif ($user->role === 'planificateur') {
+                $data['service'] = $request->service;
+
+            } elseif ($user->role === 'validateur') {
+                $data['dateDebutMandat'] = $request->dateDebutMandat;
+                $data['dateFinMandat']   = $request->dateFinMandat;
             }
 
-            // APPROBATEUR
-            if ($user->role == 'approbateur') {
-                $user->approbateur()->updateOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'service' => $request->service,
-                        'poste'   => $request->poste,
-                    ]
-                );
-            }
-
-            // VALIDATEUR
-            if ($user->role == 'validateur') {
-                $user->validateur()->updateOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'dateDebutMandat' => $request->dateDebutMandat,
-                        'dateFinMandat'   => $request->dateFinMandat,
-                    ]
-                );
-            }
+            $user->update($data);
 
             Log::notice('Mise à jour du profil utilisateur', [
                 'user_id' => $user->id,

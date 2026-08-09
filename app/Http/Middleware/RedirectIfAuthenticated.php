@@ -13,14 +13,11 @@ class RedirectIfAuthenticated
         if (Auth::guard($guard)->check()) {
             $user = Auth::guard($guard)->user();
 
-            switch ($user->role) {
-                case 'admin':       return redirect('/admin/dashboard');
-                case 'approbateur': return redirect('/approbateur/dashboard');
-                case 'validateur':  return redirect('/validateur/dashboard');
-                case 'porteur':     return redirect('/porteur/dashboard');
-                case 'planificateur': return redirect('/planificateur/dashboard');
-                default:            return redirect('/');
+            if (in_array($user->role, ['admin', 'approbateur', 'validateur', 'porteur', 'planificateur'])) {
+                return redirect()->route($user->role . '.dashboard');
             }
+
+            return redirect('/');
         }
 
         $response = $next($request);

@@ -6,13 +6,18 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     *
-     * @return void
-     */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            // Crée les utilisateurs de test en premier (ex: l'admin)
+            UserSeeder::class,
+
+            RolesAndPermissionsSeeder::class,
+            MotifsRejetSeeder::class,
+
+            // Doit tourner APRÈS UserSeeder, puisqu'elle assigne les rôles Spatie
+            // aux utilisateurs déjà créés.
+            AssignRolesToExistingUsersSeeder::class,
+        ]);
     }
 }

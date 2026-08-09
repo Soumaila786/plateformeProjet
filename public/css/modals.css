@@ -1,0 +1,41 @@
+/* Modales Bootstrap génériques (x-modals.confirm) — même langage visuel que
+   les modales lp-modal-* (listes-projets.css) : radius, ombre, en-tête avec
+   icône colorée selon le type d'action. S'appuie sur variables.css. */
+
+.pf-modal-content {
+    border: none;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.pf-modal-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-8) var(--space-10);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.pf-modal-icon {
+    width: 42px; height: 42px; border-radius: var(--radius-md); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: var(--font-md);
+}
+.pf-modal-icon-success { background: var(--color-success-light); color: var(--color-success); }
+.pf-modal-icon-danger  { background: var(--color-danger-light);  color: var(--color-danger);  }
+.pf-modal-icon-primary { background: var(--color-primary-light); color: var(--color-primary); }
+
+.pf-modal-title { font-size: var(--font-lg); font-weight: 700; color: var(--color-text); margin: 0; }
+
+.pf-modal-body { padding: var(--space-10); }
+.pf-modal-body textarea, .pf-modal-body input, .pf-modal-body select {
+    border-radius: var(--radius-md);
+}
+
+.pf-modal-footer {
+    padding: var(--space-7) var(--space-10);
+    border-top: 1px solid var(--color-border-light);
+    background: var(--color-bg-gray-light);
+}
+
+.modal-backdrop.show { opacity: .55; }

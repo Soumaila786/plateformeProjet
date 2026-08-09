@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Approbateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller {
 
@@ -33,14 +35,19 @@ class DashboardController extends Controller {
                 ->latest('dateSoumission')
                 ->get();
 
-                return view('approbateur.dashboard', compact(
+                return view('dashboard.index', compact(
                     'totalProjets', 'soumis', 'enExamen', 'approuve',
                     'valide', 'rejete', 'brouillon', 'enAttente',
                     'projetsRecents', 'projetsUrgents'
                     ));
         }catch(\Exception $e){
 
-            return back()->with('error', 'Une erreur est survenue ', $e->getMessage());
+            Log::error('Erreur lors du chargement du dashboard approbateur', [
+                'message' => $e->getMessage(),
+                'approbateur_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue ');
         }
     }
 }

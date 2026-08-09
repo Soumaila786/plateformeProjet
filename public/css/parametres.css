@@ -1,0 +1,30 @@
+/* Paramètres — spécifique à ce module. S'appuie sur variables.css. */
+
+.param-tabs {
+    display: flex;
+    gap: .3rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+.param-tab {
+    padding: .6rem 1rem;
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border-bottom: 2px solid transparent;
+    text-decoration: none;
+}
+.param-tab:hover { color: var(--color-primary); text-decoration: none; }
+.param-tab.active { color: var(--color-primary); border-color: var(--color-primary); }
+
+.param-avatar-upload {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+@media (max-width: 575px) {
+    .param-tabs { overflow-x: auto; flex-wrap: nowrap; }
+}

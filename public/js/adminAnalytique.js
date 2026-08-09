@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const data = window.adminAnalytiqueData;
 
+    const animationConfig = { duration: 1800, easing: 'easeOutQuart' };
+
     // Configuration des couleurs
     const C = {
         indigo: '#6366f1',
@@ -34,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 cutout: '65%',
                 plugins: {
                     legend: {
@@ -84,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 plugins: {
                     legend: {
                         position: 'bottom',
@@ -134,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 indexAxis: 'y',
                 plugins: { legend: { display: false } },
                 scales: {
@@ -198,6 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 plugins: {
                     legend: {
                         position: 'bottom',
@@ -266,6 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 indexAxis: 'y',
                 plugins: {
                     legend: { display: false },

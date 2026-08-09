@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Récupérer les données depuis les attributs data ou depuis les variables globales
     const chartData = window.chartData || {};
 
+    const animationConfig = { duration: 1800, easing: 'easeOutQuart' };
+
     // Donut Chart
     if (donutCanvas && chartData.donut) {
         new Chart(donutCanvas, {
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 cutout: '65%',
                 plugins: {
                     legend: {
@@ -68,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 indexAxis: 'y',
                 plugins: { legend: { display: false } },
                 scales: {
@@ -114,6 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 plugins: {
                     legend: {
                         position: 'bottom',
@@ -167,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: animationConfig,
                 plugins: { legend: { display: false } },
                 scales: {
                     x: {

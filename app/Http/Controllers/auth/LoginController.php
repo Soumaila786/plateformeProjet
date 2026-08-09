@@ -131,7 +131,7 @@ class LoginController extends Controller {
             }
 
             // Mauvais identifiants
-            if (!$user || !Hash::check($request->password, $user->motDePasse)) {
+            if (!$user || !Hash::check($request->password, $user->password)) {
                 Log::warning('Echec de connexion : Identifiants incorrects', [
                     'email' => $email,
                     'ip'    => $request->ip()
@@ -223,7 +223,7 @@ class LoginController extends Controller {
                     'block_expires_at' => $expiresAt,
                 ]);
             }
-            
+
         }catch(\Exception $e){
             Log::error("Erreur lors de l'incrementation du temps", [
                 'message' => $e->getMessage()
@@ -233,25 +233,27 @@ class LoginController extends Controller {
 
     private function redirectTo($role) {
 
+        // NOTE : ces chemins correspondent aux nouveaux préfixes neutres définis
+        // dans routes/web.php (qui ne révèlent plus le rôle dans l'URL).
         switch ($role) {
             case 'admin':
-                $redirect = '/admin/dashboard';
+                $redirect = '/gestion/dashboard';
                 break;
 
             case 'approbateur':
-                $redirect = '/approbateur/dashboard';
+                $redirect = '/examen/dashboard';
                 break;
 
             case 'validateur':
-                $redirect = '/validateur/dashboard';
+                $redirect = '/validation/dashboard';
                 break;
 
             case 'porteur':
-                $redirect = '/porteur/dashboard';
+                $redirect = '/mes-projets/dashboard';
                 break;
-            
+
             case 'planificateur':
-                $redirect = '/planificateur/dashboard';
+                $redirect = '/planification/dashboard';
                 break;
 
             default:

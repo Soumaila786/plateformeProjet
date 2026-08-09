@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Approbateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
-use App\Models\User;
 use App\Models\Commentaire;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AnalytiqueController extends Controller {
 
@@ -56,8 +58,9 @@ class AnalytiqueController extends Controller {
                 $tempLabels[]   = $m->format('M y');
                 $tempSoumis[]   = Projet::whereYear('dateSoumission', $m->year)
                     ->whereMonth('dateSoumission', $m->month)->count();
-                $tempCreation[] = Projet::whereYear('dateCreation', $m->year)
-                    ->whereMonth('dateCreation', $m->month)->count();
+                // NOTE : dateCreation a été supprimée (redondante avec created_at)
+                $tempCreation[] = Projet::whereYear('created_at', $m->year)
+                    ->whereMonth('created_at', $m->month)->count();
             }
 
             // Délai moyen soumission → approbation
@@ -73,7 +76,7 @@ class AnalytiqueController extends Controller {
                 ->take(8)
                 ->get(['titre', 'budgetTotal', 'montantDemande']);
 
-            $budgetLabels  = $budgetProjets->map(fn($p) => \Str::limit($p->titre, 15))->toArray();
+            $budgetLabels  = $budgetProjets->map(fn($p) => Str::limit($p->titre, 15))->toArray();
             $budgetTotaux  = $budgetProjets->pluck('budgetTotal')->map(fn($v) => (int)$v)->toArray();
             $budgetDemande = $budgetProjets->pluck('montantDemande')->map(fn($v) => (int)$v)->toArray();
 
@@ -96,9 +99,10 @@ class AnalytiqueController extends Controller {
                 ->selectRaw('AVG(ABS(DATEDIFF(dateApprobation, dateSoumission))) as moy')
                 ->value('moy') ?? 0, 1);
 
-            $delaiValid = round(Projet::whereNotNull('validated_at')
+            // NOTE : validated_at renommé en dateValidation
+            $delaiValid = round(Projet::whereNotNull('dateValidation')
                 ->whereNotNull('dateApprobation')
-                ->selectRaw('AVG(ABS(DATEDIFF(validated_at, dateApprobation))) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(dateValidation, dateApprobation))) as moy')
                 ->value('moy') ?? 0, 1);
 
                 $retard30 = Projet::whereIn('statutProjet', ['soumis','en_examen'])
@@ -119,14 +123,11 @@ class AnalytiqueController extends Controller {
 
             $motifsValues = array_fill(0, count($motifsLabels), 0);
 
-            // Récupération des commentaires utiles
-            // query() est un point de départ qui permet de construire une requête SQL étape par étape
             $commentaires = Commentaire::query()
                 ->whereNotNull('message')
                 ->where('message', '!=', '')
-                ->pluck('message'); // recuperer uniquement la colonne message
+                ->pluck('message');
 
-                //Analyse des commentaires
             foreach ($commentaires as $message) {
 
                 $message = mb_strtolower($message);
@@ -134,7 +135,6 @@ class AnalytiqueController extends Controller {
                 $index = 0;
 
                 foreach ($motifsCles as $categorie => $motsCles) {
-                    // ignorer "autre" dans la boucle
                     if ($categorie === 'autre') {
                         continue;
                     }
@@ -142,12 +142,11 @@ class AnalytiqueController extends Controller {
                         if (str_contains($message, $mot)) {
                             $motifsValues[$index]++;
                             $categorieTrouvee = true;
-                            break 2; // sortir des deux boucles
+                            break 2;
                         }
                         }
                         $index++;
                 }
-                // Si aucun mot-clé trouvé → catégorie "Autre"
                 if (!$categorieTrouvee) {
                     $motifsValues[count($motifsValues) - 1]++;
                 }
@@ -192,15 +191,14 @@ class AnalytiqueController extends Controller {
                 });
 
             //================= MATRICE PRIORISATION =============================================================
-            // Axe X = montantDemande (importance), Axe Y = duree (urgence)
             $matrice = Projet::whereIn('statutProjet', ['soumis','en_examen'])
                 ->whereNotNull('montantDemande')
                 ->take(20)
                 ->get(['titre','montantDemande','duree','dateSoumission'])
                 ->map(function($p) use ($now) {
                     return [
-                        'label'   => \Str::limit($p->titre, 18),
-                        'x'       => (int)($p->montantDemande / 1000000), // en millions
+                        'label'   => Str::limit($p->titre, 18),
+                        'x'       => (int)($p->montantDemande / 1000000),
                         'y'       => (int)($p->duree ?? 0),
                         'age'     => $p->dateSoumission
                             ? $now->diffInDays(Carbon::parse($p->dateSoumission))
@@ -208,9 +206,7 @@ class AnalytiqueController extends Controller {
                     ];
                 });
 
-
-
-            return view('approbateur.analytique', compact(
+            return view('analytique.index', compact(
                 'entonnoir', 'labels', 'colors', 'donutValues',
                 'tempLabels', 'tempSoumis', 'tempCreation', 'delaiMoyenAppro',
                 'budgetLabels', 'budgetTotaux', 'budgetDemande', 'cumulAttente',
@@ -221,7 +217,12 @@ class AnalytiqueController extends Controller {
 
         }catch(\Exception $e){
 
-            return back()->with('error', 'Une erreur est survenue ', $e->getMessage());
+            Log::error('Erreur lors du chargement de l’analytique approbateur', [
+                'message' => $e->getMessage(),
+                'approbateur_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue ');
         }
     }
 }

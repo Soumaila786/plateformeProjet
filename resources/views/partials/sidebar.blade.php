@@ -1,251 +1,99 @@
 @auth
+@php
+    $role = Auth::user()->role;
+    $notifCount = \App\Models\Notification::where('destinataire_id', Auth::id())
+        ->where('statut', 'non_lu')->count();
+
+    $estActif = function (string $route) {
+        if (request()->routeIs($route)) {
+            return true;
+        }
+        if (\Illuminate\Support\Str::endsWith($route, '.index')) {
+            $prefixe = \Illuminate\Support\Str::beforeLast($route, '.index');
+            return request()->routeIs($prefixe . '.show');
+        }
+        return false;
+    };
+
+    $menusParRole = [
+        'admin' => [
+            ['label' => 'Tableau Analytique', 'icon' => 'fa-chart-pie',        'route' => 'admin.analytique'],
+            ['label' => 'Utilisateurs',        'icon' => 'fa-users',           'route' => 'admin.users.index',        'permission' => 'utilisateurs.gerer'],
+            ['label' => 'Projets',             'icon' => 'fa-project-diagram', 'route' => 'admin.projets.index',      'permission' => 'projets.voir'],
+            ['label' => 'Secteurs',            'icon' => 'fa-building',        'route' => 'admin.secteurs.index',     'permission' => 'secteurs.gerer'],
+            ['label' => 'Motifs de rejet',     'icon' => 'fa-list-check',      'route' => 'admin.motifs.index',       'permission' => 'motifs.gerer'],
+            ['label' => 'Configuration système','icon' => 'fa-cogs',           'route' => 'admin.configuration.index','permission' => 'configurations.gerer'],
+            ['label' => 'Journal des activités','icon' => 'fa-clipboard-list','route' => 'admin.logs.index',         'permission' => 'configurations.gerer'],
+        ],
+        'porteur' => [
+            ['label' => 'Mes projets',    'icon' => 'fa-folder-open',  'route' => 'porteur.projets.index'],
+            ['label' => 'Nouveau projet', 'icon' => 'fa-plus-circle',  'route' => 'porteur.projets.create', 'permission' => 'projets.creer'],
+        ],
+        'approbateur' => [
+            ['label' => 'Tableau Analytique', 'icon' => 'fa-chart-pie',   'route' => 'approbateur.analytique'],
+            ['label' => 'À approuver',        'icon' => 'fa-tasks',       'route' => 'approbateur.projets.index'],
+            ['label' => 'Mes projets',        'icon' => 'fa-folder-open','route' => 'approbateur.projets.mes_projets'],
+        ],
+        'validateur' => [
+            ['label' => 'Tableau Analytique',    'icon' => 'fa-chart-pie',    'route' => 'validateur.analytique'],
+            ['label' => 'À valider',             'icon' => 'fa-check-double', 'route' => 'validateur.projets.index'],
+            ['label' => 'Mes projets traités',   'icon' => 'fa-folder-open',  'route' => 'validateur.projets.mes_projets'],
+        ],
+        'planificateur' => [
+            ['label' => 'Projets à traiter', 'icon' => 'fa-inbox',       'route' => 'planificateur.projets.index'],
+            ['label' => 'Projets traités',   'icon' => 'fa-folder-open','route' => 'planificateur.projets.traites'],
+        ],
+    ];
+
+    $items = $menusParRole[$role] ?? [];
+@endphp
+
 <div class="sidebar" id="mainSidebar">
 
     <!-- Header logo -->
     <div class="sidebar-header d-flex align-items-center px-3 py-3">
-        <div class="logo-container me-2">
-            <div style="width: 38px; height: 38px;
-                        background: linear-gradient(135deg, {{ $sysConfig->get('couleur_primaire', '#3b82f6') }}, #8b5cf6);
-                        border-radius: 10px; display: flex; align-items: center; justify-content: center;
-                        color: white; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px;">
-                {{ $sysConfig->get('logo_texte', 'GP') }}
-            </div>
-        </div>
-        <div class="app-name-container">
-            <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">
-                {{ $sysConfig->get('nom_app', config('app.name')) }}
-            </h5>
-            <small class="text-muted" style="font-size: 0.7rem;">
-                {{ $sysConfig->get('description_app', 'Gestion de projets') }}
-            </small>
-        </div>
+        <x-brand.logo :size="48" :show-text="true" />
     </div>
-
-    @php
-        $role = Auth::user()->role;
-    @endphp
 
     <ul class="nav-menu flex-grow-1">
 
         <!-- Tableau de bord -->
         <li class="nav-item">
-            <a href="{{ url($role . '/dashboard') }}"
-                class="nav-link {{ request()->is($role . '/dashboard') ? 'active' : '' }}"
+            <a href="{{ route($role . '.dashboard') }}"
+                class="nav-link {{ request()->routeIs($role . '.dashboard') ? 'active' : '' }}"
                 data-tooltip="Tableau de bord">
                 <i class="fas fa-home"></i>
                 <span>Tableau de bord</span>
             </a>
         </li>
 
-        {{-- ADMIN --}}
-        @if($role === 'admin')
+        {{-- Liens spécifiques au rôle connecté --}}
+        @foreach ($items as $item)
+            @continue(isset($item['permission']) && !auth()->user()->can($item['permission']))
+            @continue(!Route::has($item['route']))
             <li class="nav-item">
-                <a href="{{ route('admin.analytique') }}"
-                    class="nav-link {{ request()->routeIs('admin.analytique') ? 'active' : '' }}"
-                    data-tooltip="Tableau Analytique">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Tableau Analytique</span>
+                <a href="{{ route($item['route']) }}"
+                    class="nav-link {{ $estActif($item['route']) ? 'active' : '' }}"
+                    data-tooltip="{{ $item['label'] }}">
+                    <i class="fas {{ $item['icon'] }}"></i>
+                    <span>{{ $item['label'] }}</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.users.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                    data-tooltip="Utilisateurs">
-                    <i class="fas fa-users"></i>
-                    <span>Utilisateurs</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.projets.*') ? 'active' : '' }}"
-                    data-tooltip="Projets">
-                    <i class="fas fa-project-diagram"></i>
-                    <span>Projets</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.secteurs.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.secteurs.*') ? 'active' : '' }}"
-                    data-tooltip="Secteurs">
-                    <i class="fas fa-building"></i>
-                    <span>Secteurs</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.configuration.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.configuration.*') ? 'active' : '' }}"
-                    data-tooltip="Configuration">
-                    <i class="fas fa-cogs"></i>
-                    <span>Configuration système</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.logs.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}"
-                    data-tooltip="Log">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Journal des activités</span>
-                </a>
-            </li>
-        @endif
-
-        {{-- PORTEUR --}}
-        @if($role === 'porteur')
-            <li class="nav-item">
-                <a href="{{ route('porteur.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('porteur.projets.index') ? 'active' : '' }}"
-                    data-tooltip="Mes projets">
-                    <i class="fas fa-folder-open"></i>
-                    <span>Mes projets</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('porteur.projets.create') }}"
-                    class="nav-link {{ request()->routeIs('porteur.projets.create') ? 'active' : '' }}"
-                    data-tooltip="Nouveau projet">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Nouveau projet</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                @php
-                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
-                        ->where('statut', 'non_lu')->count();
-                @endphp
-                <a href="{{ route($role . '.notifications.index') }}"
-                    class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
-                    data-tooltip="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                    @if($notifCount > 0)
-                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
-                    @endif
-                </a>
-            </li> 
-        @endif
-
-        {{-- APPROBATEUR --}}
-        @if($role === 'approbateur')
-            <li class="nav-item">
-                <a href="{{ route('approbateur.analytique') }}"
-                    class="nav-link {{ request()->routeIs('approbateur.analytique') ? 'active' : '' }}"
-                    data-tooltip="Tableau Analytique">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Tableau Analytique</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('approbateur.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('approbateur.projets.index') ? 'active' : '' }}"
-                    data-tooltip="À approuver">
-                    <i class="fas fa-tasks"></i>
-                    <span>À approuver</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('approbateur.projets.mes_projets') }}"
-                    class="nav-link {{ request()->routeIs('approbateur.projets.mes_projets') ? 'active' : '' }}"
-                    data-tooltip="Mes projets">
-                    <i class="fas fa-folder-open"></i>
-                    <span>Mes projets</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                @php
-                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
-                        ->where('statut', 'non_lu')->count();
-                @endphp
-                <a href="{{ route($role . '.notifications.index') }}"
-                    class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
-                    data-tooltip="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                    @if($notifCount > 0)
-                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
-                    @endif
-                </a>
-            </li>
-        @endif
-
-        {{-- VALIDATEUR --}}
-        @if($role === 'validateur')
-            <li class="nav-item">
-                <a href="{{ route('validateur.analytique') }}"
-                    class="nav-link {{ request()->routeIs('validateur.analytique') ? 'active' : '' }}"
-                    data-tooltip="Tableau Analytique">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Tableau Analytique</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('validateur.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('validateur.projets.index') ? 'active' : '' }}"
-                    data-tooltip="À valider">
-                    <i class="fas fa-check-double"></i>
-                    <span>À valider</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('validateur.projets.mes_projets') }}"
-                    class="nav-link {{ request()->routeIs('validateur.projets.mes_projets') ? 'active' : '' }}"
-                    data-tooltip="Mes projets traités">
-                    <i class="fas fa-folder-open"></i>
-                    <span>Mes projets traités</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                @php
-                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
-                        ->where('statut', 'non_lu')->count();
-                @endphp
-                <a href="{{ route($role . '.notifications.index') }}"
-                    class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
-                    data-tooltip="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                    @if($notifCount > 0)
-                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
-                    @endif
-                </a>
-            </li>
-        @endif
-
-        {{-- PLANIFICATEUR --}}
-        @if($role === 'planificateur')
-            <li class="nav-item">
-                <a href="{{ route('planificateur.projets.index') }}"
-                    class="nav-link {{ request()->routeIs('planificateur.projets.index') ? 'active' : '' }}"
-                    data-tooltip="Projets à traiter">
-                    <i class="fas fa-inbox"></i>
-                    <span>Projets à traiter</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('planificateur.projets.traites') }}"
-                    class="nav-link {{ request()->routeIs('planificateur.projets.traites') ? 'active' : '' }}"
-                    data-tooltip="Projets traités">
-                    <i class="fas fa-folder-open"></i>
-                    <span>Projets traités</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                @php
-                    $notifCount = \App\Models\Notification::where('destinataire_id', auth()->id())
-                        ->where('statut', 'non_lu')->count();
-                @endphp
-                <a href="{{ route('planificateur.notifications.index') }}"
-                    class="nav-link {{ request()->routeIs('planificateur.notifications*') ? 'active' : '' }}"
-                    data-tooltip="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                    @if($notifCount > 0)
-                        <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
-                    @endif
-                </a>
-            </li>
-        @endif
+        @endforeach
 
         {{-- COMMUN --}}
+
+        <li class="nav-item">
+            <a href="{{ route($role . '.notifications.index') }}"
+                class="nav-link {{ request()->routeIs($role . '.notifications*') ? 'active' : '' }}"
+                data-tooltip="Notifications">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+                @if($notifCount > 0)
+                    <span class="badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                @endif
+            </a>
+        </li>
 
         <li class="nav-item">
             <a href="{{ route('parametres.index') }}"
@@ -282,11 +130,9 @@
         <div class="trait"></div>
 
         <!-- Utilisateur connecté -->
-        <li class="nav-item" id="userInfo" data-tooltip="{{ Auth::user()->nomComplet }}">
-            <div class="nav-link" style="cursor: default;">
-                <div class="user-avatar-sm">
-                    {{ strtoupper(substr(Auth::user()->nomComplet, 0, 2)) }}
-                </div>
+        <li class="nav-item sidebar-user-info" id="userInfo" data-tooltip="{{ Auth::user()->nomComplet }}">
+            <div class="nav-link sidebar-user-link">
+                <x-avatars.avatar :size="34" class="user-avatar-sm" />
                 <div class="user-info-text">
                     <div class="fw-bold">{{ Auth::user()->nomComplet }}</div>
                     <div class="user-role">{{ Auth::user()->email }}</div>
@@ -298,41 +144,6 @@
 </div>
 
 @push('scripts')
-<script>
-
-document.addEventListener('DOMContentLoaded', function () {
-
-    const sidebar    = document.getElementById('mainSidebar');
-    const toggleBtn  = document.getElementById('toggleSidebar');
-    const toggleIcon = document.getElementById('toggleIcon');
-    const toggleText = document.querySelector('.toggle-text');
-
-    if (localStorage.getItem('sidebarCollapsed') === 'true') {
-        sidebar.classList.add('collapsed');
-        toggleIcon.classList.replace('fa-chevron-left', 'fa-chevron-right');
-        if (toggleText) toggleText.textContent = 'Agrandir';
-    }
-
-    toggleBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        sidebar.classList.toggle('collapsed');
-        const collapsed = sidebar.classList.contains('collapsed');
-        localStorage.setItem('sidebarCollapsed', collapsed);
-        if (collapsed) {
-            toggleIcon.classList.remove('fa-chevron-left');
-            toggleIcon.classList.add('fa-chevron-right');
-            if (toggleText) toggleText.textContent = 'Agrandir';
-        } else {
-            toggleIcon.classList.remove('fa-chevron-right');
-            toggleIcon.classList.add('fa-chevron-left');
-            if (toggleText) toggleText.textContent = 'Réduire';
-        }
-    });
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth <= 768) sidebar.classList.remove('collapsed');
-    });
-});
-</script>
+<script src="{{ asset('js/sidebar-toggle.js') }}"></script>
 @endpush
 @endauth

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projet;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller {
 
@@ -14,11 +15,8 @@ class DashboardController extends Controller {
     try{
 
         $user = Auth::user();
-        // Compteurs statuts
         $base = Projet::where('user_id', $user->id);
-        // clone sert à :eviter de modifier la requête originale
-        // exécuter plusieurs requêtes différentes à partir d’une même base
-        // garantir des résultats corrects
+
         $total     = (clone $base)->count();
         $brouillon = (clone $base)->where('statutProjet', 'brouillon')->count();
         $soumis    = (clone $base)->where('statutProjet', 'soumis')->count();
@@ -26,7 +24,11 @@ class DashboardController extends Controller {
         $approuve  = (clone $base)->where('statutProjet', 'approuve')->count();
         $valide    = (clone $base)->where('statutProjet', 'valide')->count();
         $rejete    = (clone $base)->where('statutProjet', 'rejete')->count();
-        $finance   = (clone $base)->where('statutProjet', 'finance')->count();
+
+        // NOTE : 'finance' n'est pas un statut valide pour statutProjet
+        // (seules les activités ont un statut 'financee', pas les projets).
+        // Laissé à 0 en placeholder, comme montantFinance ci-dessous.
+        $finance   = 0;
 
         // Finances
         $budgetTotal    = (clone $base)->sum('budgetTotal')    ?? 0;
@@ -46,7 +48,7 @@ class DashboardController extends Controller {
                                     ->take(2)
                                     ->get();
 
-            return view('porteur.dashboard', compact(
+            return view('dashboard.index', compact(
                 'total',
                 'brouillon',
                 'soumis',
@@ -62,7 +64,13 @@ class DashboardController extends Controller {
                 'notifications'
                 ));
     }catch (\Exception $e){
-        return view('error', 'Une erreur est survenue', $e->getMessage());
+
+        Log::error('Erreur lors du chargement du dashboard porteur', [
+            'message' => $e->getMessage(),
+            'user_id' => Auth::id(),
+        ]);
+
+        return back()->with('error', 'Une erreur est survenue');
     }
     }
 }

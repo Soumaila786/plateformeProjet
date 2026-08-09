@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Validateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -55,22 +54,20 @@ class AnalytiqueController extends Controller {
             }
 
             //  4. DÉLAIS TRAITEMENT
-            // Temps moyen soumission → approbation (en jours)
             $delaiAppro = Projet::whereNotNull('dateApprobation')
                 ->whereNotNull('dateSoumission')
                 ->select(DB::raw('AVG(DATEDIFF(dateApprobation, dateSoumission)) as moy'))
                 ->value('moy');
 
-            // Temps moyen approbation → validation
-            $delaiValid = Projet::whereNotNull('validated_at')
+            // NOTE : validated_at renommé en dateValidation
+            $delaiValid = Projet::whereNotNull('dateValidation')
                 ->whereNotNull('dateApprobation')
-                ->select(DB::raw('AVG(DATEDIFF(validated_at, dateApprobation)) as moy'))
+                ->select(DB::raw('AVG(DATEDIFF(dateValidation, dateApprobation)) as moy'))
                 ->value('moy');
 
-            // Temps moyen total soumission → validation
-            $delaiTotal = Projet::whereNotNull('validated_at')
+            $delaiTotal = Projet::whereNotNull('dateValidation')
                 ->whereNotNull('dateSoumission')
-                ->select(DB::raw('AVG(DATEDIFF(validated_at, dateSoumission)) as moy'))
+                ->select(DB::raw('AVG(DATEDIFF(dateValidation, dateSoumission)) as moy'))
                 ->value('moy');
 
             $delais = [
@@ -88,7 +85,6 @@ class AnalytiqueController extends Controller {
                 ->count();
 
             //  5. ANALYSE FINANCIÈRE
-            // Montants demandés vs budget par secteur
             $finParSecteur = Projet::with('secteur')
                 ->select('secteur_id',
                     DB::raw('SUM(budgetTotal) as total_budget'),
@@ -136,23 +132,24 @@ class AnalytiqueController extends Controller {
             }
 
             //  7. PERFORMANCE VALIDATEUR
+            // NOTE : validated_at/validated_by renommés en dateValidation/validateur_id
             $validateur = Auth::user();
-            $perfAujourdhui = Projet::whereNotNull('validated_at')
-                ->where('validated_by', $validateur->id)
-                ->whereDate('validated_at', $now->toDateString())
+            $perfAujourdhui = Projet::whereNotNull('dateValidation')
+                ->where('validateur_id', $validateur->id)
+                ->whereDate('dateValidation', $now->toDateString())
                 ->count();
 
-            $perfSemaine = Projet::whereNotNull('validated_at')
-                ->where('validated_by', $validateur->id)
-                ->whereBetween('validated_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
+            $perfSemaine = Projet::whereNotNull('dateValidation')
+                ->where('validateur_id', $validateur->id)
+                ->whereBetween('dateValidation', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
                 ->count();
 
-            $totalTraites = Projet::whereNotNull('validated_at')
-                ->where('validated_by', $validateur->id)
+            $totalTraites = Projet::whereNotNull('dateValidation')
+                ->where('validateur_id', $validateur->id)
                 ->count();
 
             $totalValides = Projet::where('statutProjet', 'valide')
-                ->where('validated_by', $validateur->id)
+                ->where('validateur_id', $validateur->id)
                 ->count();
 
             $tauxValidation = $totalTraites > 0
@@ -169,7 +166,7 @@ class AnalytiqueController extends Controller {
                 'en_attente'     => $enAttente,
             ];
 
-            return view('validateur.analytique', compact(
+            return view('analytique.index', compact(
                 'entonnoir',
                 'totalDemande',
                 'totalBudget',

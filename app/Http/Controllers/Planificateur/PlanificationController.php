@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Planificateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
-use App\Models\Planification;
+use App\Models\Activite;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,15 +11,18 @@ use Illuminate\Support\Facades\Log;
 
 class PlanificationController extends Controller {
 
+    // NOTE : pilote désormais le Model Activite (l'ancienne table planifications
+    // a été fusionnée dedans).
+
     private function validerDonnees(Request $request) {
 
         return $request->validate([
             'activitePlanification' => 'required|string|max:255',
-            'indicateur'            => 'nullable|string|max:255',
-            'uniteIndicateur'       => 'nullable|string|max:100',
-            'resultatsAttendues'    => 'nullable|string',
-            'coutEstimatif'         => 'nullable|numeric|min:0',
-            'periode'               => 'nullable|string|max:100',
+            'indicateur'            => 'required|integer',
+            'uniteIndicateur'       => 'required|string|max:100',
+            'resultatsAttendues'    => 'required|string',
+            'coutEstimatif'         => 'required|numeric|min:0',
+            'periode'               => 'required|string|max:100',
         ]);
     }
 
@@ -40,7 +43,7 @@ class PlanificationController extends Controller {
 
             $projets = $query->orderBy('updated_at', 'desc')->paginate(4);
 
-            return view('planificateur.projets.index', compact('projets'));
+            return view('projets.index', compact('projets'));
 
         } catch (\Exception $e) {
             Log::error('Erreur chargement projets planificateur', [
@@ -52,21 +55,37 @@ class PlanificationController extends Controller {
     }
 
     public function show(Projet $projet) {
-        $projet->load(['secteur', 'user', 'planifications', 'documents']);
-        return view('planificateur.projets.show', compact('projet'));
+
+        $this->authorize('voirPlanification', $projet);
+
+        $projet->load(['secteur', 'user', 'activites', 'documents']);
+        return view('projets.show', compact('projet'));
     }
 
     public function create(Projet $projet) {
+
+        $this->authorize('gererPlanification', $projet);
+
         return view('planificateur.planifications.create', compact('projet'));
     }
 
     public function store(Request $request, Projet $projet) {
 
+        $this->authorize('gererPlanification', $projet);
+
         try {
             $data = $this->validerDonnees($request);
-            $data['projet_id'] = $projet->id;
 
-            Planification::create($data);
+            $projet->activites()->create([
+                'activite'           => $data['activitePlanification'],
+                'indicateur'         => $data['indicateur'],
+                'uniteIndicateur'    => $data['uniteIndicateur'],
+                'resultatsAttendues' => $data['resultatsAttendues'],
+                'coutEstimatif'      => $data['coutEstimatif'],
+                'periode'            => $data['periode'],
+                'statutActivite'     => 'en_attente',
+                'planificateur_id'   => Auth::id(),
+            ]);
 
             // NE PAS remettre planification_demandee à false ici
             // Le planificateur peut ajouter plusieurs activités librement
@@ -95,20 +114,33 @@ class PlanificationController extends Controller {
         }
     }
 
-    public function edit(Projet $projet, Planification $planification) {
+    public function edit(Projet $projet, Activite $planification) {
+
+        $this->authorize('gererPlanification', $projet);
         abort_if($planification->projet_id !== $projet->id, 404);
+
         return view('planificateur.planifications.edit', compact('projet', 'planification'));
     }
 
-    public function update(Request $request, Projet $projet, Planification $planification) {
+    public function update(Request $request, Projet $projet, Activite $planification) {
+
+        $this->authorize('gererPlanification', $projet);
         abort_if($planification->projet_id !== $projet->id, 404);
 
         try {
             $data = $this->validerDonnees($request);
-            $planification->update($data);
+
+            $planification->update([
+                'activite'           => $data['activitePlanification'],
+                'indicateur'         => $data['indicateur'],
+                'uniteIndicateur'    => $data['uniteIndicateur'],
+                'resultatsAttendues' => $data['resultatsAttendues'],
+                'coutEstimatif'      => $data['coutEstimatif'],
+                'periode'            => $data['periode'],
+            ]);
 
             Log::info('Planification modifiée par le planificateur', [
-                'planification_id' => $planification->idPlanification,
+                'planification_id' => $planification->id,
                 'projet_id'        => $projet->id,
                 'user_id'          => Auth::id(),
             ]);
@@ -126,14 +158,16 @@ class PlanificationController extends Controller {
         }
     }
 
-    public function destroy(Projet $projet, Planification $planification) {
+    public function destroy(Projet $projet, Activite $planification) {
+
+        $this->authorize('gererPlanification', $projet);
         abort_if($planification->projet_id !== $projet->id, 404);
 
         try {
             $planification->delete();
 
             Log::warning('Planification supprimée par le planificateur', [
-                'planification_id' => $planification->idPlanification,
+                'planification_id' => $planification->id,
                 'projet_id'        => $projet->id,
                 'user_id'          => Auth::id(),
             ]);
@@ -150,13 +184,12 @@ class PlanificationController extends Controller {
         }
     }
 
-    // Projets déjà planifiés par ce planificateur (planification_demandee = false et ont des planifications)
+    // Projets déjà planifiés par ce planificateur (planification_demandee = false et ont des activités)
     public function traites(Request $request) {
         try {
             $query = Projet::with(['secteur', 'user'])
                 ->where('planification_demandee', false)
-                ->whereHas('planifications');
-                // ->where('user_id', Auth::id());
+                ->whereHas('activites');
 
             if ($request->filled('search')) {
                 $s = $request->search;

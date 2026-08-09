@@ -1,0 +1,26 @@
+/* Page détail projet (show) — spécifique. S'appuie sur variables.css. */
+
+.ps-header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    font-size: var(--font-sm);
+    color: var(--color-text-light);
+    margin-top: var(--space-4);
+}
+.ps-header-meta i { margin-right: var(--space-2); color: var(--color-text-light); }
+
+.ps-row {
+    padding: var(--space-7) 0;
+}
+.ps-row + .ps-row {
+    border-top: 1px solid var(--color-border-light);
+}
+.ps-row-title { font-weight: 600; font-size: var(--font-base); color: var(--color-text); }
+.ps-row-sub { font-size: var(--font-sm); color: var(--color-text-light); margin-top: var(--space-2); }
+
+/* Espacement plus net entre les cartes empilées de la colonne principale */
+.ps-main > .card,
+.ps-main > div > .card {
+    margin-bottom: var(--space-10) !important;
+}

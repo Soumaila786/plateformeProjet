@@ -1,0 +1,29 @@
+/* Formulaires — labels façon ancien design (gras, gris), à charger après
+   Bootstrap dans le layout pour bien primer sur .form-label. */
+
+.form-label,
+label.form-label,
+.lp-modal-body label,
+.pf-form label {
+    font-weight: 700;
+    font-size: var(--font-sm);
+    color: var(--color-text-gray);
+    text-transform: none;
+    margin-bottom: var(--space-4);
+    display: inline-block;
+}
+
+/* Champs : cohérents avec le radius/ombre du reste de l'appli */
+.form-control,
+.form-select {
+    border-radius: var(--radius-md);
+    border-color: var(--color-border);
+    font-size: var(--font-base);
+}
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 .2rem var(--color-primary-light);
+}
+
+.invalid-feedback { font-size: var(--font-xs); }

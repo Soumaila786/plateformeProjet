@@ -33,8 +33,8 @@ class ProjetController extends Controller {
             }
 
             $projets = $query->orderBy('created_at', 'desc')->paginate(4);
-
-            return view('porteur.projets.index', compact('projets'));
+            $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
+            return view('projets.index', compact('projets','secteurs'));
 
         }catch(\Exception $e){
             Log::error('Erreur lors du chargement des projets du porteur', [
@@ -47,32 +47,40 @@ class ProjetController extends Controller {
 
     public function create() {
 
-        try{
+        $this->authorize('create', Projet::class);
+
+        try {
             $secteurs = SecteurActivite::where('statutSecteur', true)
                         ->orderBy('nomSecteur')->get();
 
-            return view('porteur.projets.create', compact('secteurs'));
+            return view('projets.create', compact('secteurs'));
 
-        }catch(\Exception $e){
-            return back()->with('error', 'Une erreur est survenue ');
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du chargement du formulaire de création', [
+                'message' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+            return back()->with('error', 'Une erreur est survenue.');
         }
     }
 
-    public function store(Request $request){
+    public function store(Request $request) {
 
-        try{
+        $this->authorize('create', Projet::class);
+
+        try {
             $request->validate([
-                'titre'         => 'required|string|max:255',
-                'description'   => 'required|string',
-                'objectif'      => 'nullable|string',
-                'secteur_id'    => 'required|exists:secteur_activites,id',
-                'duree'         => 'nullable|integer|min:1',
-                'dateDebut'     => 'nullable|date',
-                'dateFin'       => 'nullable|date|after_or_equal:dateDebut',
-                'budgetTotal'   => 'nullable|numeric|min:0',
-                'montantDemande'=> 'nullable|numeric|min:0',
-                'documents'     => 'nullable|array',
-                'documents.*'   => 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
+                'titre'          => 'required|string|max:255',
+                'description'    => 'required|string',
+                'objectif'       => 'nullable|string',
+                'secteur_id'     => 'required|exists:secteur_activites,id',
+                'duree'          => 'nullable|integer|min:1',
+                'dateDebut'      => 'nullable|date',
+                'dateFin'        => 'nullable|date|after_or_equal:dateDebut',
+                'budgetTotal'    => 'nullable|numeric|min:0',
+                'montantDemande' => 'nullable|numeric|min:0',
+                'documents'      => 'nullable|array',
+                'documents.*'    => 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
             ]);
 
             $code = 'PRJ-' . strtoupper(substr(md5(uniqid()), 0, 8));
@@ -82,7 +90,6 @@ class ProjetController extends Controller {
                 'titre'          => $request->titre,
                 'description'    => $request->description,
                 'objectif'       => $request->objectif ?? '',
-                'dateCreation'   => now(),
                 'duree'          => $request->duree,
                 'dateDebut'      => $request->dateDebut,
                 'dateFin'        => $request->dateFin,
@@ -92,7 +99,8 @@ class ProjetController extends Controller {
                 'user_id'        => Auth::id(),
                 'secteur_id'     => $request->secteur_id,
             ]);
-            Log::info('Création d’un projet', [
+
+            Log::info('Création d\'un projet', [
                 'projet_id' => $projet->id,
                 'code_projet' => $projet->codeProjet,
                 'porteur_id' => Auth::id(),
@@ -117,16 +125,17 @@ class ProjetController extends Controller {
                     'user_id' => Auth::id(),
                 ]);
             }
+
             return redirect()->route('porteur.projets.show', $projet)
                 ->with('success', 'Projet créé avec succès.');
 
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             Log::error('Erreur lors de la création du projet', [
                 'message' => $e->getMessage(),
                 'user_id' => Auth::id(),
             ]);
-            return redirect()->route('porteur.projets.show', $projet)
-                ->with('error', 'Une erreur est survenue ');
+            return redirect()->route('porteur.projets.index')
+                ->with('error', 'Une erreur est survenue.');
         }
     }
 
@@ -138,10 +147,11 @@ class ProjetController extends Controller {
             'secteur',
             'documents',
             'commentaires.utilisateur',
-            'planifications',
+            'activites',
         ]);
+        $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
 
-        return view('porteur.projets.show', compact('projet'));
+        return view('projets.show', compact('projet','secteurs'));
     }
 
     public function edit(Projet $projet){
@@ -288,7 +298,7 @@ class ProjetController extends Controller {
 
     public function storeDocument(Request $request, Projet $projet) {
 
-        $this->authorize('update', $projet);
+        $this->authorize('uploadDocument', $projet);
 
         try{
 
@@ -331,7 +341,7 @@ class ProjetController extends Controller {
 
     public function destroyDocument(Projet $projet, DocumentProjet $document){
 
-        $this->authorize('update', $projet);
+        $this->authorize('deleteDocument', $projet);
 
         try{
 
@@ -359,6 +369,7 @@ class ProjetController extends Controller {
 
     public function downloadDocument(Projet $projet, DocumentProjet $document) {
 
+        $this->authorize('view', $projet);
 
         $path = storage_path('app/public/' . $document->cheminFichier);
         if (!file_exists($path)) {
@@ -379,16 +390,18 @@ class ProjetController extends Controller {
     }
 
 
-    public function demanderPlanification($id) {
+    public function demanderPlanification(Projet $projet) {
+
+        $this->authorize('gererPlanification', $projet);
+
         try {
-            $projet = Projet::findOrFail($id);
             $projet->update([
                 'planification_demandee' => true,
             ]);
 
             $user = Auth::user();
 
-            // Notifier les PLANIFICATEURS (plus les approbateurs)
+            // Notifier les PLANIFICATEURS
             NotificationService::notifierPlanificateurs(
                 $user->nomComplet.' demande une planification pour le projet « ' . $projet->titre . ' » (' . $projet->codeProjet . ').',
                 'info',
@@ -405,7 +418,7 @@ class ProjetController extends Controller {
 
         } catch (\Exception $e) {
             Log::error('Erreur lors de la demande de planification', [
-                'projet_id' => $id,
+                'projet_id' => $projet->id,
                 'message'   => $e->getMessage(),
                 'user_id'   => Auth::id(),
             ]);

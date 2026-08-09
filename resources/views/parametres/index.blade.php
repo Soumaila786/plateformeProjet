@@ -1,47 +1,46 @@
 @extends('layouts.app')
+
 @section('title', 'Paramètres')
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/parametre.css') }}">
-@endpush
+
+@section('breadcrumb')
+    <a href="{{ route(auth()->user()->role.'.dashboard') }}">Tableau de bord</a>
+    <span>/</span>
+    <span>Paramètres</span>
+@endsection
+
+@section('page-header')
+    <div class="page-header-top">
+        <div>
+            <h1 class="page-header-title">Paramètres</h1>
+            <p class="page-header-sub">Gérez votre profil, votre sécurité et vos notifications</p>
+        </div>
+    </div>
+@endsection
+
 @section('content')
-<div class="parametres-page">
-    <div class="param-header">
-        <h1 class="param-title">Paramètres</h1>
-        <p class="param-subtitle">Configuration de votre compte</p>
-    </div>
-    <div class="param-list">
-        <a href="{{ route('parametres.profil') }}" class="param-card">
-            <div class="param-icon"><i class="fas fa-user"></i></div>
-            <div class="param-info">
-                <p class="param-label">Profil</p>
-                <p class="param-desc">Modifier vos informations personnelles</p>
-            </div>
-            <i class="fas fa-chevron-right param-arrow"></i>
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/parametres.css') }}">
+    @endpush
+
+    @php $onglet = request('onglet', 'profil'); @endphp
+
+    <div class="param-tabs">
+        <a href="{{ route('parametres.index', ['onglet' => 'profil']) }}" class="param-tab {{ $onglet === 'profil' ? 'active' : '' }}">
+            <i class="fas fa-user me-1"></i> Profil
         </a>
-        <a href="{{ route('parametres.securite') }}" class="param-card">
-            <div class="param-icon"><i class="fas fa-shield-alt"></i></div>
-            <div class="param-info">
-                <p class="param-label">Sécurité</p>
-                <p class="param-desc">Mot de passe et authentification</p>
-            </div>
-            <i class="fas fa-chevron-right param-arrow"></i>
+        <a href="{{ route('parametres.index', ['onglet' => 'securite']) }}" class="param-tab {{ $onglet === 'securite' ? 'active' : '' }}">
+            <i class="fas fa-shield-halved me-1"></i> Sécurité
         </a>
-        <a href="{{ route('parametres.notifications') }}" class="param-card">
-            <div class="param-icon"><i class="fas fa-bell"></i></div>
-            <div class="param-info">
-                <p class="param-label">Notifications</p>
-                <p class="param-desc">Préférences de notification</p>
-            </div>
-            <i class="fas fa-chevron-right param-arrow"></i>
-        </a>
-        <a href="{{ route('parametres.general') }}" class="param-card">
-            <div class="param-icon"><i class="fas fa-cog"></i></div>
-            <div class="param-info">
-                <p class="param-label">Général</p>
-                <p class="param-desc">Langue, fuseau horaire</p>
-            </div>
-            <i class="fas fa-chevron-right param-arrow"></i>
+        <a href="{{ route('parametres.index', ['onglet' => 'notifications']) }}" class="param-tab {{ $onglet === 'notifications' ? 'active' : '' }}">
+            <i class="fas fa-bell me-1"></i> Notifications
         </a>
     </div>
-</div>
+
+    @if ($onglet === 'securite')
+        @include('parametres.partials._securite')
+    @elseif ($onglet === 'notifications')
+        @include('parametres.partials._notifications')
+    @else
+        @include('parametres.partials._profil')
+    @endif
 @endsection

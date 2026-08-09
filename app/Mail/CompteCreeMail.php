@@ -12,11 +12,11 @@ class CompteCreeMail extends Mailable {
     use Queueable, SerializesModels;
 
     public $user;
-    public $motDePasse;
+    public $password;
 
-    public function __construct(User $user, $motDePasse){
-        $this->user       = $user;
-        $this->motDePasse = $motDePasse;
+    public function __construct(User $user, $password){
+        $this->user     = $user;
+        $this->password = $password;
     }
 
     public function build() {
@@ -24,8 +24,8 @@ class CompteCreeMail extends Mailable {
             ->subject('Bienvenue sur GesProjet - Votre compte a ete cree')
             ->view('emails.compte_cree')
             ->with([
-                'user'       => $this->user,
-                'motDePasse' => $this->motDePasse,
+                'user'     => $this->user,
+                'password' => $this->password,
             ]);
     }
 }

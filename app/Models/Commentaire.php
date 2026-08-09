@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Http\Models\Projet;
 
 class Commentaire extends Model
 {
@@ -17,7 +16,9 @@ class Commentaire extends Model
         'utilisateur_id',
     ];
 
-    protected $dates = ['dateEnvoi'];
+    protected $casts = [
+        'dateEnvoi' => 'datetime',
+    ];
 
     // ── Relations ──
 
@@ -27,6 +28,11 @@ class Commentaire extends Model
 
     public function utilisateur(){
         return $this->belongsTo(User::class, 'utilisateur_id');
+    }
+
+    // Motifs sélectionnés (rejet ou demande de modification) — sélection multiple
+    public function motifs() {
+        return $this->belongsToMany(MotifRejet::class, 'commentaire_motifs', 'commentaire_id', 'motif_id');
     }
 
     // ── Helpers ──
@@ -50,5 +56,5 @@ class Commentaire extends Model
         ];
         return $colors[$this->typeCommentaire] ?? '#6b7280';
     }
-    
+
 }

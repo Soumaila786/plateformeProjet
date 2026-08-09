@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Projet;
 use App\Models\SecteurActivite;
 use App\Models\Commentaire;
+use App\Models\MotifRejet;
 use App\Services\MailService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ class ProjetController extends Controller {
             $projets = $query->orderBy('updated_at', 'asc')
                             ->paginate(4);
 
-            return view('validateur.projets.index', compact('projets', 'secteurs'));
+            return view('projets.index', compact('projets', 'secteurs'));
 
         }catch(\Exception $e){
             Log::error('Erreur lors du chargement des projets à valider', [
@@ -67,7 +68,7 @@ class ProjetController extends Controller {
             $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
 
             $query = Projet::with(['secteur', 'porteur'])
-                ->where('validated_by', Auth::id());
+                ->where('validateur_id', Auth::id());
 
             if ($request->filled('search')) {
                 $s = $request->search;
@@ -85,9 +86,8 @@ class ProjetController extends Controller {
                 $query->where('statutProjet', $request->statut);
             }
 
-            $projets = $query->orderBy('validated_at', 'desc')->paginate(10);
+            $projets = $query->orderBy('dateValidation', 'desc')->paginate(10);
 
-            // Récupérer le motif de rejet depuis les commentaires
             $projets->getCollection()->transform(function ($p) {
 
                 $p->motifRejet = null;
@@ -119,19 +119,27 @@ class ProjetController extends Controller {
     // Détail d'un projet
     public function show(Projet $projet) {
 
+        $this->authorize('view', $projet);
+
+        // Motifs actifs pour alimenter les cases à cocher (rejet / demande de modification)
+        $motifsDisponibles = MotifRejet::actifs()->orderBy('libelle')->get();
+
         $projet->load([
             'secteur',
             'porteur',
-            'planifications',
+            'activites',
             'documents',
-            'commentaires.utilisateur'
+            'commentaires.utilisateur',
+            'commentaires.motifs',
         ]);
 
-        return view('validateur.projets.show', compact('projet'));
+        return view('projets.show', compact('projet', 'motifsDisponibles'));
     }
 
-    // Valider
+    // Valider (bouton 1)
     public function valider(Request $request, Projet $projet) {
+
+        $this->authorize('valider', $projet);
 
         try{
 
@@ -144,8 +152,7 @@ class ProjetController extends Controller {
             }
 
             $projet->statutProjet   = 'valide';
-            $projet->validated_by   = Auth::id();
-            $projet->validated_at   = now();
+            $projet->validateur_id  = Auth::id();
             $projet->dateValidation = now();
             $projet->save();
 
@@ -157,7 +164,6 @@ class ProjetController extends Controller {
                 'ip' => $request->ip(),
             ]);
 
-            // filled : vérifie que la clé existe ET que la valeur n'est pas une chaîne vide, null ou un tableau vide
             if ($request->filled('commentaire')) {
                 Commentaire::create([
                     'message'         => $request->commentaire,
@@ -174,7 +180,6 @@ class ProjetController extends Controller {
                 'validation'
             );
 
-            // Envoie de mail
             $this->mailService->envoyerProjetValide($projet);
             Log::info('Email de validation envoyé', [
                 'projet_id' => $projet->id,
@@ -197,43 +202,48 @@ class ProjetController extends Controller {
 
     }
 
-    // Rejeter
+    // Rejeter (bouton 3) — liste de motifs à cocher (obligatoire) + commentaire libre (optionnel)
+    // NOTE : après rejet, le projet est verrouillé définitivement (voir ProjetPolicy::update()).
     public function rejeter(Request $request, Projet $projet) {
+
+        $this->authorize('rejeter', $projet);
 
         try {
 
             $request->validate([
-                'motifRejet' => 'required|string|min:5|max:1000',
+                'motifs'            => 'required|array|min:1',
+                'motifs.*'          => 'exists:motifs_rejet,id',
+                'commentaire_libre' => 'nullable|string|max:1000',
             ]);
 
             if ($projet->statutProjet !== 'approuve') {
                 return back()->with('error', 'Ce projet ne peut pas être rejeté dans son état actuel.');
             }
 
-            $projet->statutProjet   = 'rejete';
-            $projet->validated_by   = Auth::id();
-            $projet->validated_at   = now();
-            $projet->dateValidation = now();
-            $projet->save();
-
-            Commentaire::create([
-                'message'         => $request->motifRejet,
+            $commentaire = Commentaire::create([
+                'message'         => $request->commentaire_libre ?? '',
                 'typeCommentaire' => 'rejet',
                 'dateEnvoi'       => now(),
                 'projet_id'       => $projet->id,
                 'utilisateur_id'  => Auth::id(),
             ]);
+            $commentaire->motifs()->sync($request->motifs);
 
-            NotificationService::notifierPorteur(
-                $projet,
-                'Votre projet « '.$projet->titre.' » a été rejeté par le validateur. Motif : '.$request->motifRejet,
-                'rejet'
-            );
+            $projet->statutProjet   = 'rejete';
+            $projet->validateur_id  = Auth::id();
+            $projet->dateValidation = now();
+            $projet->save();
+
+            $libelles = MotifRejet::whereIn('id', $request->motifs)->pluck('libelle')->implode(', ');
+            $msgPorteur = 'Votre projet « '.$projet->titre.' » a été rejeté par le validateur. Motif(s) : ' . $libelles
+                . ($request->filled('commentaire_libre') ? ' — ' . $request->commentaire_libre : '');
+
+            NotificationService::notifierPorteur($projet, $msgPorteur, 'rejet');
 
             Log::warning('Rejet d’un projet par le validateur', [
                 'projet_id' => $projet->id,
                 'code_projet' => $projet->codeProjet,
-                'motif' => $request->motifRejet,
+                'motifs' => $request->motifs,
                 'validateur_id' => Auth::id(),
                 'ip' => $request->ip(),
             ]);
@@ -243,6 +253,60 @@ class ProjetController extends Controller {
 
         }catch(\Exception $e){
             Log::error('Erreur lors du rejet du projet', [
+                'projet_id' => $projet->id ?? null,
+                'message' => $e->getMessage(),
+                'validateur_id' => Auth::id(),
+            ]);
+            return back()->with('error', 'Une erreur est survenue ');
+        }
+    }
+
+    // Demande de modification (bouton 2) — renvoie le projet en brouillon
+    public function demanderModification(Request $request, Projet $projet) {
+
+        $this->authorize('demandeModification', $projet);
+
+        try {
+
+            $request->validate([
+                'motifs'            => 'required|array|min:1',
+                'motifs.*'          => 'exists:motifs_rejet,id',
+                'commentaire_libre' => 'nullable|string|max:1000',
+            ]);
+
+            $commentaire = Commentaire::create([
+                'message'         => $request->commentaire_libre ?? '',
+                'typeCommentaire' => 'demande',
+                'dateEnvoi'       => now(),
+                'projet_id'       => $projet->id,
+                'utilisateur_id'  => Auth::id(),
+            ]);
+            $commentaire->motifs()->sync($request->motifs);
+
+            $projet->update([
+                'statutProjet'  => 'brouillon',
+                'validateur_id' => Auth::id(),
+            ]);
+
+            $libelles = MotifRejet::whereIn('id', $request->motifs)->pluck('libelle')->implode(', ');
+            $msgPorteur = 'Une modification est demandée sur votre projet « '.$projet->titre.' » par le validateur. Motif(s) : ' . $libelles
+                . ($request->filled('commentaire_libre') ? ' — ' . $request->commentaire_libre : '');
+
+            NotificationService::notifierPorteur($projet, $msgPorteur, 'modification');
+
+            Log::warning('Demande de modification envoyée par le validateur', [
+                'projet_id' => $projet->id,
+                'code_projet' => $projet->codeProjet,
+                'motifs' => $request->motifs,
+                'validateur_id' => Auth::id(),
+                'ip' => $request->ip(),
+            ]);
+
+            return redirect()->route('validateur.projets.index')
+                    ->with('success', 'Demande de modification envoyée au porteur.');
+
+        }catch(\Exception $e){
+            Log::error('Erreur lors de la demande de modification (validateur)', [
                 'projet_id' => $projet->id ?? null,
                 'message' => $e->getMessage(),
                 'validateur_id' => Auth::id(),

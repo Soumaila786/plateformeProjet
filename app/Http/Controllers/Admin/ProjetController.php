@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
 use App\Models\DocumentProjet;
-use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Services\Projet\ProjetService;
 
 class ProjetController extends Controller {
 
@@ -40,7 +40,7 @@ class ProjetController extends Controller {
                 'ip' => $request->ip()
             ]);
 
-            return view('admin.projets.index', compact('projets'));
+            return view('projets.index', compact('projets'));
 
         }catch (\Exception $e) {
             Log::error('Erreur lors de la récupération des projets', [
@@ -51,7 +51,9 @@ class ProjetController extends Controller {
         }
     }
 
-    public function show(Projet $projet){
+    public function show(Projet $projet, ProjetService $projetService){
+
+        $this->authorize('view', $projet);
 
         $projet->load([
             'porteur', 'secteur',
@@ -60,16 +62,21 @@ class ProjetController extends Controller {
             'commentaires.utilisateur'
         ]);
 
+        $viewData = $projetService->prepare($projet);
+
         Log::info('Consultation d’un projet', [
             'projet_id' => $projet->id,
             'admin_id' => Auth::id(),
             'ip' => request()->ip()
         ]);
 
-        return view('admin.projets.show', compact('projet'));
+        return view( 'projets.show', array_merge( ['projet' => $projet], $viewData ) );
+
     }
 
     public function destroy(Projet $projet){
+
+        $this->authorize('delete', $projet);
 
         try{
 
@@ -87,7 +94,7 @@ class ProjetController extends Controller {
                 'ip' => request()->ip()
             ]);
 
-            return redirect()->route('admin.projets.index')->with('success', 'Projet supprimé avec succès.');
+            return redirect()->route('projets.index')->with('success', 'Projet supprimé avec succès.');
 
         }catch(\Exception $e){
 
@@ -96,61 +103,18 @@ class ProjetController extends Controller {
                 'message' => $e->getMessage(),
                 'admin_id' => Auth::id()
             ]);
-            return redirect()->route('admin.projets.index', $projet)->with('error', 'Une erreur est survenue ');
+            return redirect()->route('projets.index', $projet)->with('error', 'Une erreur est survenue ');
         }
     }
 
-    // public function changerStatut(Request $request, Projet $projet) {
-
-    //     try{
-
-    //         $request->validate([
-    //             'statut' => 'required|in:brouillon,soumis,en_examen,approuve,valide,rejete',
-    //         ]);
-
-    //         $ancienStatut = $projet->statutProjet;
-    //         $projet->update(['statutProjet' => $request->statut]);
-
-    //         $labels = [
-    //             'brouillon' => 'Brouillon', 'soumis'    => 'Soumis',
-    //             'en_examen' => 'En examen', 'approuve'  => 'Approuvé',
-    //             'valide'    => 'Validé',    'rejete'     => 'Rejeté',
-    //         ];
-
-    //         // Notification au porteur
-    //         NotificationService::notifierPorteur(
-    //             $projet,
-    //             'Le statut de votre projet « ' . $projet->titre .
-    //             ' » a été modifié de « ' . ($labels[$ancienStatut] ?? $ancienStatut) .
-    //             ' » à « ' . ($labels[$request->statut] ?? $request->statut) .
-    //             ' » par l\'administrateur.',
-    //             'statut_change'
-    //         );
-
-    //         Log::notice('Changement de statut d’un projet', [
-    //             'projet_id' => $projet->id,
-    //             'titre' => $projet->titre,
-    //             'ancien_statut' => $ancienStatut,
-    //             'nouveau_statut' => $request->statut,
-    //             'admin_id' => Auth::id(),
-    //             'ip' => $request->ip()
-    //         ]);
-
-    //         return redirect()->route('admin.projets.show', $projet)->with('success', 'Statut mis à jour.');
-
-    //     }catch(\Exception $e){
-
-    //         Log::error('Erreur lors du changement de statut',[
-    //             'projet_id' => $projet->id,
-    //             'message' => $e->getMessage(),
-    //             'admin_id' => Auth::id()
-    //         ]);
-    //         return redirect()->route('admin.projets.show', $projet)
-    //             ->with('error', 'Une erreur est survenue ');
-    //     }
-    // }
+    // NOTE : changerStatut() était commentée intégralement dans le fichier d'origine
+    // (code mort, jamais routée). Supprimée dans le cadre du nettoyage (point 6) —
+    // si tu veux qu'un admin puisse forcer un changement de statut, dis-le-moi et
+    // je la réécris proprement avec la bonne autorisation Policy.
 
     public function downloadDocument(Projet $projet, DocumentProjet $document){
+
+        $this->authorize('view', $projet);
 
         $path = storage_path('app/public/' . $document->cheminFichier);
 

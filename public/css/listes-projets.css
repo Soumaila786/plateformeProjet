@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Liste de projets "en lignes" — classes lp-* (Liste Projets), désormais
+   entièrement pilotées par variables.css (aucune couleur codée en dur).
+   ========================================================================== */
+
+.lp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+.lp-header-title { font-size: var(--font-xl); font-weight: 800; margin: 0; color: var(--color-text); letter-spacing: -.02em; }
+.lp-header-sub { font-size: var(--font-sm); color: var(--color-text-light); margin: 0; }
+
+.lp-filtres { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; margin-bottom: var(--space-8); }
+
+.lp-search-wrap { position: relative; }
+.lp-search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); font-size: var(--font-xs); }
+.lp-search-wrap input {
+    padding: var(--space-4) var(--space-6) var(--space-4) 2rem;
+    border: 1px solid var(--color-border); border-radius: var(--radius-md);
+    font-size: var(--font-base); color: var(--color-text-gray);
+}
+
+.lp-select {
+    padding: var(--space-4) var(--space-6); border: 1px solid var(--color-border);
+    border-radius: var(--radius-md); font-size: var(--font-base); color: var(--color-text-gray);
+}
+
+.lp-status-filters { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.lp-status-filter {
+    padding: var(--space-3) var(--space-7); border-radius: 999px; font-size: var(--font-sm); font-weight: 600;
+    color: var(--color-text-muted); background: var(--color-bg-gray); text-decoration: none;
+}
+.lp-status-filter:hover { background: var(--color-border); text-decoration: none; }
+.lp-status-filter.active { background: var(--color-primary); color: #fff; }
+
+.lp-reset-btn { font-size: var(--font-sm); color: var(--color-danger); text-decoration: none; }
+
+.lp-row {
+    display: flex; align-items: center; gap: var(--space-8);
+    background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-xl);
+    padding: var(--space-7) var(--space-9); margin-bottom: var(--space-4);
+    box-shadow: var(--shadow-sm); transition: box-shadow var(--transition-slow);
+}
+.lp-row:hover { box-shadow: var(--shadow-md); }
+.lp-avatar {
+    width: 40px; height: 40px; border-radius: var(--radius-md); flex-shrink: 0;
+    background: var(--color-primary-light); color: var(--color-primary);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: var(--font-base);
+}
+.lp-info { flex: 1; min-width: 0; }
+.lp-top { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.lp-code { font-family: monospace; font-size: var(--font-xs); color: var(--color-text-light); text-transform: uppercase; letter-spacing: .04em; }
+.lp-titre { font-weight: 700; font-size: var(--font-base); color: var(--color-text); }
+.lp-meta { display: flex; flex-wrap: wrap; gap: var(--space-7); font-size: var(--font-sm); color: var(--color-text-light); margin: var(--space-2) 0 0; }
+.lp-meta span { display: inline-flex; align-items: center; gap: var(--space-2); }
+.lp-meta i { font-size: var(--font-xs); }
+
+.lp-badges { display: flex; align-items: center; gap: var(--space-4); flex-shrink: 0; }
+.lp-badge {
+    display: inline-flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) var(--space-6); border-radius: 999px; font-size: var(--font-sm); font-weight: 700;
+}
+.lp-dot { width: 6px; height: 6px; border-radius: var(--radius-full); }
+
+.lp-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: var(--radius-md); border: 1px solid var(--color-border);
+    background: var(--color-white); color: var(--color-text-gray); cursor: pointer; font-size: var(--font-sm);
+    transition: background var(--transition-fast);
+}
+.lp-btn:hover { background: var(--color-bg-gray-light); text-decoration: none; }
+.lp-btn-green  { background: var(--color-success-light); border-color: var(--color-success-border); color: var(--color-success); }
+.lp-btn-green:hover  { background: var(--color-success); color: #fff; }
+.lp-btn-red    { background: var(--color-danger-light); border-color: var(--color-danger-border); color: var(--color-danger); }
+.lp-btn-red:hover    { background: var(--color-danger); color: #fff; }
+.lp-btn-orange { background: var(--color-warning-light); border-color: var(--color-warning-border); color: var(--color-warning); }
+.lp-btn-orange:hover { background: var(--color-warning); color: #fff; }
+.lp-btn-primary{ background: var(--color-primary-light); border-color: var(--color-primary); color: var(--color-primary); }
+.lp-btn-primary:hover{ background: var(--color-primary); color: #fff; }
+
+.lp-empty { text-align: center; padding: 3rem 1rem; color: var(--color-text-light); }
+.lp-empty i { font-size: var(--font-3xl); margin-bottom: var(--space-4); display: block; color: var(--color-border); }
+
+/* Modale (créer/modifier + confirmation d'action) */
+.lp-modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(17, 24, 39, .45);
+    align-items: center; justify-content: center; z-index: 1050; padding: var(--space-8);
+}
+.lp-modal-overlay.active { display: flex; }
+.lp-modal-box { background: var(--color-white); border-radius: var(--radius-2xl); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-xl); }
+.lp-modal-box.lp-modal-lg { max-width: 640px; }
+.lp-modal-head { display: flex; justify-content: space-between; align-items: center; padding: var(--space-8) var(--space-10); border-bottom: 1px solid var(--color-border-light); }
+.lp-modal-title { font-size: var(--font-md); font-weight: 700; margin: 0; display: flex; align-items: center; gap: var(--space-3); color: var(--color-text); }
+.lp-modal-close {
+    width: 28px; height: 28px; border-radius: var(--radius-lg); border: none;
+    background: var(--color-bg-gray); color: var(--color-text-muted); font-size: var(--font-base); cursor: pointer;
+}
+.lp-modal-close:hover { background: var(--color-border); }
+.lp-modal-body { padding: var(--space-9) var(--space-10); }
+.lp-modal-foot { display: flex; justify-content: flex-end; gap: var(--space-4); padding: var(--space-7) var(--space-10); border-top: 1px solid var(--color-border-light); }

@@ -1,0 +1,13 @@
+/* Secteurs d'activité — spécifique à ce module.
+   S'appuie sur variables.css et les classes lp-* de listes-projets.css. */
+
+.secteur-desc {
+    font-size: .8rem;
+    color: var(--color-text-muted);
+    max-width: 420px;
+}
+
+.secteur-nb-projets {
+    font-size: .72rem;
+    color: var(--color-text-light);
+}

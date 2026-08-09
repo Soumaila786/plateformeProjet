@@ -8,11 +8,13 @@ use Illuminate\Support\Facades\Gate;
 // Modèles
 use App\Models\User;
 use App\Models\Projet;
+use App\Models\MotifRejet;
 use App\Models\SecteurActivite;
 
 // Policies
 use App\Policies\UserPolicy;
 use App\Policies\ProjetPolicy;
+use App\Policies\MotifRejetPolicy;
 use App\Policies\SecteurPolicy;
 
 class AuthServiceProvider extends ServiceProvider {
@@ -20,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider {
     protected $policies = [
         User::class           => UserPolicy::class,
         Projet::class         => ProjetPolicy::class,
+        MotifRejet::class => MotifRejetPolicy::class,
         SecteurActivite::class => SecteurPolicy::class,
     ];
 

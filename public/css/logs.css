@@ -1,0 +1,28 @@
+/* Logs — spécifique à ce module. S'appuie sur variables.css. */
+
+.log-entry {
+    display: flex;
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border-bottom: 1px solid var(--color-border-light);
+    font-family: monospace;
+    font-size: var(--font-sm);
+}
+.log-entry:last-child { border-bottom: none; }
+
+.log-level {
+    flex-shrink: 0;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: var(--font-xs);
+    text-transform: uppercase;
+    height: fit-content;
+}
+.log-level-error   { background: var(--color-danger-light); color: var(--color-danger); }
+.log-level-warning { background: var(--color-warning-light); color: var(--color-warning); }
+.log-level-info    { background: var(--color-info-light); color: var(--color-info); }
+.log-level-debug   { background: var(--color-bg-gray); color: var(--color-text-muted); }
+
+.log-message { flex: 1; min-width: 0; color: var(--color-text-gray); word-break: break-word; white-space: pre-wrap; }
+.log-date { flex-shrink: 0; color: var(--color-text-light); font-size: var(--font-xs); white-space: nowrap; }

@@ -3,51 +3,64 @@ namespace App\Http\Controllers\Porteur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
-use App\Models\Planification;
+use App\Models\Activite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class PlanificationController extends Controller {
 
+    // NOTE : ce controller pilote désormais le Model Activite — l'ancienne table
+    // "planifications" a été fusionnée dedans. Noms de classe/méthodes/routes
+    // conservés tels quels pour l'instant ; le renommage complet (Planification
+    // -> Activite dans les routes/URLs) est prévu en phase 4 (réorganisation
+    // des controllers/routes).
+
     private function validerDonnees(Request $request) {
-        
+
         return $request->validate([
             'activitePlanification' => 'required|string|max:255',
-            'indicateur'            => 'nullable|string|max:255',
-            'uniteIndicateur'       => 'nullable|string|max:100',
-            'resultatsAttendues'    => 'nullable|string',
-            'coutEstimatif'         => 'nullable|numeric|min:0',
-            'periode'               => 'nullable|string|max:100',
+            'indicateur'            => 'required|integer',
+            'uniteIndicateur'       => 'required|string|max:100',
+            'resultatsAttendues'    => 'required|string',
+            'coutEstimatif'         => 'required|numeric|min:0',
+            'periode'               => 'required|string|max:100',
         ]);
     }
 
     public function create(Projet $projet) {
 
-        $this->authorize('view', $projet);
-        // Seul le porteur propriétaire peut planifier son projet
-        abort_if($projet->user_id !== Auth::id(), 403);
+        // Utilise la vraie permission dédiée (au lieu de 'view' précédemment) :
+        // elle vérifie déjà la propriété du projet ET son statut.
+        $this->authorize('gererPlanification', $projet);
 
-        return view('porteur.planifications.create', compact('projet'));
+        return view('planifications.create', compact('projet'));
     }
 
     public function store(Request $request, Projet $projet) {
 
-        $this->authorize('view', $projet);
-        abort_if($projet->user_id !== Auth::id(), 403);
+        $this->authorize('gererPlanification', $projet);
 
         try {
             $data = $this->validerDonnees($request);
-            $data['projet_id'] = $projet->id;
 
-            Planification::create($data);
+            Activite::create([
+                'activite'           => $data['activitePlanification'],
+                'indicateur'         => $data['indicateur'],
+                'uniteIndicateur'    => $data['uniteIndicateur'],
+                'resultatsAttendues' => $data['resultatsAttendues'],
+                'coutEstimatif'      => $data['coutEstimatif'],
+                'periode'            => $data['periode'],
+                'statutActivite'     => 'en_attente',
+                'projet_id'          => $projet->id,
+            ]);
 
             Log::info('Planification créée par le porteur', [
                 'projet_id' => $projet->id,
                 'user_id'   => Auth::id(),
             ]);
 
-            return redirect()->route('porteur.projets.show', $projet)
+            return redirect()->route('projets.show', $projet)
                 ->with('success', 'Activité de planification ajoutée.');
 
         } catch (\Exception $e) {
@@ -60,27 +73,33 @@ class PlanificationController extends Controller {
         }
     }
 
-    public function edit(Projet $projet, Planification $planification) {
+    public function edit(Projet $projet, Activite $planification) {
 
-        $this->authorize('view', $projet);
-        abort_if($projet->user_id !== Auth::id(), 403);
+        $this->authorize('gererPlanification', $projet);
         abort_if($planification->projet_id !== $projet->id, 404);
 
         return view('porteur.planifications.edit', compact('projet', 'planification'));
     }
 
-    public function update(Request $request, Projet $projet, Planification $planification) {
+    public function update(Request $request, Projet $projet, Activite $planification) {
 
-        $this->authorize('view', $projet);
-        abort_if($projet->user_id !== Auth::id(), 403);
+        $this->authorize('gererPlanification', $projet);
         abort_if($planification->projet_id !== $projet->id, 404);
 
         try {
             $data = $this->validerDonnees($request);
-            $planification->update($data);
+
+            $planification->update([
+                'activite'           => $data['activitePlanification'],
+                'indicateur'         => $data['indicateur'],
+                'uniteIndicateur'    => $data['uniteIndicateur'],
+                'resultatsAttendues' => $data['resultatsAttendues'],
+                'coutEstimatif'      => $data['coutEstimatif'],
+                'periode'            => $data['periode'],
+            ]);
 
             Log::info('Planification modifiée par le porteur', [
-                'planification_id' => $planification->idPlanification,
+                'planification_id' => $planification->id,
                 'projet_id'        => $projet->id,
                 'user_id'          => Auth::id(),
             ]);
@@ -98,17 +117,16 @@ class PlanificationController extends Controller {
         }
     }
 
-    public function destroy(Projet $projet, Planification $planification) {
+    public function destroy(Projet $projet, Activite $planification) {
 
-        $this->authorize('view', $projet);
-        abort_if($projet->user_id !== Auth::id(), 403);
+        $this->authorize('gererPlanification', $projet);
         abort_if($planification->projet_id !== $projet->id, 404);
 
         try {
             $planification->delete();
 
             Log::warning('Planification supprimée par le porteur', [
-                'planification_id' => $planification->idPlanification,
+                'planification_id' => $planification->id,
                 'projet_id'        => $projet->id,
                 'user_id'          => Auth::id(),
             ]);

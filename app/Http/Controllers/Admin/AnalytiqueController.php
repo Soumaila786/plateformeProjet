@@ -7,7 +7,6 @@ use App\Models\Projet;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class AnalytiqueController extends Controller {
 
@@ -36,13 +35,10 @@ class AnalytiqueController extends Controller {
                 ['lbl' => 'Validés',    'key' => 'valide',    'color' => '#0d9488', 'val' => $kpis['valide']],
             ];
 
-            // Forcer int sur toutes les valeurs de l'entonnoir
-            // Le & est utiliser pour modifier directement la valeur dans le tableau.
-            // si on change la valeur de $step directement la valeur dans le tableau entonnoir change aussi
             foreach ($entonnoir as &$step) {
-                $step['val'] = (int)($step['val'] ?? 0); // conversion en entier la valeur
+                $step['val'] = (int)($step['val'] ?? 0);
             }
-            unset($step);  // unset() sert à supprimer une variable ou une référence en PHP.Problème : après la boucle, $step reste lié au dernier élément
+            unset($step);
             $maxEntonnoir = max(1, collect($entonnoir)->max('val'));
 
             // 3. ÉVOLUTION MENSUELLE
@@ -55,8 +51,8 @@ class AnalytiqueController extends Controller {
                 $moisSoumis[]  = Projet::whereYear('dateSoumission', $m->year)
                     ->whereMonth('dateSoumission', $m->month)->count();
                 $moisValides[] = Projet::where('statutProjet', 'valide')
-                    ->whereYear('validated_at', $m->year)
-                    ->whereMonth('validated_at', $m->month)->count();
+                    ->whereYear('dateValidation', $m->year)
+                    ->whereMonth('dateValidation', $m->month)->count();
             }
 
             // 4. RÉPARTITION STATUTS
@@ -90,15 +86,15 @@ class AnalytiqueController extends Controller {
 
             $delaiAppro = round((float)($rawAppro ?? 0), 1);
 
-            $rawValid = Projet::whereNotNull('validated_at')
+            $rawValid = Projet::whereNotNull('dateValidation')
                 ->whereNotNull('dateApprobation')
-                ->selectRaw('AVG(ABS(DATEDIFF(validated_at, dateApprobation))) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(dateValidation, dateApprobation))) as moy')
                 ->value('moy');
             $delaiValid = round((float)($rawValid ?? 0), 1);
 
-            $rawTotal = Projet::whereNotNull('validated_at')
+            $rawTotal = Projet::whereNotNull('dateValidation')
                 ->whereNotNull('dateSoumission')
-                ->selectRaw('AVG(ABS(DATEDIFF(validated_at, dateSoumission))) as moy')
+                ->selectRaw('AVG(ABS(DATEDIFF(dateValidation, dateSoumission))) as moy')
                 ->value('moy');
             $delaiTotal = round((float)($rawTotal ?? 0), 1);
 
@@ -173,40 +169,40 @@ class AnalytiqueController extends Controller {
 
             // 9. PROJETS EN ATTENTE CRITIQUE (> 10 jours)
             $critiqueStatuts = ['soumis','en_examen','approuve'];
-            $projetsBloque   = Projet::with(['porteur','secteur'])       // récupères les projets avec leurs relations
-                ->whereIn('statutProjet', $critiqueStatuts)             // récupérer les projets dont le statut est dans la liste
-                ->where('updated_at', '<', $now->copy()->subDays(10))  // prendre les projets non modifiés depuis plus de 10 jours
-                ->orderBy('updated_at')                               // Trie par date de mise à jour (du plus ancien au plus récent)
-                ->take(5)                                            // prend les 5 projets les plus critiques
-                ->get()                                             // Exécuter la requête
-                ->map(function ($p) use ($now) {                   // Tu transformes chaque projet en tableau personnalisé
+            $projetsBloque   = Projet::with(['porteur','secteur'])
+                ->whereIn('statutProjet', $critiqueStatuts)
+                ->where('updated_at', '<', $now->copy()->subDays(10))
+                ->orderBy('updated_at')
+                ->take(5)
+                ->get()
+                ->map(function ($p) use ($now) {
                     return [
                         'id'      => $p->id,
                         'titre'   => $p->titre,
                         'statut'  => $p->statutProjet,
-                        'porteur' => optional($p->porteur)->nomComplet ?? '—',        // optional() évite les erreurs si null
+                        'porteur' => optional($p->porteur)->nomComplet ?? '—',
                         'secteur' => optional($p->secteur)->nomSecteur ?? '—',
-                        'jours'   => $now->diffInDays(Carbon::parse($p->updated_at)), // Calcul des jours : combien de jours depuis la dernière mise à jour
+                        'jours'   => $now->diffInDays(Carbon::parse($p->updated_at)),
                         'code'    => $p->codeProjet,
                     ];
                 });
 
             // 10. CHARGE DE TRAVAIL ÉQUIPES
+            // NOTE : avant cette correction, le nombre de dossiers traités par approbateur
+            // ne filtrait pas réellement par approbateur (comptait tous les projets approuvés/
+            // rejetés du système, même total pour tout le monde). Corrigé pour utiliser
+            // approbateur_id, qui existe bien en base.
             $approbateurs = User::where('role', 'approbateur')
                 ->get()
                 ->map(function ($u) {
-                    $nb = Projet::whereIn('statutProjet', ['approuve', 'rejete'])
-                    ->whereNotNull('dateApprobation')
-                    ->where('user_id', '!=', null) // sécurité
-                    ->count();
-                    // On compte par porteur ici — à adapter si colonne approbateur_id existe
+                    $nb = Projet::where('approbateur_id', $u->id)->count();
                     return ['nom' => $u->nomComplet, 'nb' => (int)$nb, 'role' => 'Approbateur'];
                 });
 
             $validateurs = User::where('role', 'validateur')->get()
                 ->map(function ($u) {
-                    $nb = Projet::whereNotNull('validated_at')
-                        ->where('validated_by', $u->id)->count();
+                    $nb = Projet::whereNotNull('dateValidation')
+                        ->where('validateur_id', $u->id)->count();
                     return ['nom' => $u->nomComplet, 'nb' => (int)$nb, 'role' => 'Validateur'];
                 });
 
@@ -215,7 +211,7 @@ class AnalytiqueController extends Controller {
             $equipeNb     = $equipes->pluck('nb')->map(function($v) { return (int)($v ?? 0); })->toArray();
             $equipeRoles  = $equipes->pluck('role')->toArray();
 
-            return view('admin.analytique', compact(
+            return view('analytique.index', compact(
                 'kpis', 'entonnoir', 'maxEntonnoir', 'moisLabels',
                 'moisSoumis', 'moisValides', 'statutLabels',
                 'statutColors', 'statutValues', 'sectLabels',

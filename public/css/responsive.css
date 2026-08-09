@@ -1,0 +1,98 @@
+/* ==========================================================================
+   Passe responsive transverse — à charger APRÈS tous les autres CSS
+   (variables.css, sidebar.css, listes-projets.css, dashboard.css,
+   analytique.css, users.css, secteurs.css, motifs.css, parametres.css).
+   Ne redéfinit pas ce qui est déjà géré dans variables.css (grille sidebar,
+   .content-area, .page-header) — complète uniquement ce qui manquait.
+
+   Points de rupture : mobile < 576px · tablette 576–991px · desktop >= 992px
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------
+   Sidebar mobile : bouton hamburger + rideau (backdrop)
+   Le collapse desktop (bouton "Réduire" existant) reste inchangé ; sous
+   992px, la sidebar passe en tiroir plein écran piloté par .is-open
+   (déjà déclarée dans variables.css) + le bouton injecté par
+   responsive-sidebar.js.
+--------------------------------------------------------------------- */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: .75rem;
+    left: .75rem;
+    z-index: 1050;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+}
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, .45);
+    z-index: 1035;
+}
+.sidebar-backdrop.is-visible { display: block; }
+
+@media (max-width: 991px) {
+    .mobile-menu-btn { display: flex; }
+    .app-content { padding-top: 3.25rem; }
+}
+@media (min-width: 992px) {
+    .sidebar-backdrop { display: none !important; }
+}
+
+/* ---------------------------------------------------------------------
+   Listes en lignes (lp-*) : empiler sur mobile plutôt que déborder
+--------------------------------------------------------------------- */
+@media (max-width: 767px) {
+    .lp-row { flex-wrap: wrap; }
+    .lp-info { flex-basis: 100%; order: 2; margin-top: .5rem; }
+    .lp-badges { flex-basis: 100%; order: 3; flex-wrap: wrap; margin-top: .5rem; }
+    .lp-avatar { order: 1; }
+
+    .lp-filtres { flex-direction: column; align-items: stretch; }
+    .lp-search-wrap input, .lp-select { width: 100%; }
+
+    .lp-status-filters { overflow-x: auto; flex-wrap: nowrap; padding-bottom: .25rem; }
+}
+
+/* ---------------------------------------------------------------------
+   Modales mutualisées : marges/paddings confortables en petit écran
+--------------------------------------------------------------------- */
+@media (max-width: 575px) {
+    .lp-modal-box, .lp-modal-box.lp-modal-lg { max-width: 100%; margin: 0 .5rem; }
+    .lp-modal-body { padding: .9rem; }
+    .lp-modal-foot { flex-wrap: wrap; }
+    .lp-modal-foot .btn { flex: 1; }
+}
+
+/* ---------------------------------------------------------------------
+   En-tête de page (titre + sous-titre + bouton d'action)
+--------------------------------------------------------------------- */
+@media (max-width: 575px) {
+    .page-header-top { flex-direction: column; align-items: stretch; }
+    .page-header-top .btn { width: 100%; justify-content: center; }
+}
+
+/* ---------------------------------------------------------------------
+   Page projet (show) : grille principale/aside empilée (Bootstrap gère déjà
+   col-lg-8/col-lg-4, ceci n'ajoute que des espacements)
+--------------------------------------------------------------------- */
+@media (max-width: 991px) {
+    .circuit-stepper, [role="img"][aria-label^="Progression"] { overflow-x: auto; }
+}
+
+/* ---------------------------------------------------------------------
+   Cartes stat / analytique : déjà en grid auto-fit, on resserre juste
+   le texte sur très petit écran
+--------------------------------------------------------------------- */
+@media (max-width: 400px) {
+    .dash-stats-grid, .an-grid { grid-template-columns: 1fr !important; }
+}

@@ -13,18 +13,10 @@ class CheckRole {
             return redirect()->route('login');
         }
 
-        $user = Auth::user();
-        $hasRole = false;
-        
-        foreach ($roles as $role) {
-            if ($user->role === $role) {
-                $hasRole = true;
-                break;
-            }
-        }
-        if (!$hasRole) {
+        if (!Auth::user()->hasAnyRole($roles)) {
             abort(403, 'Accès non autorisé.');
         }
+
         return $next($request);
     }
 }

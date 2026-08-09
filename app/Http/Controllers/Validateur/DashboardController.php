@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Validateur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller {
     public function index() {
@@ -26,7 +28,7 @@ class DashboardController extends Controller {
                 ->latest('updated_at')
                 ->get();
 
-            return view('validateur.dashboard', compact(
+            return view('dashboard.index', compact(
                 'totalProjets',
                 'soumis',
                 'enAttente',
@@ -38,7 +40,12 @@ class DashboardController extends Controller {
 
         }catch (\Exception $e){
 
-            return back()->with('error', 'Une erreur est survenue', $e->getMessage());
+            Log::error('Erreur lors du chargement du dashboard validateur', [
+                'message' => $e->getMessage(),
+                'validateur_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Une erreur est survenue');
         }
     }
 }

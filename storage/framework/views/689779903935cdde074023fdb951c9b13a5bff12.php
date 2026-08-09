@@ -10,7 +10,6 @@
 
         
         <div class="login-header">
-            <div class="login-logo">GP</div>
             <h1 class="login-title"><?php echo e(config('app.name')); ?></h1>
             <p class="login-subtitle">Gestion de projets — Accès réservé</p>
         </div>
@@ -18,44 +17,23 @@
         <div class="login-body">
 
             
-            <?php if(isset($permanentBlock) && $permanentBlock): ?>
-            <div class="alert-block alert-permanent">
-                <div class="alert-icon"><i class="fas fa-ban"></i></div>
-                <div class="alert-content">
-                    <p class="alert-title">Compte désactivé</p>
-                    <p class="alert-text">Ce compte a été désactivé suite à de trop nombreuses tentatives. Contactez l'administrateur système.</p>
-                </div>
-            </div>
-            <?php endif; ?>
 
             
-            <?php if(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp): ?>
-            <div class="alert-block alert-temp">
-                <div class="alert-icon"><i class="fas fa-lock"></i></div>
-                <div class="alert-content">
-                    <p class="alert-title">Accès temporairement suspendu</p>
-                    <p class="alert-text">Trop de tentatives incorrectes. Réessayez dans :</p>
-                    <div class="countdown-wrap">
-                        <span class="countdown-timer" id="countdown">--:--</span>
-                    </div>
-                    <div class="countdown-bar-wrap">
-                        <div class="countdown-bar" id="countdownBar"></div>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
-
-            
-            <?php if($errors->any() && !(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp)): ?>
+            <?php if($errors->any()): ?>
             <div class="login-alert">
                 <i class="fas fa-exclamation-circle"></i>
                 <span><?php echo e($errors->first()); ?></span>
             </div>
             <?php endif; ?>
 
-            
-            <?php if(!(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp)): ?>
-            <form method="POST" action="<?php echo e(route('login.post')); ?>">
+            <?php if(session('status')): ?>
+            <div class="login-alert" style="background:#f0fdf4;color:#15803d;border-color:#bbf7d0;">
+                <i class="fas fa-check-circle"></i>
+                <span><?php echo e(session('status')); ?></span>
+            </div>
+            <?php endif; ?>
+
+            <form method="POST" action="<?php echo e(route('login')); ?>">
                 <?php echo csrf_field(); ?>
 
                 
@@ -121,7 +99,7 @@ unset($__errorArgs, $__bag); ?>
                         <input type="checkbox" name="remember" <?php echo e(old('remember') ? 'checked' : ''); ?>>
                         <span>Se souvenir de moi</span>
                     </label>
-                    <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+                    <a href="<?php echo e(route('password.request')); ?>" class="forgot-link">Mot de passe oublié ?</a>
                 </div>
 
                 <button type="submit" class="btn-submit">
@@ -129,7 +107,6 @@ unset($__errorArgs, $__bag); ?>
                 </button>
 
             </form>
-            <?php endif; ?>
 
         </div>
 
@@ -144,7 +121,6 @@ unset($__errorArgs, $__bag); ?>
 
 <?php $__env->startPush('scripts'); ?>
 <script>
-    // ── Afficher/masquer mot de passe ──
     function togglePassword() {
         const input = document.getElementById('password');
         const icon  = document.getElementById('togglePasswordIcon');
@@ -156,44 +132,6 @@ unset($__errorArgs, $__bag); ?>
             icon.classList.replace('fa-eye-slash', 'fa-eye');
         }
     }
-
-
-
-    // ── Compte à rebours basé sur le timestamp réel ──
-    <?php if(isset($blockExpiresAt) && $blockExpiresAt > now()->timestamp): ?>
-    (function() {
-        const expiresAt  = <?php echo e($blockExpiresAt); ?>;        // timestamp Unix côté serveur
-        const totalSecs  = expiresAt - Math.floor(Date.now() / 1000);
-        const timerEl    = document.getElementById('countdown');
-        const barEl      = document.getElementById('countdownBar');
-
-        if (!timerEl || totalSecs <= 0) {
-            location.reload();
-            return;
-        }
-
-        function tick() {
-            const remaining = expiresAt - Math.floor(Date.now() / 1000);
-
-            if (remaining <= 0) {
-                // Blocage expiré → recharger proprement
-                location.reload();
-                return;
-            }
-
-            const m = Math.floor(remaining / 60).toString().padStart(2, '0');
-            const s = (remaining % 60).toString().padStart(2, '0');
-            timerEl.textContent = m + ':' + s;
-
-            const pct = Math.max(0, (remaining / totalSecs) * 100);
-            barEl.style.width = pct + '%';
-
-            setTimeout(tick, 1000);
-        }
-
-        tick();
-    })();
-    <?php endif; ?>
 </script>
 <?php $__env->stopPush(); ?>
 

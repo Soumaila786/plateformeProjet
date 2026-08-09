@@ -27,7 +27,7 @@ class ConfigurationController extends Controller {
                 'ip' => request()->ip()
             ]);
 
-            return view('admin.configuration.index', compact('configs', 'groupes'));
+            return view('configuration.index', compact('configs', 'groupes'));
 
         } catch (\Exception $e) {
             Log::error('Erreur lors du chargement des configurations', [
@@ -44,30 +44,58 @@ class ConfigurationController extends Controller {
     public function update(Request $request) {
         try{
 
-            // Valider les champs numériques et email
+            // Valider les champs numériques, email et image
             $rules = [];
             $configs = Configuration::all();
 
             foreach ($configs as $config) {
                 if ($config->type === 'email') {
                     $rules[$config->cle] = 'nullable|email';
-                    } elseif ($config->type === 'number') {
-                        $rules[$config->cle] = 'nullable|numeric|min:0';
+                } elseif ($config->type === 'number') {
+                    $rules[$config->cle] = 'nullable|numeric|min:0';
                 } elseif ($config->type === 'color') {
                     $rules[$config->cle] = 'nullable|regex:/^#[0-9A-Fa-f]{6}$/';
+                } elseif ($config->type === 'image') {
+                    $rules[$config->cle] = 'nullable|image|max:2048';
                 }
             }
 
             $request->validate($rules);
 
-            // Sauvegarder chaque config
+            // Sauvegarder chaque config et garder trace de ce qui a changé (pour le log)
+            $modifications = [];
+
             foreach ($configs as $config) {
+
+                if ($config->type === 'image') {
+                    // Upload de fichier (ex: logo de l'application) : on ne touche à la
+                    // valeur que si un nouveau fichier a été envoyé, sinon on garde l'actuel.
+                    if ($request->hasFile($config->cle)) {
+                        if ($config->valeur) {
+                            \Illuminate\Support\Facades\Storage::disk('public')->delete($config->valeur);
+                        }
+                        $chemin = $request->file($config->cle)->store('configurations', 'public');
+
+                        $modifications[$config->cle] = ['ancienne' => $config->valeur, 'nouvelle' => $chemin];
+                        $config->update(['valeur' => $chemin]);
+                    }
+                    continue;
+                }
+
                 if ($config->type === 'boolean') {
                     // Checkbox : si pas dans le request = 0
                     $valeur = $request->has($config->cle) ? '1' : '0';
-                    } else {
-                        $valeur = $request->input($config->cle, $config->valeur);
+                } else {
+                    $valeur = $request->input($config->cle, $config->valeur);
                 }
+
+                if ($valeur !== $config->valeur) {
+                    $modifications[$config->cle] = [
+                        'ancienne' => $config->valeur,
+                        'nouvelle' => $valeur,
+                    ];
+                }
+
                 $config->update(['valeur' => $valeur]);
             }
 
@@ -92,7 +120,7 @@ class ConfigurationController extends Controller {
         }
     }
 
-        // Reset une config à sa valeur par défaut
+    // Reset une config à sa valeur par défaut
     public function reset($cle) {
 
         try{

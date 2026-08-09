@@ -2,17 +2,23 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-User::create([
-    'nomComplet' => 'Admin Principal',
-    'email' => 'admin@gmail.com',
-    'matricule' => 'ADM001',
-    'fonction' => 'Administrateur',
-    'contact' => '70000000',
-    'motDePasse' => Hash::make('password'),
-    'role' => 'admin',
-    'actif' => true,
-    'dateCreation' => now()
-]);
+class UserSeeder extends Seeder
+{
+    public function run()
+    {
+        User::create([
+            'nomComplet' => 'Admin Principal',
+            'email' => 'admin@gmail.com',
+            'matricule' => 'ADM001',
+            'fonction' => 'Administrateur',
+            'contact' => '70000000',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'actif' => true,
+        ]);
+    }
+}

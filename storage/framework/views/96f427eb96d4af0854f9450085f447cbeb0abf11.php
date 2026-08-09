@@ -17,7 +17,7 @@
     <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
-    
+
     <?php echo $__env->yieldContent('content'); ?>
 
     <?php echo $__env->yieldPushContent('scripts'); ?>
