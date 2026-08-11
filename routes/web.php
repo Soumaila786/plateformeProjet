@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ContactController;
 
 // Page d'accueil
 Route::get('/', function () { return view('accueil');});
+Route::post('/contact', [ContactController::class, 'envoyer'])->name('contact.envoyer');
 
 // Authentification
 require __DIR__.'/auth.php';

@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title', 'Journal des activités'); ?>
 
 <?php $__env->startSection('breadcrumb'); ?>
