@@ -3,101 +3,77 @@
 @section('title', 'Connexion')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/typography.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/accueil.css') }}">
 @endpush
 
 @section('content')
-<div class="login-wrapper">
-    <div class="login-card">
 
-        {{-- En-tête (logo retiré à la demande — affiché uniquement sur la page d'accueil) --}}
-        <div class="login-header">
-            <h1 class="login-title">{{ config('app.name') }}</h1>
-            <p class="login-subtitle">Gestion de projets — Accès réservé</p>
-        </div>
+    <x-site-header contexte="auth" />
 
-        <div class="login-body">
-
-            {{--
-                NOTE : le blocage temporaire/définitif après tentatives échouées
-                (alert-permanent / alert-temp / countdown) est désactivé pour
-                l'instant — il reposait sur $permanentBlock/$blockExpiresAt
-                fournis par l'ancien LoginController custom. À réintégrer dans
-                AuthenticatedSessionController::store() une fois la logique
-                d'origine récupérée.
-            --}}
-
-            {{-- ── Erreur normale (identifiants invalides, etc.) ── --}}
-            @if($errors->any())
-            <div class="login-alert">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>{{ $errors->first() }}</span>
+    <section class="ac-auth-section">
+        <div class="ac-auth-card">
+            <div class="text-center mb-4">
+                <h1 class="ac-auth-title">Connexion</h1>
+                <p class="ac-auth-sub">Accédez à votre espace CIFEU</p>
             </div>
-            @endif
 
             @if(session('status'))
-            <div class="login-alert" style="background:#f0fdf4;color:#15803d;border-color:#bbf7d0;">
-                <i class="fas fa-check-circle"></i>
-                <span>{{ session('status') }}</span>
-            </div>
+                <div class="ac-contact-alert ac-contact-alert-success">
+                    <i class="fas fa-check-circle"></i> {{ session('status') }}
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="ac-contact-alert ac-contact-alert-error">
+                    <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
+                </div>
             @endif
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
-                {{-- Email --}}
-                <div class="form-group">
-                    <label class="form-label-top" for="email">Adresse e-mail</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="email" name="email"
-                            value="{{ old('email') }}"
-                            class="input-field @error('email') error @enderror"
-                            placeholder="exemple@domaine.com"
-                            required autofocus>
-                    </div>
-                    @error('email')<span class="field-error">{{ $message }}</span>@enderror
+                <div class="mb-3">
+                    <label class="form-label" for="email">Adresse e-mail</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}"
+                           class="form-control @error('email') is-invalid @enderror"
+                           placeholder="exemple@domaine.com" required autofocus>
+                    @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                {{-- Mot de passe --}}
-                <div class="form-group">
-                    <label class="form-label-top" for="password">Mot de passe</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Mot de passe</label>
+                    <div class="ac-auth-pwd-wrap">
                         <input type="password" id="password" name="password"
-                            class="input-field @error('password') error @enderror"
-                            placeholder="••••••••" required>
-                        <button type="button" class="toggle-pwd" onclick="togglePassword()">
+                               class="form-control @error('password') is-invalid @enderror"
+                               placeholder="••••••••" required>
+                        <button type="button" class="ac-auth-pwd-toggle" onclick="togglePassword()">
                             <i class="fas fa-eye" id="togglePasswordIcon"></i>
                         </button>
                     </div>
-                    @error('password')<span class="field-error">{{ $message }}</span>@enderror
+                    @error('password')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
 
-                {{-- Options --}}
-                <div class="login-options">
-                    <label class="remember-label">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <label class="d-flex align-items-center gap-2 small mb-0" style="color:var(--color-text-gray);">
                         <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                        <span>Se souvenir de moi</span>
+                        Se souvenir de moi
                     </label>
-                    <a href="{{ route('password.request') }}" class="forgot-link">Mot de passe oublié ?</a>
+                    <a href="{{ route('password.request') }}" class="small" style="color:var(--color-primary); text-decoration:none;">
+                        Mot de passe oublié ?
+                    </a>
                 </div>
 
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="ac-btn-hero w-100 justify-content-center" style="background:var(--color-primary); color:#fff !important; box-shadow:none;">
                     Se connecter
                 </button>
-
             </form>
-
         </div>
+    </section>
 
-        <div class="login-footer">
-            <i class="fas fa-shield-alt"></i>
-            Connexion sécurisée &nbsp;·&nbsp; &copy; {{ date('Y') }} {{ config('app.name') }}
-        </div>
-
-    </div>
-</div>
+@endsection
 
 @push('scripts')
 <script>
@@ -114,5 +90,3 @@
     }
 </script>
 @endpush
-
-@endsection

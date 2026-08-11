@@ -10,12 +10,18 @@
 
 <?php
     $getConf = fn ($cle, $defaut = null) => isset($sysConfig) ? ($sysConfig->get($cle, $defaut) ?? $defaut) : $defaut;
+
+    // ──────────────────────────────────────────────────────────────
+    // Chaque domaine a maintenant une vraie image (balise <img> plus
+    // bas). REMPLACE le fichier correspondant dans public/images/domaines/
+    // par ta propre photo — même nom de fichier, ou ajuste le chemin ici.
+    // ──────────────────────────────────────────────────────────────
     $domaines = [
-        ['image' => 'domaines/bd-projets.jpg', 'titre' => 'Base de données des projets',  'texte' => "Constituer et centraliser la base des projets en recherche de financement.", 'disponible' => true],
+        ['image' => 'domaines/base-donnees-projets.jpg', 'titre' => 'Base de données des projets',  'texte' => "Constituer et centraliser la base des projets en recherche de financement.", 'disponible' => true],
         ['image' => 'domaines/conventions.jpg',           'titre' => 'Conventions',                  'texte' => "Préparer et suivre les conventions et protocoles d'accord avec les partenaires.", 'disponible' => false],
-        ['image' => 'domaines/budgets.jpg',                'titre' => 'Budget',                       'texte' => "Élaborer, suivre et contrôler le budget des projets financés.", 'disponible' => false],
-        ['image' => 'domaines/dettes.jpg',             'titre' => 'Dette & FEU',                  'texte' => "Suivre la mobilisation, la gestion de la dette et la comptabilisation des FEU.", 'disponible' => false],
-        ['image' => 'domaines/depenses.jpg',          'titre' => 'Dépenses sur FEU',             'texte' => "Gérer et suivre les dépenses réalisées sur les financements extérieurs.", 'disponible' => false],
+        ['image' => 'domaines/budget.jpg',                'titre' => 'Budget',                       'texte' => "Élaborer, suivre et contrôler le budget des projets financés.", 'disponible' => false],
+        ['image' => 'domaines/dette-feu.jpg',             'titre' => 'Dette & FEU',                  'texte' => "Suivre la mobilisation, la gestion de la dette et la comptabilisation des FEU.", 'disponible' => false],
+        ['image' => 'domaines/depenses-feu.jpg',          'titre' => 'Dépenses sur FEU',             'texte' => "Gérer et suivre les dépenses réalisées sur les financements extérieurs.", 'disponible' => false],
         ['image' => 'domaines/suivi-evaluation.jpg',      'titre' => 'Suivi & évaluation',           'texte' => "Suivre et évaluer l'avancement et l'impact des projets financés.", 'disponible' => false],
         ['image' => 'domaines/prelevements.jpg',          'titre' => 'Prélèvements institutionnels', 'texte' => "Gérer les prélèvements institutionnels appliqués aux financements.", 'disponible' => false],
         ['image' => 'domaines/frais-formation.jpg',       'titre' => 'Frais de formation / Labo',    'texte' => "Gérer les frais de formation et de laboratoire des étudiants.", 'disponible' => false],
@@ -25,25 +31,18 @@
 
 <?php $__env->startSection('content'); ?>
 
-    <header class="ac-header ac-reveal" data-reveal="fade-down">
-        <div class="ac-header-inner">
-            <div class="d-inline-flex align-items-center gap-2">
-                
-                <img src="<?php echo e(asset('images/logo-cifeu.jpg')); ?>" alt="CIFEU" style="height:38px; width:auto;">
-                <span class="fw-bold" style="font-size:1.05rem; color: var(--color-text);">
-                    <?php echo e($getConf('nom_app', config('app.name'))); ?>
-
-                </span>
-            </div>
-
-            <nav class="ac-nav">
-                <a href="#apropos">À propos</a>
-                <a href="#domaines">Domaines</a>
-                <a href="#contact">Contact</a>
-                <a href="<?php echo e(route('login')); ?>" class="ac-btn-login">Connexion</a>
-            </nav>
-        </div>
-    </header>
+    <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.site-header','data' => ['contexte' => 'accueil']]); ?>
+<?php $component->withName('site-header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withAttributes(['contexte' => 'accueil']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
 
     <section class="ac-hero ac-hero-photo">
         <div class="ac-hero-inner">
@@ -165,7 +164,7 @@
 
     <footer class="ac-footer">
         <div class="d-inline-flex align-items-center gap-2">
-            <img src="<?php echo e(asset('images/logo-cifeu.jpg')); ?>" alt="CIFEU" style="height:28px; width:auto;">
+            <img src="<?php echo e(asset('images/logo-cifeu.png')); ?>" alt="CIFEU" style="height:28px; width:auto;">
             <span class="fw-bold" style="font-size:.95rem; color: var(--color-text);">
                 <?php echo e($getConf('nom_app', config('app.name'))); ?>
 

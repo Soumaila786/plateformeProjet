@@ -12,12 +12,18 @@
 
 @php
     $getConf = fn ($cle, $defaut = null) => isset($sysConfig) ? ($sysConfig->get($cle, $defaut) ?? $defaut) : $defaut;
+
+    // ──────────────────────────────────────────────────────────────
+    // Chaque domaine a maintenant une vraie image (balise <img> plus
+    // bas). REMPLACE le fichier correspondant dans public/images/domaines/
+    // par ta propre photo — même nom de fichier, ou ajuste le chemin ici.
+    // ──────────────────────────────────────────────────────────────
     $domaines = [
-        ['image' => 'domaines/bd-projets.jpg', 'titre' => 'Base de données des projets',  'texte' => "Constituer et centraliser la base des projets en recherche de financement.", 'disponible' => true],
+        ['image' => 'domaines/base-donnees-projets.jpg', 'titre' => 'Base de données des projets',  'texte' => "Constituer et centraliser la base des projets en recherche de financement.", 'disponible' => true],
         ['image' => 'domaines/conventions.jpg',           'titre' => 'Conventions',                  'texte' => "Préparer et suivre les conventions et protocoles d'accord avec les partenaires.", 'disponible' => false],
-        ['image' => 'domaines/budgets.jpg',                'titre' => 'Budget',                       'texte' => "Élaborer, suivre et contrôler le budget des projets financés.", 'disponible' => false],
-        ['image' => 'domaines/dettes.jpg',             'titre' => 'Dette & FEU',                  'texte' => "Suivre la mobilisation, la gestion de la dette et la comptabilisation des FEU.", 'disponible' => false],
-        ['image' => 'domaines/depenses.jpg',          'titre' => 'Dépenses sur FEU',             'texte' => "Gérer et suivre les dépenses réalisées sur les financements extérieurs.", 'disponible' => false],
+        ['image' => 'domaines/budget.jpg',                'titre' => 'Budget',                       'texte' => "Élaborer, suivre et contrôler le budget des projets financés.", 'disponible' => false],
+        ['image' => 'domaines/dette-feu.jpg',             'titre' => 'Dette & FEU',                  'texte' => "Suivre la mobilisation, la gestion de la dette et la comptabilisation des FEU.", 'disponible' => false],
+        ['image' => 'domaines/depenses-feu.jpg',          'titre' => 'Dépenses sur FEU',             'texte' => "Gérer et suivre les dépenses réalisées sur les financements extérieurs.", 'disponible' => false],
         ['image' => 'domaines/suivi-evaluation.jpg',      'titre' => 'Suivi & évaluation',           'texte' => "Suivre et évaluer l'avancement et l'impact des projets financés.", 'disponible' => false],
         ['image' => 'domaines/prelevements.jpg',          'titre' => 'Prélèvements institutionnels', 'texte' => "Gérer les prélèvements institutionnels appliqués aux financements.", 'disponible' => false],
         ['image' => 'domaines/frais-formation.jpg',       'titre' => 'Frais de formation / Labo',    'texte' => "Gérer les frais de formation et de laboratoire des étudiants.", 'disponible' => false],
@@ -27,24 +33,7 @@
 
 @section('content')
 
-    <header class="ac-header ac-reveal" data-reveal="fade-down">
-        <div class="ac-header-inner">
-            <div class="d-inline-flex align-items-center gap-2">
-                {{-- REMPLACE par ton logo --}}
-                <img src="{{ asset('images/logo-cifeu.jpg') }}" alt="CIFEU" style="height:38px; width:auto;">
-                <span class="fw-bold" style="font-size:1.05rem; color: var(--color-text);">
-                    {{ $getConf('nom_app', config('app.name')) }}
-                </span>
-            </div>
-
-            <nav class="ac-nav">
-                <a href="#apropos">À propos</a>
-                <a href="#domaines">Domaines</a>
-                <a href="#contact">Contact</a>
-                <a href="{{ route('login') }}" class="ac-btn-login">Connexion</a>
-            </nav>
-        </div>
-    </header>
+    <x-site-header contexte="accueil" />
 
     <section class="ac-hero ac-hero-photo">
         <div class="ac-hero-inner">
@@ -162,7 +151,7 @@
 
     <footer class="ac-footer">
         <div class="d-inline-flex align-items-center gap-2">
-            <img src="{{ asset('images/logo-cifeu.jpg') }}" alt="CIFEU" style="height:28px; width:auto;">
+            <img src="{{ asset('images/logo-cifeu.png') }}" alt="CIFEU" style="height:28px; width:auto;">
             <span class="fw-bold" style="font-size:.95rem; color: var(--color-text);">
                 {{ $getConf('nom_app', config('app.name')) }}
             </span>

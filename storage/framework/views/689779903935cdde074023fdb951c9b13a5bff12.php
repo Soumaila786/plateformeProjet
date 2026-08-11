@@ -1,85 +1,87 @@
 <?php $__env->startSection('title', 'Connexion'); ?>
 
 <?php $__env->startPush('styles'); ?>
-<link rel="stylesheet" href="<?php echo e(asset('css/login.css')); ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo e(asset('css/variables.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/typography.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/forms.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/accueil.css')); ?>">
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="login-wrapper">
-    <div class="login-card">
 
-        
-        <div class="login-header">
-            <h1 class="login-title"><?php echo e(config('app.name')); ?></h1>
-            <p class="login-subtitle">Gestion de projets — Accès réservé</p>
-        </div>
+    <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.site-header','data' => ['contexte' => 'auth']]); ?>
+<?php $component->withName('site-header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php $component->withAttributes(['contexte' => 'auth']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
 
-        <div class="login-body">
-
-            
-
-            
-            <?php if($errors->any()): ?>
-            <div class="login-alert">
-                <i class="fas fa-exclamation-circle"></i>
-                <span><?php echo e($errors->first()); ?></span>
+    <section class="ac-auth-section">
+        <div class="ac-auth-card">
+            <div class="text-center mb-4">
+                <h1 class="ac-auth-title">Connexion</h1>
+                <p class="ac-auth-sub">Accédez à votre espace CIFEU</p>
             </div>
-            <?php endif; ?>
 
             <?php if(session('status')): ?>
-            <div class="login-alert" style="background:#f0fdf4;color:#15803d;border-color:#bbf7d0;">
-                <i class="fas fa-check-circle"></i>
-                <span><?php echo e(session('status')); ?></span>
-            </div>
+                <div class="ac-contact-alert ac-contact-alert-success">
+                    <i class="fas fa-check-circle"></i> <?php echo e(session('status')); ?>
+
+                </div>
+            <?php endif; ?>
+            <?php if($errors->any()): ?>
+                <div class="ac-contact-alert ac-contact-alert-error">
+                    <i class="fas fa-exclamation-circle"></i> <?php echo e($errors->first()); ?>
+
+                </div>
             <?php endif; ?>
 
             <form method="POST" action="<?php echo e(route('login')); ?>">
                 <?php echo csrf_field(); ?>
 
-                
-                <div class="form-group">
-                    <label class="form-label-top" for="email">Adresse e-mail</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="email" name="email"
-                            value="<?php echo e(old('email')); ?>"
-                            class="input-field <?php $__errorArgs = ['email'];
+                <div class="mb-3">
+                    <label class="form-label" for="email">Adresse e-mail</label>
+                    <input type="email" id="email" name="email" value="<?php echo e(old('email')); ?>"
+                           class="form-control <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> error <?php unset($message);
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                            placeholder="exemple@domaine.com"
-                            required autofocus>
-                    </div>
+                           placeholder="exemple@domaine.com" required autofocus>
                     <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                 </div>
 
-                
-                <div class="form-group">
-                    <label class="form-label-top" for="password">Mot de passe</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock input-icon"></i>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Mot de passe</label>
+                    <div class="ac-auth-pwd-wrap">
                         <input type="password" id="password" name="password"
-                            class="input-field <?php $__errorArgs = ['password'];
+                               class="form-control <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> error <?php unset($message);
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                            placeholder="••••••••" required>
-                        <button type="button" class="toggle-pwd" onclick="togglePassword()">
+                               placeholder="••••••••" required>
+                        <button type="button" class="ac-auth-pwd-toggle" onclick="togglePassword()">
                             <i class="fas fa-eye" id="togglePasswordIcon"></i>
                         </button>
                     </div>
@@ -87,37 +89,30 @@ unset($__errorArgs, $__bag); ?>"
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?><span class="field-error"><?php echo e($message); ?></span><?php unset($message);
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback d-block"><?php echo e($message); ?></div><?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                 </div>
 
-                
-                <div class="login-options">
-                    <label class="remember-label">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <label class="d-flex align-items-center gap-2 small mb-0" style="color:var(--color-text-gray);">
                         <input type="checkbox" name="remember" <?php echo e(old('remember') ? 'checked' : ''); ?>>
-                        <span>Se souvenir de moi</span>
+                        Se souvenir de moi
                     </label>
-                    <a href="<?php echo e(route('password.request')); ?>" class="forgot-link">Mot de passe oublié ?</a>
+                    <a href="<?php echo e(route('password.request')); ?>" class="small" style="color:var(--color-primary); text-decoration:none;">
+                        Mot de passe oublié ?
+                    </a>
                 </div>
 
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="ac-btn-hero w-100 justify-content-center" style="background:var(--color-primary); color:#fff !important; box-shadow:none;">
                     Se connecter
                 </button>
-
             </form>
-
         </div>
+    </section>
 
-        <div class="login-footer">
-            <i class="fas fa-shield-alt"></i>
-            Connexion sécurisée &nbsp;·&nbsp; &copy; <?php echo e(date('Y')); ?> <?php echo e(config('app.name')); ?>
-
-        </div>
-
-    </div>
-</div>
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('scripts'); ?>
 <script>
@@ -134,7 +129,5 @@ unset($__errorArgs, $__bag); ?>
     }
 </script>
 <?php $__env->stopPush(); ?>
-
-<?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.guest', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/auth/login.blade.php ENDPATH**/ ?>

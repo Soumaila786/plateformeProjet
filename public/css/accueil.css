@@ -43,7 +43,7 @@ body { background: var(--color-white); overflow-x: hidden; }
         linear-gradient(160deg, rgba(15,23,42,.88) 0%, rgba(30,27,75,.82) 55%, rgba(30,58,138,.8) 100%),
         url('/images/hero-ujkz.png');
     background-size: cover;
-    background-position: center 40%;
+    background-position: center 20%;
 }
 .ac-hero-inner { max-width: 720px; margin: 0 auto; position: relative; z-index: 2; }
 .ac-hero-badge {
