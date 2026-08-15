@@ -1,14 +1,22 @@
 @extends('layouts.app')
 
-@section('title', 'Secteurs d\'activité')
+@section('title', "Secteurs d'activité")
 
 @section('breadcrumb')
     <a href="{{ route('admin.dashboard') }}">Tableau de bord</a>
+    <span>/</span>
+    <a href="{{ route('parametres.index') }}">Paramètres</a>
     <span>/</span>
     <span>Secteurs d'activité</span>
 @endsection
 
 @section('page-header')
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/parametres.css') }}">
+    @endpush
+
+    @include('parametres.partials._tabs')
+
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Secteurs d'activité</h1>

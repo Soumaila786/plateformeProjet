@@ -18,12 +18,8 @@
     $menusParRole = [
         'admin' => [
             ['label' => 'Tableau Analytique', 'icon' => 'fa-chart-pie',        'route' => 'admin.analytique'],
-            ['label' => 'Utilisateurs',        'icon' => 'fa-users',           'route' => 'admin.users.index',        'permission' => 'utilisateurs.gerer'],
             ['label' => 'Projets',             'icon' => 'fa-project-diagram', 'route' => 'admin.projets.index',      'permission' => 'projets.voir'],
-            ['label' => 'Secteurs',            'icon' => 'fa-building',        'route' => 'admin.secteurs.index',     'permission' => 'secteurs.gerer'],
-            ['label' => 'Motifs de rejet',     'icon' => 'fa-list-check',      'route' => 'admin.motifs.index',       'permission' => 'motifs.gerer'],
             ['label' => 'Configuration système','icon' => 'fa-cogs',           'route' => 'admin.configuration.index','permission' => 'configurations.gerer'],
-            ['label' => 'Journal des activités','icon' => 'fa-clipboard-list','route' => 'admin.logs.index',         'permission' => 'configurations.gerer'],
         ],
         'porteur' => [
             ['label' => 'Mes projets',    'icon' => 'fa-folder-open',  'route' => 'porteur.projets.index'],
@@ -46,13 +42,21 @@
     ];
 
     $items = $menusParRole[$role] ?? [];
+
+    // FIX : vrais noms de route admin.users.*/admin.secteurs.*/admin.motifs.*
+    // (pas users.*/secteurs.*/motifs.* — ce sont des noms de vue, pas de route)
+    $parametresActif = request()->routeIs('parametres.*')
+        || request()->routeIs('admin.users.*')
+        || request()->routeIs('admin.secteurs.*')
+        || request()->routeIs('admin.motifs.*')
+        || request()->routeIs('admin.logs.*');
 @endphp
 
 <div class="sidebar" id="mainSidebar">
 
     <!-- Header logo -->
     <div class="sidebar-header d-flex align-items-center px-3 py-3">
-        <x-brand.logo :size="48" :show-text="true" />
+        <x-brand.logo :size="36" :show-text="true" />
     </div>
 
     <ul class="nav-menu flex-grow-1">
@@ -97,7 +101,7 @@
 
         <li class="nav-item">
             <a href="{{ route('parametres.index') }}"
-                class="nav-link {{ request()->routeIs('parametres.*') ? 'active' : '' }}"
+                class="nav-link {{ $parametresActif ? 'active' : '' }}"
                 data-tooltip="Paramètres">
                 <i class="fas fa-cog"></i>
                 <span>Paramètres</span>

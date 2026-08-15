@@ -38,8 +38,8 @@
                 <div class="mb-3">
                     <label class="form-label" for="email">Adresse e-mail</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}"
-                           class="form-control @error('email') is-invalid @enderror"
-                           placeholder="exemple@domaine.com" required autofocus>
+                        class="form-control @error('email') is-invalid @enderror"
+                        placeholder="exemple@domaine.com" required autofocus>
                     @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
@@ -47,8 +47,8 @@
                     <label class="form-label" for="password">Mot de passe</label>
                     <div class="ac-auth-pwd-wrap">
                         <input type="password" id="password" name="password"
-                               class="form-control @error('password') is-invalid @enderror"
-                               placeholder="••••••••" required>
+                            class="form-control @error('password') is-invalid @enderror"
+                            placeholder="••••••••" required>
                         <button type="button" class="ac-auth-pwd-toggle" onclick="togglePassword()">
                             <i class="fas fa-eye" id="togglePasswordIcon"></i>
                         </button>

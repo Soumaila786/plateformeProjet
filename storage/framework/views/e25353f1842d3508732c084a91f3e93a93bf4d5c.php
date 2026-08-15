@@ -10,7 +10,7 @@
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Paramètres</h1>
-            <p class="page-header-sub">Gérez votre profil, votre sécurité et vos notifications</p>
+            <p class="page-header-sub">Gérez votre profil et, pour l'admin, l'ensemble des réglages de l'application</p>
         </div>
     </div>
 <?php $__env->stopSection(); ?>
@@ -20,19 +20,9 @@
         <link rel="stylesheet" href="<?php echo e(asset('css/parametres.css')); ?>">
     <?php $__env->stopPush(); ?>
 
-    <?php $onglet = request('onglet', 'profil'); ?>
+    <?php echo $__env->make('parametres.partials._tabs', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-    <div class="param-tabs">
-        <a href="<?php echo e(route('parametres.index', ['onglet' => 'profil'])); ?>" class="param-tab <?php echo e($onglet === 'profil' ? 'active' : ''); ?>">
-            <i class="fas fa-user me-1"></i> Profil
-        </a>
-        <a href="<?php echo e(route('parametres.index', ['onglet' => 'securite'])); ?>" class="param-tab <?php echo e($onglet === 'securite' ? 'active' : ''); ?>">
-            <i class="fas fa-shield-halved me-1"></i> Sécurité
-        </a>
-        <a href="<?php echo e(route('parametres.index', ['onglet' => 'notifications'])); ?>" class="param-tab <?php echo e($onglet === 'notifications' ? 'active' : ''); ?>">
-            <i class="fas fa-bell me-1"></i> Notifications
-        </a>
-    </div>
+    <?php $onglet = request('onglet', 'profil'); ?>
 
     <?php if($onglet === 'securite'): ?>
         <?php echo $__env->make('parametres.partials._securite', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>

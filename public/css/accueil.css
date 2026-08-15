@@ -139,6 +139,25 @@ body { background: var(--color-white); overflow-x: hidden; }
 .ac-contact-alert-success { background: var(--color-success-light); color: var(--color-success); }
 .ac-contact-alert-error   { background: var(--color-danger-light); color: var(--color-danger); }
 
+/* ── Pages d'authentification (login/forgot/reset) ── */
+.ac-auth-section {
+    min-height: calc(100vh - 78px);
+    display: flex; align-items: center; justify-content: center;
+    background: var(--color-bg);
+    padding: 3rem var(--space-9);
+}
+.ac-auth-card {
+    background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md); padding: var(--space-10) 2.5rem; width: 100%; max-width: 420px;
+}
+.ac-auth-title { font-size: var(--font-2xl); font-weight: 800; color: var(--color-text); margin: 0 0 var(--space-3); }
+.ac-auth-sub { font-size: var(--font-sm); color: var(--color-text-light); margin: 0; }
+.ac-auth-pwd-wrap { position: relative; }
+.ac-auth-pwd-toggle {
+    position: absolute; right: var(--space-7); top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--color-text-light); cursor: pointer;
+}
+
 /* ── Footer ── */
 .ac-footer {
     text-align: center; padding: 2.5rem var(--space-9); border-top: 1px solid var(--color-border);

@@ -5,10 +5,20 @@
 @section('breadcrumb')
     <a href="{{ route('admin.dashboard') }}">Tableau de bord</a>
     <span>/</span>
+    <a href="{{ route('parametres.index') }}">Paramètres</a>
+    <span>/</span>
     <span>Journal des activités</span>
 @endsection
 
 @section('page-header')
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/listes-projets.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/logs.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/parametres.css') }}">
+    @endpush
+
+    @include('parametres.partials._tabs')
+
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Journal des activités</h1>
@@ -38,18 +48,6 @@
 @endsection
 
 @section('content')
-    @push('styles')
-        <link rel="stylesheet" href="{{ asset('css/listes-projets.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/logs.css') }}">
-    @endpush
-
-    {{--
-        NOTE : structure de $logs supposée — chaque entrée expose 'niveau'/'level'
-        et 'message' (+ 'date' éventuel). À ajuster si ta structure diffère.
-        FIX : match(true) remplacé par des comparaisons classiques, incompatible
-        avec PHP < 8.0.
-    --}}
-
     <x-cards.info>
         @forelse ($logs as $entree)
             @php

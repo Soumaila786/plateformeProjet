@@ -49,7 +49,7 @@
                 <div class="mb-3">
                     <label class="form-label" for="email">Adresse e-mail</label>
                     <input type="email" id="email" name="email" value="<?php echo e(old('email')); ?>"
-                           class="form-control <?php $__errorArgs = ['email'];
+                        class="form-control <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -57,7 +57,7 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                           placeholder="exemple@domaine.com" required autofocus>
+                        placeholder="exemple@domaine.com" required autofocus>
                     <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -72,7 +72,7 @@ unset($__errorArgs, $__bag); ?>
                     <label class="form-label" for="password">Mot de passe</label>
                     <div class="ac-auth-pwd-wrap">
                         <input type="password" id="password" name="password"
-                               class="form-control <?php $__errorArgs = ['password'];
+                            class="form-control <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -80,7 +80,7 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                               placeholder="••••••••" required>
+                            placeholder="••••••••" required>
                         <button type="button" class="ac-auth-pwd-toggle" onclick="togglePassword()">
                             <i class="fas fa-eye" id="togglePasswordIcon"></i>
                         </button>

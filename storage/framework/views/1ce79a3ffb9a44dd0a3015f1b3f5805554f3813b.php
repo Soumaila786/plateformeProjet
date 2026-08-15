@@ -3,10 +3,18 @@
 <?php $__env->startSection('breadcrumb'); ?>
     <a href="<?php echo e(route('admin.dashboard')); ?>">Tableau de bord</a>
     <span>/</span>
+    <a href="<?php echo e(route('parametres.index')); ?>">Paramètres</a>
+    <span>/</span>
     <span>Motifs de rejet</span>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('page-header'); ?>
+    <?php $__env->startPush('styles'); ?>
+        <link rel="stylesheet" href="<?php echo e(asset('css/parametres.css')); ?>">
+    <?php $__env->stopPush(); ?>
+
+    <?php echo $__env->make('parametres.partials._tabs', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Motifs de rejet</h1>
