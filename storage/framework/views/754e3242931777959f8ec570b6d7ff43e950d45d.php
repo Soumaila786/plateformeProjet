@@ -1,0 +1,1 @@
+<?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views\emails\reset_password.blade.php ENDPATH**/ ?>

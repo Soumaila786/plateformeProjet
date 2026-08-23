@@ -17,7 +17,11 @@ class ProjetController extends Controller {
 
         try{
 
-            $query = Projet::with(['porteur', 'secteur']);
+            $query = Projet::with(['porteur', 'secteur'])
+                ->where(function ($query) {
+                    $query->where('statutProjet', '!=', 'brouillon')
+                        ->orWhere('user_id', Auth::id());
+                });
 
             if ($request->filled('search')) {
                 $search = $request->search;

@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title', $projet->titre); ?>
 
 <?php $__env->startSection('breadcrumb'); ?>

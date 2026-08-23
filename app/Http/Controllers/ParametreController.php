@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ParametreController extends Controller {
 
@@ -23,32 +24,55 @@ class ParametreController extends Controller {
     //  Profil
     public function profil() {
 
-        return view('parametres.profil');
+        return view('parametres.index');
     }
 
     public function profilUpdate(Request $request) {
 
-        try{
+        $user = Auth::user();
 
-            $user = Auth::user();
+        $rules = [
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ];
 
-            $request->validate([
+        if (!$request->hasFile('photo')) {
+            $rules += [
                 'nomComplet' => 'required|string|max:255',
                 'email'      => 'required|email|unique:users,email,' . $user->id,
                 'contact'    => 'nullable|string|max:50',
-                // Champs spécifiques au rôle (directement sur users, plus de tables satellites)
-                'specialite'      => 'nullable|string|max:255',
-                'service'         => 'nullable|string|max:255',
-                'poste'           => 'nullable|string|max:255',
-                'dateDebutMandat' => 'nullable|date',
-                'dateFinMandat'   => 'nullable|date',
-            ]);
-
-            $data = [
-                'nomComplet' => $request->nomComplet,
-                'email'      => $request->email,
-                'contact'    => $request->contact,
             ];
+        }
+
+        $request->validate($rules + [
+            // Champs spécifiques au rôle (directement sur users, plus de tables satellites)
+            'specialite'      => 'nullable|string|max:255',
+            'service'         => 'nullable|string|max:255',
+            'poste'           => 'nullable|string|max:255',
+            'dateDebutMandat' => 'nullable|date',
+            'dateFinMandat'   => 'nullable|date',
+        ]);
+
+        try{
+
+            $data = [];
+
+            if (!$request->hasFile('photo')) {
+                $data += [
+                    'nomComplet' => $request->nomComplet,
+                    'email'      => $request->email,
+                    'contact'    => $request->contact,
+                ];
+            }
+
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->store('profile-photos', 'public');
+
+                if ($user->photo) {
+                    Storage::disk('public')->delete($user->photo);
+                }
+
+                $data['photo'] = $photoPath;
+            }
 
             // NOTE : porteur()/approbateur()/validateur() n'existent plus (tables satellites
             // fusionnées dans users). On met à jour directement les colonnes concernées,
@@ -88,6 +112,7 @@ class ParametreController extends Controller {
             return back()->with('error', 'Une erreur est survenue');
         }
     }
+
 
     //  Sécurité
     public function securite() {

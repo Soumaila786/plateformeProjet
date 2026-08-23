@@ -1,8 +1,8 @@
 <?php
     $ongletsPerso = [
+        'profil'        => ['label' => 'Profil',        'icon' => 'fa-user',            'route' => 'parametres.index', 'params' => ['onglet' => 'profil']],
         'notifications' => ['label' => 'Notifications',  'icon' => 'fa-bell',            'route' => 'parametres.index', 'params' => ['onglet' => 'notifications']],
         'securite'      => ['label' => 'Sécurité',       'icon' => 'fa-shield-halved',   'route' => 'parametres.index', 'params' => ['onglet' => 'securite']],
-        'profil'        => ['label' => 'Profil',        'icon' => 'fa-user',            'route' => 'parametres.index', 'params' => ['onglet' => 'profil']],
     ];
 
     // FIX : ce sont les vrais NOMS DE ROUTE (admin.users.index, etc.), pas les
@@ -21,6 +21,13 @@
 
 <div class="param-tabs">
 
+    <?php $__currentLoopData = $ongletsPerso; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cle => $onglet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <a href="<?php echo e(route($onglet['route'], $onglet['params'])); ?>"
+            class="param-tab <?php echo e($ongletActifPerso === $cle ? 'active' : ''); ?>">
+            <i class="fas <?php echo e($onglet['icon']); ?> me-1"></i> <?php echo e($onglet['label']); ?>
+
+        </a>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('utilisateurs.gerer')): ?>
         <span class="param-tabs-sep"></span>
         <?php $__currentLoopData = $ongletsAdmin; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $onglet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -32,12 +39,5 @@
             </a>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     <?php endif; ?>
-    <?php $__currentLoopData = $ongletsPerso; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cle => $onglet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <a href="<?php echo e(route($onglet['route'], $onglet['params'])); ?>"
-           class="param-tab <?php echo e($ongletActifPerso === $cle ? 'active' : ''); ?>">
-            <i class="fas <?php echo e($onglet['icon']); ?> me-1"></i> <?php echo e($onglet['label']); ?>
-
-        </a>
-    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 </div>
 <?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views/parametres/partials/_tabs.blade.php ENDPATH**/ ?>

@@ -12,10 +12,17 @@ class ProjetPolicy {
         if (!$user->can('projets.voir')) {
             return false;
         }
+
+        // Un brouillon reste privé jusqu'à sa soumission.
+        if ($projet->statutProjet === 'brouillon') {
+            return $projet->user_id === $user->id;
+        }
+
         // Le porteur ne voit que ses propres projets, les autres rôles voient tout
         if ($user->hasRole('porteur')) {
             return $projet->user_id === $user->id;
         }
+
         return true;
     }
 

@@ -1,10 +1,9 @@
 @php $u = auth()->user(); @endphp
 
 <x-cards.info titre="Photo de profil" icon="fa-camera" class="mb-3">
-    {{-- NOTE : nécessite d'ajouter la gestion de l'upload dans ParametreController::profilUpdate()
-         (actuellement le controller ne traite pas de fichier) --}}
     <form action="{{ route('parametres.profil.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         <div class="param-avatar-upload">
             <x-avatars.avatar :user="$u" :size="64" />
             <div>
@@ -20,24 +19,25 @@
 <x-cards.info titre="Informations personnelles" icon="fa-id-card">
     <form action="{{ route('parametres.profil.update') }}" method="POST">
         @csrf
+        @method('PUT')
 
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label small">Nom complet</label>
                 <input type="text" name="nomComplet" value="{{ old('nomComplet', $u->nomComplet) }}"
-                       class="form-control @error('nomComplet') is-invalid @enderror" required>
+                    class="form-control @error('nomComplet') is-invalid @enderror" required>
                 @error('nomComplet')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
                 <label class="form-label small">Email</label>
                 <input type="email" name="email" value="{{ old('email', $u->email) }}"
-                       class="form-control @error('email') is-invalid @enderror" required>
+                    class="form-control @error('email') is-invalid @enderror" required>
                 @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
                 <label class="form-label small">Contact</label>
                 <input type="text" name="contact" value="{{ old('contact', $u->contact) }}"
-                       class="form-control @error('contact') is-invalid @enderror" maxlength="50">
+                    class="form-control @error('contact') is-invalid @enderror" maxlength="50">
                 @error('contact')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
@@ -45,7 +45,6 @@
                 <input type="text" value="{{ ucfirst($u->role) }}" class="form-control" disabled>
             </div>
 
-            {{-- Champs spécifiques au rôle, comme dans le formulaire admin des utilisateurs --}}
             @if ($u->role === 'porteur')
                 <div class="col-md-12">
                     <label class="form-label small">Spécialité</label>

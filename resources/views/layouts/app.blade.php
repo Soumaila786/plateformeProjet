@@ -35,6 +35,7 @@
         }
     </style>
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/ui-polish.css') }}">
 
     <style>
         html, body {

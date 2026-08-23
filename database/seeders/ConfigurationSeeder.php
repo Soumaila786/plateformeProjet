@@ -15,6 +15,7 @@ class ConfigurationSeeder extends Seeder
             ['cle'=>'nom_app',          'valeur'=>'GesProjet',              'type'=>'text',    'groupe'=>'general',  'label'=>"Nom de l'application",       'description'=>"Nom affiché dans l'interface"],
             ['cle'=>'description_app',  'valeur'=>'Système de gestion de projets', 'type'=>'text', 'groupe'=>'general', 'label'=>'Description',             'description'=>'Description courte de l\'application'],
             ['cle'=>'logo_texte',       'valeur'=>'GP',                     'type'=>'text',    'groupe'=>'general',  'label'=>'Texte du logo',              'description'=>'Initiales affichées dans le logo (max 2 caractères)'],
+            ['cle'=>'logo_image',       'valeur'=>null,                     'type'=>'image',   'groupe'=>'general',  'label'=>'Logo de l\'application',       'description'=>'Image affichée dans l\'application (2 Mo maximum).'],
             ['cle'=>'couleur_primaire', 'valeur'=>'#6366f1',                'type'=>'color',   'groupe'=>'general',  'label'=>'Couleur principale',         'description'=>'Couleur principale de l\'interface'],
             ['cle'=>'mode_maintenance', 'valeur'=>'0',                      'type'=>'boolean', 'groupe'=>'general',  'label'=>'Mode maintenance',           'description'=>'Activer pour bloquer l\'accès aux utilisateurs'],
 

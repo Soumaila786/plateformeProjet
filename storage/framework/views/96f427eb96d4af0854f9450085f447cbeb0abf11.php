@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo e(asset('css/login.css')); ?>">
     <?php echo $__env->yieldPushContent('styles'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/ui-polish.css')); ?>">
 </head>
 <body>
 

@@ -19,10 +19,8 @@
         <img src="{{ asset('storage/'.$logoImage) }}" alt="{{ $nomApp }}"
              style="width:{{ $size }}px; height:{{ $size }}px; object-fit:contain; border-radius:12px; flex-shrink:0;">
     @else
-        <div class="d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
-             style="width:{{ $size }}px; height:{{ $size }}px; border-radius:12px; background:{{ $couleur }}; font-size:{{ round($size * 0.38) }}px;">
-            {{ $logoTexte }}
-        </div>
+        <img src="{{ asset('images/logo-cifeu.jpg') }}" alt="{{ $nomApp }}"
+             style="width:{{ $size }}px; height:{{ $size }}px; object-fit:contain; border-radius:12px; flex-shrink:0;">
     @endif
 
     @if ($showText)

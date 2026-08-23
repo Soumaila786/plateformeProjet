@@ -6,9 +6,9 @@
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php $component->withAttributes(['titre' => 'Photo de profil','icon' => 'fa-camera','class' => 'mb-3']); ?>
-    
     <form action="<?php echo e(route('parametres.profil.update')); ?>" method="POST" enctype="multipart/form-data">
         <?php echo csrf_field(); ?>
+        <?php echo method_field('PUT'); ?>
         <div class="param-avatar-upload">
             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.avatars.avatar','data' => ['user' => $u,'size' => 64]]); ?>
@@ -59,12 +59,13 @@ unset($__errorArgs, $__bag); ?>
 <?php $component->withAttributes(['titre' => 'Informations personnelles','icon' => 'fa-id-card']); ?>
     <form action="<?php echo e(route('parametres.profil.update')); ?>" method="POST">
         <?php echo csrf_field(); ?>
+        <?php echo method_field('PUT'); ?>
 
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label small">Nom complet</label>
                 <input type="text" name="nomComplet" value="<?php echo e(old('nomComplet', $u->nomComplet)); ?>"
-                       class="form-control <?php $__errorArgs = ['nomComplet'];
+                    class="form-control <?php $__errorArgs = ['nomComplet'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -84,7 +85,7 @@ unset($__errorArgs, $__bag); ?>
             <div class="col-md-6">
                 <label class="form-label small">Email</label>
                 <input type="email" name="email" value="<?php echo e(old('email', $u->email)); ?>"
-                       class="form-control <?php $__errorArgs = ['email'];
+                    class="form-control <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -104,7 +105,7 @@ unset($__errorArgs, $__bag); ?>
             <div class="col-md-6">
                 <label class="form-label small">Contact</label>
                 <input type="text" name="contact" value="<?php echo e(old('contact', $u->contact)); ?>"
-                       class="form-control <?php $__errorArgs = ['contact'];
+                    class="form-control <?php $__errorArgs = ['contact'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -126,7 +127,6 @@ unset($__errorArgs, $__bag); ?>
                 <input type="text" value="<?php echo e(ucfirst($u->role)); ?>" class="form-control" disabled>
             </div>
 
-            
             <?php if($u->role === 'porteur'): ?>
                 <div class="col-md-12">
                     <label class="form-label small">Spécialité</label>

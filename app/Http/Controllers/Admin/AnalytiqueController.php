@@ -17,8 +17,8 @@ class AnalytiqueController extends Controller {
 
             // 1. KPIs
             $kpis = [
-                'total'     => Projet::count(),
-                'brouillon' => Projet::where('statutProjet', 'brouillon')->count(),
+                'total'     => Projet::where('statutProjet', '!=', 'brouillon')->count(),
+                'brouillon' => 0,
                 'soumis'    => Projet::where('statutProjet', 'soumis')->count(),
                 'en_examen' => Projet::where('statutProjet', 'en_examen')->count(),
                 'approuve'  => Projet::where('statutProjet', 'approuve')->count(),
@@ -56,13 +56,14 @@ class AnalytiqueController extends Controller {
             }
 
             // 4. RÉPARTITION STATUTS
-            $statutLabels = ['Brouillon','Soumis','En examen','Approuvé','Rejeté','Validé'];
-            $statutKeys   = ['brouillon','soumis','en_examen','approuve','rejete','valide'];
-            $statutColors = ['#9ca3af','#6366f1','#f97316','#22c55e','#ef4444','#0d9488'];
+            $statutLabels = ['Soumis','En examen','Approuvé','Rejeté','Validé'];
+            $statutKeys   = ['soumis','en_examen','approuve','rejete','valide'];
+            $statutColors = ['#6366f1','#f97316','#22c55e','#ef4444','#0d9488'];
             $statutValues = array_map(fn($k) => (int)($kpis[$k] ?? 0), $statutKeys);
 
             // 5. TOP SECTEURS
-            $secteurs = Projet::with('secteur')
+            $secteurs = Projet::where('statutProjet', '!=', 'brouillon')
+                ->with('secteur')
                 ->select('secteur_id',
                     DB::raw('COUNT(*) as nb'),
                     DB::raw('SUM(montantDemande) as total_demande'),
@@ -99,7 +100,8 @@ class AnalytiqueController extends Controller {
             $delaiTotal = round((float)($rawTotal ?? 0), 1);
 
             // 7. PERFORMANCE PORTEURS
-            $porteurs = Projet::select(
+            $porteurs = Projet::where('statutProjet', '!=', 'brouillon')
+                ->select(
                     'user_id',
                     DB::raw('COUNT(*) as total'),
                     DB::raw('SUM(CASE WHEN statutProjet IN ("approuve","valide") THEN 1 ELSE 0 END) as reussis'),
@@ -195,7 +197,8 @@ class AnalytiqueController extends Controller {
             $approbateurs = User::where('role', 'approbateur')
                 ->get()
                 ->map(function ($u) {
-                    $nb = Projet::where('approbateur_id', $u->id)->count();
+                    $nb = Projet::where('statutProjet', '!=', 'brouillon')
+                        ->where('approbateur_id', $u->id)->count();
                     return ['nom' => $u->nomComplet, 'nb' => (int)$nb, 'role' => 'Approbateur'];
                 });
 

@@ -347,7 +347,7 @@ class ProjetController extends Controller {
 
             NotificationService::notifierPorteur($projet, $msgPorteur, 'modification');
 
-            return redirect()->route('approbateur.projets.show', $projet)
+            return redirect()->route('approbateur.projets.index')
                 ->with('success', 'Demande de modification envoyée au porteur.');
 
         }catch(\Exception $e){

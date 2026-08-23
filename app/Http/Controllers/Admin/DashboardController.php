@@ -17,11 +17,12 @@ class DashboardController extends Controller {
         try{
 
             //  Projets
-            $projetsParStatut = Projet::selectRaw('statutProjet, count(*) as total')
+            $projetsParStatut = Projet::where('statutProjet', '!=', 'brouillon')
+                ->selectRaw('statutProjet, count(*) as total')
                 ->groupBy('statutProjet')
                 ->pluck('total', 'statutProjet');
 
-            $totalProjets     = Projet::count();
+            $totalProjets     = $projetsParStatut->sum();
             $projetsBrouillon = $projetsParStatut->get('brouillon', 0);
             $projetsSoumis    = $projetsParStatut->get('soumis', 0);
             $projetsEnExamen  = $projetsParStatut->get('en_examen', 0);
@@ -45,7 +46,8 @@ class DashboardController extends Controller {
                 ->where('updated_at', '<', Carbon::now()->subDays(10))->count();
 
             //  Projets récents
-            $projetsRecents = Projet::with(['porteur','secteur'])
+            $projetsRecents = Projet::where('statutProjet', '!=', 'brouillon')
+            ->with(['porteur','secteur'])
             ->latest('updated_at')->take(6)->get();
 
             //  Utilisateurs récents

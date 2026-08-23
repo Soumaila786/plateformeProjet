@@ -1,8 +1,8 @@
 @php
     $ongletsPerso = [
+        'profil'        => ['label' => 'Profil',        'icon' => 'fa-user',            'route' => 'parametres.index', 'params' => ['onglet' => 'profil']],
         'notifications' => ['label' => 'Notifications',  'icon' => 'fa-bell',            'route' => 'parametres.index', 'params' => ['onglet' => 'notifications']],
         'securite'      => ['label' => 'Sécurité',       'icon' => 'fa-shield-halved',   'route' => 'parametres.index', 'params' => ['onglet' => 'securite']],
-        'profil'        => ['label' => 'Profil',        'icon' => 'fa-user',            'route' => 'parametres.index', 'params' => ['onglet' => 'profil']],
     ];
 
     // FIX : ce sont les vrais NOMS DE ROUTE (admin.users.index, etc.), pas les
@@ -21,6 +21,12 @@
 
 <div class="param-tabs">
 
+    @foreach ($ongletsPerso as $cle => $onglet)
+        <a href="{{ route($onglet['route'], $onglet['params']) }}"
+            class="param-tab {{ $ongletActifPerso === $cle ? 'active' : '' }}">
+            <i class="fas {{ $onglet['icon'] }} me-1"></i> {{ $onglet['label'] }}
+        </a>
+    @endforeach
     @can('utilisateurs.gerer')
         <span class="param-tabs-sep"></span>
         @foreach ($ongletsAdmin as $onglet)
@@ -31,10 +37,4 @@
             </a>
         @endforeach
     @endcan
-    @foreach ($ongletsPerso as $cle => $onglet)
-        <a href="{{ route($onglet['route'], $onglet['params']) }}"
-           class="param-tab {{ $ongletActifPerso === $cle ? 'active' : '' }}">
-            <i class="fas {{ $onglet['icon'] }} me-1"></i> {{ $onglet['label'] }}
-        </a>
-    @endforeach
 </div>
