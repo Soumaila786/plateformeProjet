@@ -22,4 +22,9 @@ class SecteurActivite extends Model
     {
         return $this->hasMany(Projet::class, 'secteur_id');
     }
+
+    public function sousDomaines()
+    {
+        return $this->hasMany(SousDomaine::class, 'secteur_id');
+    }
 }

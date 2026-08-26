@@ -24,7 +24,7 @@ class ParametreController extends Controller {
     //  Profil
     public function profil() {
 
-        return view('parametres.index');
+        return view('parametres.profil');
     }
 
     public function profilUpdate(Request $request) {

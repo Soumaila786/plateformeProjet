@@ -5,12 +5,14 @@
     // Le vrai correctif reste côté controller (voir message) : il faut
     // passer $secteurs à chaque vue qui inclut cette modale.
     $secteurs = $secteurs ?? collect();
+    $typesProjets = $typesProjets ?? \App\Models\TypeProjet::where('actif', true)->orderBy('nom')->get();
+    $sousDomaines = $sousDomaines ?? \App\Models\SousDomaine::where('actif', true)->orderBy('nom')->get();
 @endphp
 
 <div class="mb-3">
     <label class="form-label">Titre du projet</label>
     <input type="text" name="titre" value="{{ old('titre', $p->titre ?? '') }}"
-           class="form-control @error('titre') is-invalid @enderror" required maxlength="255">
+        class="form-control @error('titre') is-invalid @enderror" required maxlength="255">
     @error('titre')<div class="invalid-feedback">{{ $message }}</div>@enderror
 </div>
 
@@ -27,7 +29,17 @@
 </div>
 
 <div class="row g-3 mb-3">
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <label class="form-label">Type de projet</label>
+        <select name="type_projet_id" class="form-select @error('type_projet_id') is-invalid @enderror" required>
+            <option value="">Sélectionner...</option>
+            @foreach ($typesProjets as $type)
+                <option value="{{ $type->id }}" {{ (string) old('type_projet_id', $p->type_projet_id ?? '') === (string) $type->id ? 'selected' : '' }}>{{ $type->nom }}</option>
+            @endforeach
+        </select>
+        @error('type_projet_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+    <div class="col-md-4">
         <label class="form-label">Secteur d'activité</label>
         <select name="secteur_id" class="form-select @error('secteur_id') is-invalid @enderror" required>
             <option value="">Sélectionner...</option>
@@ -41,7 +53,17 @@
         </select>
         @error('secteur_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <label class="form-label">Sous-domaine</label>
+        <select name="sous_domaine_id" class="form-select @error('sous_domaine_id') is-invalid @enderror">
+            <option value="">Aucun sous-domaine</option>
+            @foreach ($sousDomaines as $sousDomaine)
+                <option value="{{ $sousDomaine->id }}" data-secteur="{{ $sousDomaine->secteur_id }}" {{ (string) old('sous_domaine_id', $p->sous_domaine_id ?? '') === (string) $sousDomaine->id ? 'selected' : '' }}>{{ $sousDomaine->nom }}</option>
+            @endforeach
+        </select>
+        @error('sous_domaine_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+    <div class="col-md-4">
         <label class="form-label">Durée (mois)</label>
         <input type="number" name="duree" min="1" value="{{ old('duree', $p->duree ?? '') }}" class="form-control @error('duree') is-invalid @enderror">
         @error('duree')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -75,10 +97,15 @@
 </div>
 
 {{-- Masqué automatiquement en édition (JS, id="lpDocumentsUpload") : update() ne
-     traite pas les fichiers — l'ajout de documents après création se fait depuis
-     la page détail (section Documents) --}}
+    traite pas les fichiers — l'ajout de documents après création se fait depuis
+    la page détail (section Documents) --}}
 <div class="mb-3" id="lpDocumentsUpload">
-    <label class="form-label">Documents (optionnel — pdf, doc, xls, images, 10 Mo max chacun)</label>
-    <input type="file" name="documents[]" multiple class="form-control @error('documents') is-invalid @enderror">
+    <label class="form-label">Document (optionnel — pdf, doc, xls, image, 10 Mo max)</label>
+    <input type="file" name="documents[]" class="form-control @error('documents') is-invalid @enderror">
     @error('documents')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    <div class="mt-2">
+        <label class="form-label small">Nom personnalisé</label>
+        <input type="text" name="document_names[]" class="form-control form-control-sm" maxlength="255" placeholder="Ex. Budget prévisionnel">
+        <div class="form-text">Laissez vide pour conserver le nom original du fichier.</div>
+    </div>
 </div>

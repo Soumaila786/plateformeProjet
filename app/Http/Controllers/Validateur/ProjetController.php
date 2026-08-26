@@ -9,6 +9,7 @@ use App\Models\Commentaire;
 use App\Models\MotifRejet;
 use App\Services\MailService;
 use App\Services\NotificationService;
+use App\Services\Projet\ProjetWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -147,14 +148,14 @@ class ProjetController extends Controller {
                 'commentaire' => 'nullable|string|max:1000',
             ]);
 
-            if ($projet->statutProjet !== 'approuve') {
+            if ($projet->statutProjet !== 'en_validation') {
                 return back()->with('error', 'Ce projet ne peut pas être validé dans son état actuel.');
             }
 
-            $projet->statutProjet   = 'valide';
             $projet->validateur_id  = Auth::id();
             $projet->dateValidation = now();
             $projet->save();
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'valide', 'Validation du projet');
 
             Log::notice('Validation d’un projet', [
                 'projet_id' => $projet->id,
@@ -216,7 +217,7 @@ class ProjetController extends Controller {
                 'commentaire_libre' => 'nullable|string|max:1000',
             ]);
 
-            if ($projet->statutProjet !== 'approuve') {
+            if ($projet->statutProjet !== 'en_validation') {
                 return back()->with('error', 'Ce projet ne peut pas être rejeté dans son état actuel.');
             }
 
@@ -229,10 +230,10 @@ class ProjetController extends Controller {
             ]);
             $commentaire->motifs()->sync($request->motifs);
 
-            $projet->statutProjet   = 'rejete';
             $projet->validateur_id  = Auth::id();
             $projet->dateValidation = now();
             $projet->save();
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'rejete', 'Rejet par le validateur', $commentaire->id);
 
             $libelles = MotifRejet::whereIn('id', $request->motifs)->pluck('libelle')->implode(', ');
             $msgPorteur = 'Votre projet « '.$projet->titre.' » a été rejeté par le validateur. Motif(s) : ' . $libelles
@@ -283,10 +284,8 @@ class ProjetController extends Controller {
             ]);
             $commentaire->motifs()->sync($request->motifs);
 
-            $projet->update([
-                'statutProjet'  => 'brouillon',
-                'validateur_id' => Auth::id(),
-            ]);
+            $projet->update(['validateur_id' => Auth::id()]);
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'a_corriger', 'Demande de correction', $commentaire->id);
 
             $libelles = MotifRejet::whereIn('id', $request->motifs)->pluck('libelle')->implode(', ');
             $msgPorteur = 'Une modification est demandée sur votre projet « '.$projet->titre.' » par le validateur. Motif(s) : ' . $libelles

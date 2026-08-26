@@ -13,6 +13,8 @@ class Projet extends Model {
         'titre',
         'description',
         'objectif',
+        'type_projet_id',
+        'sous_domaine_id',
         'dateSoumission',
         'duree',
         'dateDebut',
@@ -61,6 +63,16 @@ class Projet extends Model {
         return $this->belongsTo(SecteurActivite::class, 'secteur_id');
     }
 
+    public function typeProjet()
+    {
+        return $this->belongsTo(TypeProjet::class, 'type_projet_id');
+    }
+
+    public function sousDomaine()
+    {
+        return $this->belongsTo(SousDomaine::class, 'sous_domaine_id');
+    }
+
     public function activites(){
         return $this->hasMany(Activite::class);
     }
@@ -71,6 +83,11 @@ class Projet extends Model {
 
     public function commentaires() {
         return $this->hasMany(Commentaire::class, 'projet_id');
+    }
+
+    public function historiques()
+    {
+        return $this->hasMany(HistoriqueProjet::class, 'projet_id')->latest();
     }
 
     // Dernier commentaire de rejet (remplace l'ancien champ motifRejet / commentaire_id)
@@ -89,7 +106,7 @@ class Projet extends Model {
     // Un projet 'rejete' est définitivement verrouillé (lecture seule, aucune resoumission).
     // 'en_examen' reste éditable (cohérent avec ProjetPolicy::update()).
     public function isEditable() {
-        return !in_array($this->statutProjet, ['approuve', 'valide', 'rejete']);
+        return in_array($this->statutProjet, ['brouillon', 'a_corriger']);
     }
 
     public function isDeletable() {
@@ -97,7 +114,7 @@ class Projet extends Model {
     }
 
     public function isSubmittable(): bool {
-        return $this->statutProjet === 'brouillon';
+        return in_array($this->statutProjet, ['brouillon', 'a_corriger']);
     }
 
     public function isRejected(): bool {
@@ -105,6 +122,6 @@ class Projet extends Model {
     }
 
     public function isApprouveAndValide() {
-        return in_array($this->statutProjet, ['approuve', 'valide']);
+        return in_array($this->statutProjet, ['approuve', 'en_validation', 'valide']);
     }
 }

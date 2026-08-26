@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Services\Projet\ProjetService;
+use App\Services\Projet\ProjetWorkflowService;
 
 
 class ProjetController extends Controller {
@@ -145,10 +146,8 @@ class ProjetController extends Controller {
 
         try{
 
-            $projet->update([
-                'statutProjet' => 'en_examen',
-                'approbateur_id' => Auth::id()
-            ]);
+            $projet->update(['approbateur_id' => Auth::id()]);
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'en_examen', 'Mise en examen');
 
             NotificationService::notifierPorteur(
                 $projet,
@@ -190,10 +189,11 @@ class ProjetController extends Controller {
             ]);
 
             $projet->update([
-                'statutProjet'    => 'approuve',
                 'dateApprobation' => now(),
-                'approbateur_id' => Auth::id()
+                'approbateur_id' => Auth::id(),
             ]);
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'approuve', 'Approbation du projet');
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'en_validation', 'Transmission pour validation');
             Log::notice('Projet approuvé', [
                 'projet_id' => $projet->id,
                 'code_projet' => $projet->codeProjet,
@@ -267,10 +267,8 @@ class ProjetController extends Controller {
             ]);
             $commentaire->motifs()->sync($request->motifs);
 
-            $projet->update([
-                'statutProjet'   => 'rejete',
-                'approbateur_id' => Auth::id(),
-            ]);
+            $projet->update(['approbateur_id' => Auth::id()]);
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'rejete', 'Rejet par l’approbateur', $commentaire->id);
 
             $libelles = MotifRejet::whereIn('id', $request->motifs)->pluck('libelle')->implode(', ');
             $msgPorteur = 'Votre projet « ' . $projet->titre . ' » a été rejeté. Motif(s) : ' . $libelles
@@ -328,10 +326,8 @@ class ProjetController extends Controller {
             ]);
             $commentaire->motifs()->sync($request->motifs);
 
-            $projet->update([
-                'statutProjet'   => 'brouillon',
-                'approbateur_id' => Auth::id(),
-            ]);
+            $projet->update(['approbateur_id' => Auth::id()]);
+            app(ProjetWorkflowService::class)->transition($projet, Auth::user(), 'a_corriger', 'Demande de modification', $commentaire->id);
 
             $libelles = MotifRejet::whereIn('id', $request->motifs)->pluck('libelle')->implode(', ');
             $msgPorteur = 'Une modification est demandée sur votre projet « ' . $projet->titre . ' ». Motif(s) : ' . $libelles

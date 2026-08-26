@@ -10,14 +10,8 @@
 
 <?php
     $getConf = fn ($cle, $defaut = null) => isset($sysConfig) ? ($sysConfig->get($cle, $defaut) ?? $defaut) : $defaut;
-
-    // ──────────────────────────────────────────────────────────────
-    // Chaque domaine a maintenant une vraie image (balise <img> plus
-    // bas). REMPLACE le fichier correspondant dans public/images/domaines/
-    // par ta propre photo — même nom de fichier, ou ajuste le chemin ici.
-    // ──────────────────────────────────────────────────────────────
     $domaines = [
-        ['image' => 'domaines/base-donnees-projets.jpg', 'titre' => 'Base de données des projets',  'texte' => "Constituer et centraliser la base des projets en recherche de financement.", 'disponible' => true],
+        ['image' => 'domaines/base-donnees-projets.jpg',  'titre' => 'Base de données des projets',  'texte' => "Constituer et centraliser la base des projets en recherche de financement.", 'disponible' => true],
         ['image' => 'domaines/conventions.jpg',           'titre' => 'Conventions',                  'texte' => "Préparer et suivre les conventions et protocoles d'accord avec les partenaires.", 'disponible' => false],
         ['image' => 'domaines/budget.jpg',                'titre' => 'Budget',                       'texte' => "Élaborer, suivre et contrôler le budget des projets financés.", 'disponible' => false],
         ['image' => 'domaines/dette-feu.jpg',             'titre' => 'Dette & FEU',                  'texte' => "Suivre la mobilisation, la gestion de la dette et la comptabilisation des FEU.", 'disponible' => false],

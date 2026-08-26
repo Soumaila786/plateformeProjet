@@ -13,6 +13,18 @@
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-md);
     padding: 1.1rem 1.25rem;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.min-w-0 { min-width: 0 !important; }
+
+.dash-card > .d-flex {
+    min-width: 0;
+}
+
+.dash-card > .d-flex > .min-w-0 {
+    flex: 1 1 auto;
 }
 
 .dash-alert-bloque {

@@ -19,7 +19,7 @@
         'admin' => [
             ['label' => 'Tableau Analytique', 'icon' => 'fa-chart-pie',        'route' => 'admin.analytique'],
             ['label' => 'Projets',             'icon' => 'fa-project-diagram', 'route' => 'admin.projets.index',      'permission' => 'projets.voir'],
-            ['label' => 'Configuration système','icon' => 'fa-cogs',           'route' => 'admin.configuration.index','permission' => 'configurations.gerer'],
+            // ['label' => 'Configuration système','icon' => 'fa-cogs',           'route' => 'admin.configuration.index','permission' => 'configurations.gerer'],
         ],
         'porteur' => [
             ['label' => 'Mes projets',    'icon' => 'fa-folder-open',  'route' => 'porteur.projets.index'],
@@ -48,6 +48,9 @@
     $parametresActif = request()->routeIs('parametres.*')
         || request()->routeIs('admin.users.*')
         || request()->routeIs('admin.secteurs.*')
+        || request()->routeIs('admin.types-projets.*')
+        || request()->routeIs('admin.sous-domaines.*')
+        || request()->routeIs('admin.configuration.*')
         || request()->routeIs('admin.motifs.*')
         || request()->routeIs('admin.logs.*');
 @endphp

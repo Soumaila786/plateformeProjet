@@ -15,13 +15,12 @@
         <link rel="stylesheet" href="<?php echo e(asset('css/parametres.css')); ?>">
     <?php $__env->stopPush(); ?>
 
-    <?php echo $__env->make('parametres.partials._tabs', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Journal des activités</h1>
             <p class="page-header-sub"><?php echo e(count($logs)); ?> entrée<?php echo e(count($logs) > 1 ? 's' : ''); ?> (200 dernières lignes max)</p>
         </div>
+        <a href="<?php echo e(route('parametres.index')); ?>" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Retour aux paramètres</a>
     </div>
 
     <div class="lp-filtres">

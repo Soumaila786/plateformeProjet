@@ -6,7 +6,6 @@
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php $component->withAttributes(['titre' => 'Photo de profil','icon' => 'fa-camera','class' => 'mb-3']); ?>
-    
     <form action="<?php echo e(route('parametres.profil.update')); ?>" method="POST" enctype="multipart/form-data">
         <?php echo csrf_field(); ?>
         <?php echo method_field('PUT'); ?>
@@ -66,7 +65,7 @@ unset($__errorArgs, $__bag); ?>
             <div class="col-md-6">
                 <label class="form-label small">Nom complet</label>
                 <input type="text" name="nomComplet" value="<?php echo e(old('nomComplet', $u->nomComplet)); ?>"
-                       class="form-control <?php $__errorArgs = ['nomComplet'];
+                    class="form-control <?php $__errorArgs = ['nomComplet'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -86,7 +85,7 @@ unset($__errorArgs, $__bag); ?>
             <div class="col-md-6">
                 <label class="form-label small">Email</label>
                 <input type="email" name="email" value="<?php echo e(old('email', $u->email)); ?>"
-                       class="form-control <?php $__errorArgs = ['email'];
+                    class="form-control <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -106,7 +105,7 @@ unset($__errorArgs, $__bag); ?>
             <div class="col-md-6">
                 <label class="form-label small">Contact</label>
                 <input type="text" name="contact" value="<?php echo e(old('contact', $u->contact)); ?>"
-                       class="form-control <?php $__errorArgs = ['contact'];
+                    class="form-control <?php $__errorArgs = ['contact'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }

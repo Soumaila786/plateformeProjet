@@ -59,8 +59,17 @@
         <form action="<?php echo e(route('porteur.projets.documents.store', $projet)); ?>" method="POST" enctype="multipart/form-data" class="mt-3 pt-3 border-top">
             <?php echo csrf_field(); ?>
             <label class="form-label small">Ajouter des documents (pdf, doc, xls, images — 10 Mo max chacun)</label>
-            <div class="d-flex gap-2">
-                <input type="file" name="documents[]" class="form-control form-control-sm" multiple required>
+            <div class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small mb-1">Fichier</label>
+                    <input type="file" name="documents[]" class="form-control form-control-sm" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small mb-1">Nom à afficher (optionnel)</label>
+                    <input type="text" name="document_names[]" class="form-control form-control-sm" maxlength="255" placeholder="Ex. Rapport financier 2026">
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
                 <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.buttons.button','data' => ['type' => 'submit','variant' => 'outline','size' => 'sm']]); ?>
 <?php $component->withName('buttons.button'); ?>

@@ -12,7 +12,9 @@ class ProjetService {
         'brouillon' => [ 'lbl' => 'Brouillon', 'cls' => 'badge-brouillon', 'dot' => '#9ca3af', ],
         'soumis'    => [ 'lbl' => 'Soumis',    'cls' => 'badge-soumis',    'dot' => '#6366f1', ],
         'en_examen' => [ 'lbl' => 'En examen', 'cls' => 'badge-en-examen', 'dot' => '#f97316', ],
+        'a_corriger' => [ 'lbl' => 'À corriger', 'cls' => 'badge-a-corriger', 'dot' => '#f59e0b', ],
         'approuve'  => [ 'lbl' => 'Approuvé',  'cls' => 'badge-approuve',  'dot' => '#22c55e', ],
+        'en_validation' => [ 'lbl' => 'En validation', 'cls' => 'badge-en-validation', 'dot' => '#0ea5e9', ],
         'valide'    => [ 'lbl' => 'Validé',    'cls' => 'badge-valide',    'dot' => '#0d9488', ],
         'rejete'    => [ 'lbl' => 'Rejeté',    'cls' => 'badge-rejete',    'dot' => '#ef4444', ],
     ];

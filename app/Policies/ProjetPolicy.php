@@ -14,7 +14,7 @@ class ProjetPolicy {
         }
 
         // Un brouillon reste privé jusqu'à sa soumission.
-        if ($projet->statutProjet === 'brouillon') {
+        if (in_array($projet->statutProjet, ['brouillon', 'a_corriger'])) {
             return $projet->user_id === $user->id;
         }
 
@@ -35,32 +35,32 @@ class ProjetPolicy {
     // NOTE : un projet 'rejete' est verrouillé définitivement (lecture seule).
     public function update(User $user, Projet $projet){
         if ($user->hasRole('admin')) {
-            return true;
+            return false;
         }
         if (!$user->can('projets.modifier')) {
             return false;
         }
         return $projet->user_id === $user->id
-            && !in_array($projet->statutProjet, ['approuve', 'valide', 'rejete']);
+            && in_array($projet->statutProjet, ['brouillon', 'a_corriger']);
     }
 
     // Supprimer un projet
     public function delete(User $user, Projet $projet){
         if ($user->hasRole('admin')) {
-            return true;
+            return false;
         }
         if (!$user->can('projets.supprimer')) {
             return false;
         }
         return $projet->user_id === $user->id
-            && in_array($projet->statutProjet, ['brouillon', 'soumis']);
+            && in_array($projet->statutProjet, ['brouillon', 'a_corriger', 'soumis']);
     }
 
     // Soumettre un projet
     public function soumettre(User $user, Projet $projet) {
         return $user->can('projets.soumettre')
             && $projet->user_id === $user->id
-            && $projet->statutProjet === 'brouillon';
+            && in_array($projet->statutProjet, ['brouillon', 'a_corriger']);
     }
 
     // Mettre en examen
@@ -81,10 +81,10 @@ class ProjetPolicy {
             return false;
         }
         if ($user->hasRole('approbateur')) {
-            return in_array($projet->statutProjet, ['soumis', 'en_examen']);
+            return $projet->statutProjet === 'en_examen';
         }
         if ($user->hasRole('validateur')) {
-            return $projet->statutProjet === 'approuve';
+            return $projet->statutProjet === 'en_validation';
         }
         return false;
     }
@@ -92,7 +92,7 @@ class ProjetPolicy {
     // Valider
     public function valider(User $user, Projet $projet) {
         return $user->can('projets.valider')
-            && $projet->statutProjet === 'approuve';
+            && $projet->statutProjet === 'en_validation';
     }
 
     // Demande de modification (approbateur : soumis/en_examen -- validateur : approuve)
@@ -101,10 +101,10 @@ class ProjetPolicy {
             return false;
         }
         if ($user->hasRole('approbateur')) {
-            return in_array($projet->statutProjet, ['soumis', 'en_examen']);
+            return $projet->statutProjet === 'en_examen';
         }
         if ($user->hasRole('validateur')) {
-            return $projet->statutProjet === 'approuve';
+            return $projet->statutProjet === 'en_validation';
         }
         return false;
     }

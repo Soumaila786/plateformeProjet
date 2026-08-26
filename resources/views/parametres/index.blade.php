@@ -12,7 +12,7 @@
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Paramètres</h1>
-            <p class="page-header-sub">Gérez votre profil et, pour l'admin, l'ensemble des réglages de l'application</p>
+            <p class="page-header-sub">Choisissez une rubrique pour gérer votre espace et les référentiels CIFEU.</p>
         </div>
     </div>
 @endsection
@@ -23,14 +23,4 @@
     @endpush
 
     @include('parametres.partials._tabs')
-
-    @php $onglet = request('onglet', 'profil'); @endphp
-
-    @if ($onglet === 'securite')
-        @include('parametres.partials._securite')
-    @elseif ($onglet === 'notifications')
-        @include('parametres.partials._notifications')
-    @else
-        @include('parametres.partials._profil')
-    @endif
 @endsection

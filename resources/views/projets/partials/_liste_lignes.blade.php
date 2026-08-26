@@ -55,25 +55,25 @@
                 <a href="{{ route($routeShow, $projet) }}" class="lp-btn" title="Voir"><i class="fas fa-eye"></i></a>
             @endif
 
-            @if (isset($routeExaminer) && auth()->user()->can('projets.examiner') && $projet->statutProjet === 'soumis')
+            @if (isset($routeExaminer) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.examiner') && $projet->statutProjet === 'soumis')
                 <form method="POST" action="{{ route($routeExaminer, $projet) }}" onsubmit="return confirm('Mettre ce projet en examen ?')" class="d-inline">
                     @csrf
                     <button type="submit" class="lp-btn lp-btn-orange" title="Mettre en examen"><i class="fas fa-magnifying-glass"></i></button>
                 </form>
             @endif
 
-            @if (isset($routeApprouver) && auth()->user()->can('projets.approuver') && $projet->statutProjet === 'en_examen')
+            @if (isset($routeApprouver) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.approuver') && $projet->statutProjet === 'en_examen')
                 <button type="button" class="lp-btn lp-btn-green" title="Approuver" onclick="openModal('modalApprouver{{ $projet->id }}')"><i class="fas fa-check"></i></button>
             @endif
-            @if (isset($routeValider) && auth()->user()->can('projets.valider') && $projet->statutProjet === 'approuve')
+            @if (isset($routeValider) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.valider') && $projet->statutProjet === 'approuve')
                 <button type="button" class="lp-btn lp-btn-green" title="Valider" onclick="openModal('modalValider{{ $projet->id }}')"><i class="fas fa-check-double"></i></button>
             @endif
 
-            @if (isset($routeDemanderModif) && auth()->user()->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
+            @if (isset($routeDemanderModif) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
                 <button type="button" class="lp-btn" title="Demander une modification" onclick="openModal('modalDemandeModif{{ $projet->id }}')"><i class="fas fa-pen"></i></button>
             @endif
 
-            @if (isset($routeRejeter) && auth()->user()->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
+            @if (isset($routeRejeter) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
                 <button type="button" class="lp-btn lp-btn-red" title="Rejeter" onclick="openModal('modalRejeter{{ $projet->id }}')"><i class="fas fa-times"></i></button>
             @endif
 
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    @if (isset($routeApprouver) && auth()->user()->can('projets.approuver') && $projet->statutProjet === 'en_examen')
+    @if (isset($routeApprouver) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.approuver') && $projet->statutProjet === 'en_examen')
         <div id="modalApprouver{{ $projet->id }}" class="lp-modal-overlay">
             <div class="lp-modal-box">
                 <div class="lp-modal-head">
@@ -118,7 +118,7 @@
         </div>
     @endif
 
-    @if (isset($routeValider) && auth()->user()->can('projets.valider') && $projet->statutProjet === 'approuve')
+    @if (isset($routeValider) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.valider') && $projet->statutProjet === 'approuve')
         <div id="modalValider{{ $projet->id }}" class="lp-modal-overlay">
             <div class="lp-modal-box">
                 <div class="lp-modal-head">
@@ -141,7 +141,7 @@
         </div>
     @endif
 
-    @if (isset($routeRejeter) && auth()->user()->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
+    @if (isset($routeRejeter) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
         <div id="modalRejeter{{ $projet->id }}" class="lp-modal-overlay">
             <div class="lp-modal-box">
                 <div class="lp-modal-head">
@@ -170,7 +170,7 @@
         </div>
     @endif
 
-    @if (isset($routeDemanderModif) && auth()->user()->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
+    @if (isset($routeDemanderModif) && !auth()->user()->hasRole('admin') && auth()->user()->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
         <div id="modalDemandeModif{{ $projet->id }}" class="lp-modal-overlay">
             <div class="lp-modal-box">
                 <div class="lp-modal-head">

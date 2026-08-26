@@ -29,11 +29,8 @@
         <img src="<?php echo e(asset('storage/'.$logoImage)); ?>" alt="<?php echo e($nomApp); ?>"
              style="width:<?php echo e($size); ?>px; height:<?php echo e($size); ?>px; object-fit:contain; border-radius:12px; flex-shrink:0;">
     <?php else: ?>
-        <div class="d-flex align-items-center justify-content-center fw-bold text-white flex-shrink-0"
-             style="width:<?php echo e($size); ?>px; height:<?php echo e($size); ?>px; border-radius:12px; background:<?php echo e($couleur); ?>; font-size:<?php echo e(round($size * 0.38)); ?>px;">
-            <?php echo e($logoTexte); ?>
-
-        </div>
+        <img src="<?php echo e(asset('images/logo-cifeu.jpg')); ?>" alt="<?php echo e($nomApp); ?>"
+             style="width:<?php echo e($size); ?>px; height:<?php echo e($size); ?>px; object-fit:contain; border-radius:12px; flex-shrink:0;">
     <?php endif; ?>
 
     <?php if($showText): ?>

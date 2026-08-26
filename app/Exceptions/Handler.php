@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Throwable;
 
 class Handler extends ExceptionHandler{
@@ -38,6 +39,12 @@ class Handler extends ExceptionHandler{
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Throwable $exception) {
+
+        if ($exception instanceof PostTooLargeException) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Le document est trop volumineux. Choisissez un fichier de 10 Mo maximum.');
+        }
         
         if ($exception instanceof QueryException
             && str_contains($exception->getMessage(), 'SQLSTATE[HY000] [2002]')) {

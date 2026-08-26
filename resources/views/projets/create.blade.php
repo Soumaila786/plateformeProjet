@@ -79,14 +79,26 @@
                         <div class="pf-section-icon"><i class="fas fa-calendar-days"></i></div>
                         <div>
                             <h2 class="pf-section-title">Planning</h2>
-                            <p class="pf-section-sub">Secteur, durée et dates prévisionnelles</p>
+                            <p class="pf-section-sub">Classification, durée et dates prévisionnelles</p>
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
+                            <label class="form-label">Type de projet</label>
+                            <select name="type_projet_id" class="form-select @error('type_projet_id') is-invalid @enderror" required>
+                                <option value="">Sélectionner...</option>
+                                @foreach ($typesProjets as $type)
+                                    <option value="{{ $type->id }}" {{ (string) old('type_projet_id') === (string) $type->id ? 'selected' : '' }}>
+                                        {{ $type->nom }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('type_projet_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Secteur d'activité</label>
-                            <select name="secteur_id" class="form-select @error('secteur_id') is-invalid @enderror" required>
+                            <select name="secteur_id" id="secteurProjet" class="form-select @error('secteur_id') is-invalid @enderror" required>
                                 <option value="">Sélectionner...</option>
                                 @foreach ($secteurs as $secteur)
                                     <option value="{{ $secteur->id }}" {{ (string) old('secteur_id') === (string) $secteur->id ? 'selected' : '' }}>
@@ -95,6 +107,19 @@
                                 @endforeach
                             </select>
                             @error('secteur_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sous-domaine</label>
+                            <select name="sous_domaine_id" id="sousDomaineProjet" class="form-select @error('sous_domaine_id') is-invalid @enderror">
+                                <option value="">Aucun sous-domaine</option>
+                                @foreach ($sousDomaines as $sousDomaine)
+                                    <option value="{{ $sousDomaine->id }}" data-secteur="{{ $sousDomaine->secteur_id }}"
+                                        {{ (string) old('sous_domaine_id') === (string) $sousDomaine->id ? 'selected' : '' }}>
+                                        {{ $sousDomaine->nom }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('sous_domaine_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Durée (mois)</label>
@@ -193,3 +218,25 @@
         </div>
     </form>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const secteur = document.getElementById('secteurProjet');
+            const sousDomaine = document.getElementById('sousDomaineProjet');
+
+            if (!secteur || !sousDomaine) return;
+
+            const filtrerSousDomaines = function () {
+                const secteurId = secteur.value;
+                Array.from(sousDomaine.options).forEach(function (option) {
+                    option.hidden = option.value !== '' && option.dataset.secteur !== secteurId;
+                    if (option.hidden && option.selected) sousDomaine.value = '';
+                });
+            };
+
+            secteur.addEventListener('change', filtrerSousDomaines);
+            filtrerSousDomaines();
+        });
+    </script>
+@endpush

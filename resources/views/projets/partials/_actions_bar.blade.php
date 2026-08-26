@@ -8,6 +8,7 @@
 
 @php
     $u = auth()->user();
+    $estOperateur = !$u->hasRole('admin');
     $porteurProjet = $projet->porteur ?? $projet->user ?? null;
     $estProprietaire = $porteurProjet && $porteurProjet->id === $u->id;
     $champsModifierProjet = [
@@ -22,7 +23,7 @@
 
 <div class="d-flex flex-wrap gap-2">
 
-    @if ($u->can('projets.examiner') && $projet->statutProjet === 'soumis')
+    @if ($estOperateur && $u->can('projets.examiner') && $projet->statutProjet === 'soumis')
         <form action="{{ route('approbateur.projets.examiner', $projet) }}" method="POST" class="d-inline">
             @csrf
             <x-buttons.button variant="outline" icon="fa-magnifying-glass" type="submit">
@@ -31,25 +32,25 @@
         </form>
     @endif
 
-    @if ($u->can('projets.approuver') && $projet->statutProjet === 'en_examen')
+    @if ($estOperateur && $u->can('projets.approuver') && $projet->statutProjet === 'en_examen')
         <x-buttons.button variant="success" icon="fa-check" data-bs-toggle="modal" data-bs-target="#modalApprouver">
             Approuver
         </x-buttons.button>
     @endif
 
-    @if ($u->can('projets.valider') && $projet->statutProjet === 'approuve')
+    @if ($estOperateur && $u->can('projets.valider') && $projet->statutProjet === 'approuve')
         <x-buttons.button variant="success" icon="fa-check-double" data-bs-toggle="modal" data-bs-target="#modalValider">
             Valider
         </x-buttons.button>
     @endif
 
-    @if ($u->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
+    @if ($estOperateur && $u->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
         <x-buttons.button variant="outline" icon="fa-pen" data-bs-toggle="modal" data-bs-target="#modalDemandeModif">
             Demander modification
         </x-buttons.button>
     @endif
 
-    @if ($u->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
+    @if ($estOperateur && $u->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve']))
         <x-buttons.button variant="danger" icon="fa-xmark" data-bs-toggle="modal" data-bs-target="#modalRejeter">
             Rejeter
         </x-buttons.button>
@@ -90,14 +91,10 @@
         <x-buttons.button variant="danger" icon="fa-trash" data-bs-toggle="modal" data-bs-target="#modalSupprimer">
             Supprimer
         </x-buttons.button>
-    @elseif ($u->hasRole('admin') && $u->can('projets.supprimer'))
-        <x-buttons.button variant="danger" icon="fa-trash" data-bs-toggle="modal" data-bs-target="#modalSupprimer">
-            Supprimer
-        </x-buttons.button>
     @endif
 </div>
 
-@if ($u->can('projets.approuver') || $u->can('projets.valider'))
+@if ($estOperateur && ($u->can('projets.approuver') || $u->can('projets.valider')))
     <x-modals.confirm id="modalApprouver" titre="Approuver le projet" :action="route('approbateur.projets.approuver', $projet)"
         boutonLabel="Approuver" boutonVariant="success">
         <p class="text-muted small">Le projet passera à l'étape suivante du circuit.</p>
@@ -113,7 +110,7 @@
     </x-modals.confirm>
 @endif
 
-@if ($u->can('projets.rejeter'))
+@if ($estOperateur && $u->can('projets.rejeter'))
     @php $routeRejeter = $u->hasRole('approbateur') ? 'approbateur.projets.rejeter' : 'validateur.projets.rejeter'; @endphp
     <x-modals.confirm id="modalRejeter" titre="Rejeter le projet" :action="route($routeRejeter, $projet)"
         boutonLabel="Rejeter" boutonVariant="danger">

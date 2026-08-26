@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
 
             RolesAndPermissionsSeeder::class,
+            ClassificationSeeder::class,
+            DemoUsersProjectsSeeder::class,
             MotifsRejetSeeder::class,
 
             // Doit tourner APRÈS UserSeeder, puisqu'elle assigne les rôles Spatie

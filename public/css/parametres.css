@@ -1,28 +1,37 @@
 /* Paramètres — spécifique à ce module. S'appuie sur variables.css. */
 
 .param-tabs {
-    display: flex;
-    gap: .3rem;
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-    align-items: center;
+    display: grid;
+    gap: .65rem;
+    margin-bottom: 1.5rem;
+    max-width: 760px;
 }
 .param-tab {
-    padding: .6rem 1rem;
-    font-size: .85rem;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .85rem 1rem;
+    font-size: .9rem;
     font-weight: 600;
     color: var(--color-text-muted);
-    border-bottom: 2px solid transparent;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
     text-decoration: none;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
-.param-tab:hover { color: var(--color-primary); text-decoration: none; }
-.param-tab.active { color: var(--color-primary); border-color: var(--color-primary); }
+.param-tab:hover { color: var(--color-primary); text-decoration: none; transform: translateX(3px); border-color: var(--color-primary); }
+.param-tab.active { color: var(--color-primary); border-color: var(--color-primary); box-shadow: 0 6px 18px rgba(99,102,241,.12); }
+.param-tab strong, .param-tab small { display: block; }
+.param-tab strong { color: var(--color-text); }
+.param-tab small { margin-top: 2px; color: var(--color-text-light); font-size: .74rem; font-weight: 400; }
+.param-tab-icon { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 9px; background: var(--color-primary-light); color: var(--color-primary); }
 
 /* Sépare les onglets personnels (Profil/Sécurité/Notifications) des
    onglets de gestion admin (Utilisateurs/Secteurs/Motifs/Journal) */
 .param-tabs-sep {
-    width: 1px; height: 20px; background: var(--color-border); margin: 0 .4rem;
+    height: 1px; background: var(--color-border); margin: .55rem 0;
 }
 
 .param-avatar-upload {
@@ -33,5 +42,5 @@
 }
 
 @media (max-width: 575px) {
-    .param-tabs { overflow-x: auto; flex-wrap: nowrap; }
+    .param-tabs { max-width: none; }
 }

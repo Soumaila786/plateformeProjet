@@ -17,13 +17,12 @@
         <link rel="stylesheet" href="{{ asset('css/parametres.css') }}">
     @endpush
 
-    @include('parametres.partials._tabs')
-
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Journal des activités</h1>
             <p class="page-header-sub">{{ count($logs) }} entrée{{ count($logs) > 1 ? 's' : '' }} (200 dernières lignes max)</p>
         </div>
+        <a href="{{ route('parametres.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Retour aux paramètres</a>
     </div>
 
     <div class="lp-filtres">

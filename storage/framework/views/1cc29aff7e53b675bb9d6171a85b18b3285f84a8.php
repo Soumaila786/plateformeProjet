@@ -35,6 +35,7 @@
         }
     </style>
     <?php echo $__env->yieldPushContent('styles'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/ui-polish.css')); ?>">
 
     <style>
         html, body {

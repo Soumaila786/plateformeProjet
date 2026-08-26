@@ -8,6 +8,7 @@
 
 <?php
     $u = auth()->user();
+    $estOperateur = !$u->hasRole('admin');
     $porteurProjet = $projet->porteur ?? $projet->user ?? null;
     $estProprietaire = $porteurProjet && $porteurProjet->id === $u->id;
     $champsModifierProjet = [
@@ -22,7 +23,7 @@
 
 <div class="d-flex flex-wrap gap-2">
 
-    <?php if($u->can('projets.examiner') && $projet->statutProjet === 'soumis'): ?>
+    <?php if($estOperateur && $u->can('projets.examiner') && $projet->statutProjet === 'soumis'): ?>
         <form action="<?php echo e(route('approbateur.projets.examiner', $projet)); ?>" method="POST" class="d-inline">
             <?php echo csrf_field(); ?>
             <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
@@ -41,7 +42,7 @@
         </form>
     <?php endif; ?>
 
-    <?php if($u->can('projets.approuver') && $projet->statutProjet === 'en_examen'): ?>
+    <?php if($estOperateur && $u->can('projets.approuver') && $projet->statutProjet === 'en_examen'): ?>
         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.buttons.button','data' => ['variant' => 'success','icon' => 'fa-check','dataBsToggle' => 'modal','dataBsTarget' => '#modalApprouver']]); ?>
 <?php $component->withName('buttons.button'); ?>
@@ -57,7 +58,7 @@
 <?php endif; ?>
     <?php endif; ?>
 
-    <?php if($u->can('projets.valider') && $projet->statutProjet === 'approuve'): ?>
+    <?php if($estOperateur && $u->can('projets.valider') && $projet->statutProjet === 'approuve'): ?>
         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.buttons.button','data' => ['variant' => 'success','icon' => 'fa-check-double','dataBsToggle' => 'modal','dataBsTarget' => '#modalValider']]); ?>
 <?php $component->withName('buttons.button'); ?>
@@ -73,7 +74,7 @@
 <?php endif; ?>
     <?php endif; ?>
 
-    <?php if($u->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve'])): ?>
+    <?php if($estOperateur && $u->can('projets.demander_modification') && in_array($projet->statutProjet, ['en_examen', 'approuve'])): ?>
         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.buttons.button','data' => ['variant' => 'outline','icon' => 'fa-pen','dataBsToggle' => 'modal','dataBsTarget' => '#modalDemandeModif']]); ?>
 <?php $component->withName('buttons.button'); ?>
@@ -89,7 +90,7 @@
 <?php endif; ?>
     <?php endif; ?>
 
-    <?php if($u->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve'])): ?>
+    <?php if($estOperateur && $u->can('projets.rejeter') && in_array($projet->statutProjet, ['en_examen', 'approuve'])): ?>
         <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.buttons.button','data' => ['variant' => 'danger','icon' => 'fa-xmark','dataBsToggle' => 'modal','dataBsTarget' => '#modalRejeter']]); ?>
 <?php $component->withName('buttons.button'); ?>
@@ -169,24 +170,10 @@
 <?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
-    <?php elseif($u->hasRole('admin') && $u->can('projets.supprimer')): ?>
-        <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.buttons.button','data' => ['variant' => 'danger','icon' => 'fa-trash','dataBsToggle' => 'modal','dataBsTarget' => '#modalSupprimer']]); ?>
-<?php $component->withName('buttons.button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php $component->withAttributes(['variant' => 'danger','icon' => 'fa-trash','data-bs-toggle' => 'modal','data-bs-target' => '#modalSupprimer']); ?>
-            Supprimer
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
-<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
-<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
-<?php endif; ?>
     <?php endif; ?>
 </div>
 
-<?php if($u->can('projets.approuver') || $u->can('projets.valider')): ?>
+<?php if($estOperateur && ($u->can('projets.approuver') || $u->can('projets.valider'))): ?>
     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.modals.confirm','data' => ['id' => 'modalApprouver','titre' => 'Approuver le projet','action' => route('approbateur.projets.approuver', $projet),'boutonLabel' => 'Approuver','boutonVariant' => 'success']]); ?>
 <?php $component->withName('modals.confirm'); ?>
@@ -220,7 +207,7 @@
 <?php endif; ?>
 <?php endif; ?>
 
-<?php if($u->can('projets.rejeter')): ?>
+<?php if($estOperateur && $u->can('projets.rejeter')): ?>
     <?php $routeRejeter = $u->hasRole('approbateur') ? 'approbateur.projets.rejeter' : 'validateur.projets.rejeter'; ?>
     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
 <?php $component = $__env->getContainer()->make(Illuminate\View\AnonymousComponent::class, ['view' => 'components.modals.confirm','data' => ['id' => 'modalRejeter','titre' => 'Rejeter le projet','action' => route($routeRejeter, $projet),'boutonLabel' => 'Rejeter','boutonVariant' => 'danger']]); ?>

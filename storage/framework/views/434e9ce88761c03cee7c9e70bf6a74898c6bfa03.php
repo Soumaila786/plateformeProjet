@@ -48,6 +48,9 @@
     $parametresActif = request()->routeIs('parametres.*')
         || request()->routeIs('admin.users.*')
         || request()->routeIs('admin.secteurs.*')
+        || request()->routeIs('admin.types-projets.*')
+        || request()->routeIs('admin.sous-domaines.*')
+        || request()->routeIs('admin.configuration.*')
         || request()->routeIs('admin.motifs.*')
         || request()->routeIs('admin.logs.*');
 ?>

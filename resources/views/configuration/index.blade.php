@@ -9,11 +9,16 @@
 @endsection
 
 @section('page-header')
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/parametres.css') }}">
+    @endpush
+
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Configuration système</h1>
             <p class="page-header-sub">Paramètres généraux de l'application</p>
         </div>
+        <a href="{{ route('parametres.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Retour aux paramètres</a>
     </div>
 @endsection
 

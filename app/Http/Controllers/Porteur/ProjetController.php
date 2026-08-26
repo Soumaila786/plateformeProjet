@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Porteur;
 use App\Http\Controllers\Controller;
 use App\Models\Projet;
 use App\Models\DocumentProjet;
+use App\Models\HistoriqueProjet;
 use App\Models\SecteurActivite;
+use App\Models\SousDomaine;
+use App\Models\TypeProjet;
 use App\Services\NotificationService;
+use App\Services\Projet\ProjetWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -52,8 +56,10 @@ class ProjetController extends Controller {
         try {
             $secteurs = SecteurActivite::where('statutSecteur', true)
                         ->orderBy('nomSecteur')->get();
+            $typesProjets = TypeProjet::where('actif', true)->orderBy('nom')->get();
+            $sousDomaines = SousDomaine::where('actif', true)->orderBy('nom')->get();
 
-            return view('projets.create', compact('secteurs'));
+            return view('projets.create', compact('secteurs', 'typesProjets', 'sousDomaines'));
 
         } catch (\Exception $e) {
             Log::error('Erreur lors du chargement du formulaire de création', [
@@ -73,7 +79,9 @@ class ProjetController extends Controller {
                 'titre'          => 'required|string|max:255',
                 'description'    => 'required|string',
                 'objectif'       => 'nullable|string',
+                'type_projet_id'  => 'required|exists:types_projets,id',
                 'secteur_id'     => 'required|exists:secteur_activites,id',
+                'sous_domaine_id' => 'nullable|exists:sous_domaines,id',
                 'duree'          => 'nullable|integer|min:1',
                 'dateDebut'      => 'nullable|date',
                 'dateFin'        => 'nullable|date|after_or_equal:dateDebut',
@@ -81,7 +89,19 @@ class ProjetController extends Controller {
                 'montantDemande' => 'nullable|numeric|min:0',
                 'documents'      => 'nullable|array',
                 'documents.*'    => 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
+                'document_names'   => 'nullable|array',
+                'document_names.*' => 'nullable|string|max:255',
             ]);
+
+            if ($request->filled('sous_domaine_id')
+                && !SousDomaine::where('id', $request->sous_domaine_id)
+                    ->where('secteur_id', $request->secteur_id)
+                    ->where('actif', true)
+                    ->exists()) {
+                return back()->withInput()->withErrors([
+                    'sous_domaine_id' => 'Le sous-domaine ne correspond pas au secteur sélectionné.',
+                ]);
+            }
 
             $code = 'PRJ-' . strtoupper(substr(md5(uniqid()), 0, 8));
 
@@ -90,6 +110,8 @@ class ProjetController extends Controller {
                 'titre'          => $request->titre,
                 'description'    => $request->description,
                 'objectif'       => $request->objectif ?? '',
+                'type_projet_id' => $request->type_projet_id,
+                'sous_domaine_id' => $request->sous_domaine_id,
                 'duree'          => $request->duree,
                 'dateDebut'      => $request->dateDebut,
                 'dateFin'        => $request->dateFin,
@@ -100,6 +122,13 @@ class ProjetController extends Controller {
                 'secteur_id'     => $request->secteur_id,
             ]);
 
+            HistoriqueProjet::create([
+                'projet_id' => $projet->id,
+                'user_id' => Auth::id(),
+                'nouveau_statut' => 'brouillon',
+                'action' => 'Création du projet',
+            ]);
+
             Log::info('Création d\'un projet', [
                 'projet_id' => $projet->id,
                 'code_projet' => $projet->codeProjet,
@@ -108,10 +137,11 @@ class ProjetController extends Controller {
             ]);
 
             if ($request->hasFile('documents')) {
-                foreach ($request->file('documents') as $file) {
+                foreach ($request->file('documents') as $index => $file) {
                     $chemin = $file->store("projets/{$projet->id}/documents", 'public');
+                    $nom = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '-', trim($request->input("document_names.{$index}", '')));
                     DocumentProjet::create([
-                        'nomFichier'    => $file->getClientOriginalName(),
+                        'nomFichier'    => $nom !== '' ? $nom . '.' . $file->getClientOriginalExtension() : $file->getClientOriginalName(),
                         'typeDocument'  => $file->getClientOriginalExtension(),
                         'cheminFichier' => $chemin,
                         'dateUpload'    => now(),
@@ -178,7 +208,9 @@ class ProjetController extends Controller {
             'titre'         => 'required|string|max:255',
             'description'   => 'required|string',
             'objectif'      => 'nullable|string',
+            'type_projet_id' => 'required|exists:types_projets,id',
             'secteur_id'    => 'required|exists:secteur_activites,id',
+            'sous_domaine_id' => 'nullable|exists:sous_domaines,id',
             'duree'         => 'nullable|integer|min:1',
             'dateDebut'     => 'nullable|date',
             'dateFin'       => 'nullable|date|after_or_equal:dateDebut',
@@ -186,10 +218,22 @@ class ProjetController extends Controller {
             'montantDemande'=> 'nullable|numeric|min:0',
             ]);
 
+            if ($request->filled('sous_domaine_id')
+                && !SousDomaine::where('id', $request->sous_domaine_id)
+                    ->where('secteur_id', $request->secteur_id)
+                    ->where('actif', true)
+                    ->exists()) {
+                return back()->withInput()->withErrors([
+                    'sous_domaine_id' => 'Le sous-domaine ne correspond pas au secteur sélectionné.',
+                ]);
+            }
+
             $projet->update([
                 'titre'          => $request->titre,
                 'description'    => $request->description,
                 'objectif'       => $request->objectif ?? '',
+                'type_projet_id' => $request->type_projet_id,
+                'sous_domaine_id' => $request->sous_domaine_id,
                 'duree'          => $request->duree,
                 'dateDebut'      => $request->dateDebut,
                 'dateFin'        => $request->dateFin,
@@ -256,10 +300,13 @@ class ProjetController extends Controller {
 
         try{
 
-            $projet->update([
-                'statutProjet'   => 'soumis',
-                'dateSoumission' => now(),
-            ]);
+            $projet->update(['dateSoumission' => now()]);
+            app(ProjetWorkflowService::class)->transition(
+                $projet,
+                Auth::user(),
+                'soumis',
+                'Soumission du projet'
+            );
 
             // Notifier les approbateurs
             NotificationService::notifierApprobateurs(
@@ -305,12 +352,15 @@ class ProjetController extends Controller {
             $request->validate([
                 'documents'   => 'required|array',
                 'documents.*' => 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
+                'document_names'   => 'nullable|array',
+                'document_names.*' => 'nullable|string|max:255',
             ]);
 
-            foreach ($request->file('documents') as $file) {
+            foreach ($request->file('documents') as $index => $file) {
                 $chemin = $file->store("projets/{$projet->id}/documents", 'public');
+                $nom = str_replace(['\\', '/', ':', '*', '?', '"', '<', '>', '|'], '-', trim($request->input("document_names.{$index}", '')));
                 DocumentProjet::create([
-                    'nomFichier'    => $file->getClientOriginalName(),
+                    'nomFichier'    => $nom !== '' ? $nom . '.' . $file->getClientOriginalExtension() : $file->getClientOriginalName(),
                     'typeDocument'  => $file->getClientOriginalExtension(),
                     'cheminFichier' => $chemin,
                     'dateUpload'    => now(),

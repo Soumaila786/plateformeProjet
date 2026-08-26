@@ -43,8 +43,17 @@
         <form action="{{ route('porteur.projets.documents.store', $projet) }}" method="POST" enctype="multipart/form-data" class="mt-3 pt-3 border-top">
             @csrf
             <label class="form-label small">Ajouter des documents (pdf, doc, xls, images — 10 Mo max chacun)</label>
-            <div class="d-flex gap-2">
-                <input type="file" name="documents[]" class="form-control form-control-sm" multiple required>
+            <div class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small mb-1">Fichier</label>
+                    <input type="file" name="documents[]" class="form-control form-control-sm" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small mb-1">Nom à afficher (optionnel)</label>
+                    <input type="text" name="document_names[]" class="form-control form-control-sm" maxlength="255" placeholder="Ex. Rapport financier 2026">
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
                 <x-buttons.button type="submit" variant="outline" size="sm">Ajouter</x-buttons.button>
             </div>
         </form>

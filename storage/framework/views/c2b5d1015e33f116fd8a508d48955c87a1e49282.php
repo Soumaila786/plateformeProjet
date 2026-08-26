@@ -131,14 +131,41 @@ unset($__errorArgs, $__bag); ?>
                         <div class="pf-section-icon"><i class="fas fa-calendar-days"></i></div>
                         <div>
                             <h2 class="pf-section-title">Planning</h2>
-                            <p class="pf-section-sub">Secteur, durée et dates prévisionnelles</p>
+                            <p class="pf-section-sub">Classification, durée et dates prévisionnelles</p>
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
+                            <label class="form-label">Type de projet</label>
+                            <select name="type_projet_id" class="form-select <?php $__errorArgs = ['type_projet_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" required>
+                                <option value="">Sélectionner...</option>
+                                <?php $__currentLoopData = $typesProjets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($type->id); ?>" <?php echo e((string) old('type_projet_id') === (string) $type->id ? 'selected' : ''); ?>>
+                                        <?php echo e($type->nom); ?>
+
+                                    </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                            <?php $__errorArgs = ['type_projet_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Secteur d'activité</label>
-                            <select name="secteur_id" class="form-select <?php $__errorArgs = ['secteur_id'];
+                            <select name="secteur_id" id="secteurProjet" class="form-select <?php $__errorArgs = ['secteur_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -155,6 +182,34 @@ unset($__errorArgs, $__bag); ?>" required>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                             <?php $__errorArgs = ['secteur_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sous-domaine</label>
+                            <select name="sous_domaine_id" id="sousDomaineProjet" class="form-select <?php $__errorArgs = ['sous_domaine_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                                <option value="">Aucun sous-domaine</option>
+                                <?php $__currentLoopData = $sousDomaines; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sousDomaine): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($sousDomaine->id); ?>" data-secteur="<?php echo e($sousDomaine->secteur_id); ?>"
+                                        <?php echo e((string) old('sous_domaine_id') === (string) $sousDomaine->id ? 'selected' : ''); ?>>
+                                        <?php echo e($sousDomaine->nom); ?>
+
+                                    </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                            <?php $__errorArgs = ['sous_domaine_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -354,5 +409,27 @@ unset($__errorArgs, $__bag); ?>
         </div>
     </form>
 <?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const secteur = document.getElementById('secteurProjet');
+            const sousDomaine = document.getElementById('sousDomaineProjet');
+
+            if (!secteur || !sousDomaine) return;
+
+            const filtrerSousDomaines = function () {
+                const secteurId = secteur.value;
+                Array.from(sousDomaine.options).forEach(function (option) {
+                    option.hidden = option.value !== '' && option.dataset.secteur !== secteurId;
+                    if (option.hidden && option.selected) sousDomaine.value = '';
+                });
+            };
+
+            secteur.addEventListener('change', filtrerSousDomaines);
+            filtrerSousDomaines();
+        });
+    </script>
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views\projets\create.blade.php ENDPATH**/ ?>

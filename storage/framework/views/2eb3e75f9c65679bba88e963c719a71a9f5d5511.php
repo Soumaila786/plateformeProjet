@@ -9,11 +9,16 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('page-header'); ?>
+    <?php $__env->startPush('styles'); ?>
+        <link rel="stylesheet" href="<?php echo e(asset('css/parametres.css')); ?>">
+    <?php $__env->stopPush(); ?>
+
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Configuration système</h1>
             <p class="page-header-sub">Paramètres généraux de l'application</p>
         </div>
+        <a href="<?php echo e(route('parametres.index')); ?>" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Retour aux paramètres</a>
     </div>
 <?php $__env->stopSection(); ?>
 
