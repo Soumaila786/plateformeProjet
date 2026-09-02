@@ -5,12 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    public function up(): void
-    {
+return new class extends Migration {
+    public function up(): void {
         DB::statement("ALTER TABLE projets MODIFY statutProjet ENUM('brouillon','soumis','en_examen','a_corriger','approuve','en_validation','valide','rejete') NOT NULL DEFAULT 'brouillon'");
-
         Schema::create('historique_projets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('projet_id')->constrained('projets')->cascadeOnDelete();
@@ -24,10 +21,8 @@ return new class extends Migration
         });
     }
 
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('historique_projets');
-
         DB::statement("ALTER TABLE projets MODIFY statutProjet ENUM('brouillon','soumis','en_examen','approuve','rejete','valide') NOT NULL DEFAULT 'brouillon'");
     }
 };

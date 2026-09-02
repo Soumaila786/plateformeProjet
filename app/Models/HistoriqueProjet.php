@@ -4,10 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class HistoriqueProjet extends Model
-{
+class HistoriqueProjet extends Model {
     protected $table = 'historique_projets';
-
     protected $fillable = [
         'projet_id',
         'user_id',
@@ -17,18 +15,15 @@ class HistoriqueProjet extends Model
         'commentaire_id',
     ];
 
-    public function projet()
-    {
+    public function projet(){
         return $this->belongsTo(Projet::class, 'projet_id');
     }
 
-    public function utilisateur()
-    {
+    public function utilisateur(){
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function commentaire()
-    {
+    public function commentaire(){
         return $this->belongsTo(Commentaire::class, 'commentaire_id');
     }
 }

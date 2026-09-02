@@ -5,9 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Projet extends Model {
-
     protected $table = 'projets';
-
     protected $fillable = [
         'codeProjet',
         'titre',
@@ -30,7 +28,6 @@ class Projet extends Model {
         'validateur_id',
         'planification_demandee',
     ];
-
     protected $casts = [
         'dateSoumission'         => 'datetime',
         'dateApprobation'        => 'datetime',
@@ -63,13 +60,11 @@ class Projet extends Model {
         return $this->belongsTo(SecteurActivite::class, 'secteur_id');
     }
 
-    public function typeProjet()
-    {
+    public function typeProjet(){
         return $this->belongsTo(TypeProjet::class, 'type_projet_id');
     }
 
-    public function sousDomaine()
-    {
+    public function sousDomaine() {
         return $this->belongsTo(SousDomaine::class, 'sous_domaine_id');
     }
 
@@ -85,16 +80,15 @@ class Projet extends Model {
         return $this->hasMany(Commentaire::class, 'projet_id');
     }
 
-    public function historiques()
-    {
+    public function historiques() {
         return $this->hasMany(HistoriqueProjet::class, 'projet_id')->latest();
     }
 
     // Dernier commentaire de rejet (remplace l'ancien champ motifRejet / commentaire_id)
     public function dernierMotifRejet() {
         return $this->hasOne(Commentaire::class, 'projet_id')
-                     ->where('typeCommentaire', 'rejet')
-                     ->latestOfMany();
+                    ->where('typeCommentaire', 'rejet')
+                    ->latestOfMany();
     }
 
     //  Accesseurs de statut

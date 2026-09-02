@@ -18,6 +18,5 @@
 @endsection
 
 @section('content')
-    {{-- Comme dashboard/index.blade.php : un seul point d'entrée, un partial par rôle --}}
     @include('analytique.partials._' . auth()->user()->role)
 @endsection
