@@ -16,12 +16,19 @@
 @endphp
 
 @if ($cheminPhoto)
-    <img src="{{ asset('storage/'.$cheminPhoto) }}" alt="{{ $nomComplet }}"
-         {{ $attributes->merge(['class' => 'rounded-circle']) }}
-         style="width:{{ $size }}px; height:{{ $size }}px; object-fit:cover; flex-shrink:0;">
+    <img src="{{ asset('storage/'.$cheminPhoto) }}"
+        alt="{{ $nomComplet }}" {{ $attributes->merge(['class' => 'rounded-circle']) }}
+        style="width:{{ $size }}px;
+            height:{{ $size }}px;
+            object-fit:cover;
+            flex-shrink:0;">
 @else
     <div {{ $attributes->merge(['class' => 'rounded-circle d-flex align-items-center justify-content-center fw-bold text-white']) }}
-         style="width:{{ $size }}px; height:{{ $size }}px; background:var(--color-primary); font-size:{{ round($size * 0.4) }}px; flex-shrink:0;">
+        style="width:{{ $size }}px;
+            height:{{ $size }}px;
+            background:var(--color-primary);
+            font-size:{{ round($size * 0.4) }}px;
+            flex-shrink:0;">
         {{ $initiales ?: '?' }}
     </div>
 @endif

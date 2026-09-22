@@ -16,10 +16,7 @@
     $classe = $classesParVariant[$variant] ?? 'btn-outline-secondary';
 @endphp
 
-<a
-    href="{{ $href }}"
-    {{ $attributes->merge(['class' => 'btn '.$classe.($size === 'sm' ? ' btn-sm' : '')]) }}
->
+<a href="{{ $href }}" {{ $attributes->merge(['class' => 'btn '.$classe.($size === 'sm' ? ' btn-sm' : '')]) }}>
     @if ($icon)
         <i class="fas {{ $icon }}" aria-hidden="true"></i>
     @endif

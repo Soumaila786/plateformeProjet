@@ -70,9 +70,18 @@
 <div class="an-grid">
     <div class="an-card">
         <h6><i class="fas fa-stopwatch me-1"></i>Délais moyens de traitement (jours)</h6>
-        <div class="d-flex justify-content-between py-1 small"><span class="text-muted">Soumission → Approbation</span><strong>{{ $delaiAppro }} j</strong></div>
-        <div class="d-flex justify-content-between py-1 small"><span class="text-muted">Approbation → Validation</span><strong>{{ $delaiValid }} j</strong></div>
-        <div class="d-flex justify-content-between py-1 small"><span class="text-muted">Total du processus</span><strong>{{ $delaiTotal }} j</strong></div>
+        <div class="d-flex justify-content-between py-1 small">
+            <span class="text-muted">Soumission → Approbation</span>
+            <strong>{{ $delaiAppro }} j</strong>
+        </div>
+        <div class="d-flex justify-content-between py-1 small">
+            <span class="text-muted">Approbation → Validation</span>
+            <strong>{{ $delaiValid }} j</strong>
+        </div>
+        <div class="d-flex justify-content-between py-1 small">
+            <span class="text-muted">Total du processus</span>
+            <strong>{{ $delaiTotal }} j</strong>
+        </div>
     </div>
 
     <div class="an-card">

@@ -1,0 +1,32 @@
+Loading composer repositories with package information
+Updating dependencies
+Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - Root composer.json requires barryvdh/laravel-dompdf ^3.1, found barryvdh/laravel-dompdf[v3.1.0, v3.1.1, v3.1.2] but the package is fixed to v2.2.0 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 2
+    - Root composer.json requires doctrine/dbal ^4.3, found doctrine/dbal[4.3.0, ..., 4.5.x-dev] but the package is fixed to 3.10.5 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 3
+    - Root composer.json requires laravel/sanctum ^4.2, found laravel/sanctum[v4.2.0, ..., 4.x-dev] but the package is fixed to v2.15.1 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 4
+    - Root composer.json requires laravel/tinker ^3.0, found laravel/tinker[dev-master, v3.0.0, v3.0.1, v3.0.2, 3.x-dev (alias of dev-master)] but the package is fixed to v2.11.1 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 5
+    - Root composer.json requires spatie/laravel-permission ^7.0, found spatie/laravel-permission[7.0.0, ..., v7.x-dev] but the package is fixed to 5.11.1 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 6
+    - Root composer.json requires laravel/breeze ^2.3, found laravel/breeze[v2.3.0, ..., 2.x-dev] but the package is fixed to v1.10.0 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 7
+    - Root composer.json requires laravel/sail ^1.41, found laravel/sail[v1.41.0, ..., 1.x-dev] but the package is fixed to v1.19.0 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 8
+    - Root composer.json requires nunomaduro/collision ^8.8, found nunomaduro/collision[v8.8.0, ..., v8.x-dev] but the package is fixed to v5.11.0 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 9
+    - Root composer.json requires phpunit/phpunit ^12.5, found phpunit/phpunit[12.5.0, ..., 12.5.x-dev] but the package is fixed to 9.6.34 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+  Problem 10
+    - Root composer.json requires laravel/framework ^13.0 -> satisfiable by laravel/framework[v13.0.0, ..., 13.x-dev].
+    - laravel/framework[v13.0.0, ..., v13.16.1] require brick/math ^0.14.2 || ^0.15 || ^0.16 || ^0.17 -> found brick/math[0.14.2, ..., 0.17.2] but the package is fixed to 0.9.3 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+    - laravel/framework[v13.17.0, ..., v13.24.0] require brick/math ^0.14.2 || ^0.15 || ^0.16 || ^0.17 || ^0.18 -> found brick/math[0.14.2, ..., 0.18.0] but the package is fixed to 0.9.3 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+    - laravel/framework[v13.25.0, ..., v13.32.0] require brick/math ^0.14.2 || ^0.15 || ^0.16 || ^0.17 || ^0.18 || ^0.19 -> found brick/math[0.14.2, ..., 0.19.1] but the package is fixed to 0.9.3 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+    - laravel/framework 13.x-dev requires league/flysystem ^3.25.1 -> found league/flysystem[3.25.1, ..., 3.x-dev] but the package is fixed to 1.1.10 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+    - laravel/framework dev-master requires ramsey/uuid ^4.7 -> found ramsey/uuid[4.7.0, ..., 4.x-dev] but the package is fixed to 4.2.3 (lock file version) by a partial update and that version does not match. Make sure you list it as an argument for the update command.
+    - laravel/framework 13.0.x-dev is an alias of laravel/framework dev-master and thus requires it to be installed too.
+
+Use the option --with-all-dependencies (-W) to allow upgrades, downgrades and removals for packages currently locked to specific versions.

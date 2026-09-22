@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable {
+class User extends Authenticatable implements MustVerifyEmail {
 
-    use HasRoles;
+    use HasFactory, HasRoles;
 
     protected $table = 'users';
 
@@ -33,7 +35,7 @@ class User extends Authenticatable {
 
     protected $hidden = [
         'password',
-        'rememberToken',
+        'remember_token',
     ];
 
     protected $casts = [
