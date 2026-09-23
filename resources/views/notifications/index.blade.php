@@ -36,6 +36,7 @@
 @section('content')
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/listes-projets.css') }}">
     @endpush
 
     @forelse ($notifications as $notif)
@@ -58,7 +59,7 @@
                 <form method="POST" action="{{ route($role.'.notifications.destroy', $notif) }}"
                     onsubmit="return confirm('Supprimer cette notification ?')">
                     @csrf @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none" title="Supprimer">
+                    <button type="submit" class="lp-btn lp-btn-red" title="Supprimer">
                         <i class="fas fa-trash"></i>
                     </button>
                 </form>

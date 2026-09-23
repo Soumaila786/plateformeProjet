@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', $user->nomComplet); ?>
 
 <?php $__env->startSection('breadcrumb'); ?>
@@ -77,25 +75,24 @@
 
             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('utilisateurs.gerer')): ?>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                    <button type="button" class="lp-btn" title="Modifier"
                             data-modal-edit="modalUserForm"
                             data-modal-action="<?php echo e(route('admin.users.update', $user)); ?>"
                             data-modal-titre-edition="Modifier l'utilisateur"
                             data-modal-fields="<?php echo e(json_encode($champsModifierUser)); ?>">
-                        <i class="fas fa-pen"></i> Modifier
+                        <i class="fas fa-pen"></i>
                     </button>
                     <form method="POST" action="<?php echo e(route('admin.users.toggle-status', $user)); ?>"
                           onsubmit="return confirm('<?php echo e($user->actif ? 'Désactiver' : 'Activer'); ?> ce compte ?')">
                         <?php echo csrf_field(); ?>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas <?php echo e($user->actif ? 'fa-user-slash' : 'fa-user-check'); ?>"></i> <?php echo e($user->actif ? 'Désactiver' : 'Activer'); ?>
-
+                        <button type="submit" class="lp-btn <?php echo e($user->actif ? '' : 'lp-btn-green'); ?>" title="<?php echo e($user->actif ? 'Désactiver' : 'Activer'); ?>">
+                            <i class="fas <?php echo e($user->actif ? 'fa-toggle-off' : 'fa-toggle-on'); ?>"></i>
                         </button>
                     </form>
                     <form method="POST" action="<?php echo e(route('admin.users.destroy', $user)); ?>"
                           onsubmit="return confirm('Supprimer définitivement cet utilisateur ?')">
                         <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                        <button type="submit" class="lp-btn lp-btn-red" title="Supprimer"><i class="fas fa-trash"></i></button>
                     </form>
                 </div>
             <?php endif; ?>

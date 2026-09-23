@@ -136,13 +136,21 @@
     <div class="col-lg-5">
         <div class="dash-card mb-3">
             <h6 class="fw-bold mb-3">Finances</h6>
-            <div class="d-flex justify-content-between py-1 small">
-                <span class="text-muted">Budget total demandé</span>
-                <strong class="font-monospace"><?php echo e(number_format($budgetTotal, 0, ',', ' ')); ?> FCFA</strong>
+            <div class="small mb-2">
+                <span class="text-muted d-block">Budget total</span>
+                <?php $__empty_1 = true; $__currentLoopData = $budgetParDevise; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $devise => $total): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <strong class="font-monospace d-block"><?php echo e(number_format($total, 2, ',', ' ')); ?> <?php echo e($devise); ?></strong>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <span class="text-muted">Aucun montant enregistré</span>
+                <?php endif; ?>
             </div>
-            <div class="d-flex justify-content-between py-1 small">
-                <span class="text-muted">Montant demandé</span>
-                <strong class="font-monospace"><?php echo e(number_format($montantDemande, 0, ',', ' ')); ?> FCFA</strong>
+            <div class="small">
+                <span class="text-muted d-block">Montant demandé</span>
+                <?php $__empty_1 = true; $__currentLoopData = $montantDemandeParDevise; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $devise => $total): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <strong class="font-monospace d-block"><?php echo e(number_format($total, 2, ',', ' ')); ?> <?php echo e($devise); ?></strong>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <span class="text-muted">Aucun montant enregistré</span>
+                <?php endif; ?>
             </div>
         </div>
         <div class="dash-card">

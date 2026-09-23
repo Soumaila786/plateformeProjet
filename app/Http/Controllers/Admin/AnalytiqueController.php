@@ -6,29 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\Projet;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AnalytiqueController extends Controller {
 
-    public function index() {
+    public function index(Request $request) {
 
         $now = Carbon::now();
         try{
+            $base = $this->filteredProjects($request);
+            $typesProjets = \App\Models\TypeProjet::orderBy('nom')->get();
+            $secteursFiltres = \App\Models\SecteurActivite::orderBy('nomSecteur')->get();
+            $porteursFiltres = User::where('role', 'porteur')->orderBy('nomComplet')->get();
 
             // 1. KPIs
             $kpis = [
-                'total'     => Projet::where('statutProjet', '!=', 'brouillon')->count(),
+                'total'     => (clone $base)->where('statutProjet', '!=', 'brouillon')->count(),
                 'brouillon' => 0,
-                'soumis'    => Projet::where('statutProjet', 'soumis')->count(),
-                'en_examen' => Projet::where('statutProjet', 'en_examen')->count(),
-                'approuve'  => Projet::where('statutProjet', 'approuve')->count(),
-                'rejete'    => Projet::where('statutProjet', 'rejete')->count(),
-                'valide'    => Projet::where('statutProjet', 'valide')->count(),
+                'soumis'    => (clone $base)->where('statutProjet', 'soumis')->count(),
+                'en_examen' => (clone $base)->where('statutProjet', 'en_examen')->count(),
+                'approuve'  => (clone $base)->where('statutProjet', 'approuve')->count(),
+                'rejete'    => (clone $base)->where('statutProjet', 'rejete')->count(),
+                'valide'    => (clone $base)->where('statutProjet', 'valide')->count(),
             ];
 
             // 2. ENTONNOIR
             $entonnoir = [
-                ['lbl' => 'Brouillon',  'key' => 'brouillon', 'color' => '#9ca3af', 'val' => $kpis['brouillon']],
                 ['lbl' => 'Soumis',     'key' => 'soumis',    'color' => '#6366f1', 'val' => $kpis['soumis']],
                 ['lbl' => 'En examen',  'key' => 'en_examen', 'color' => '#f97316', 'val' => $kpis['en_examen']],
                 ['lbl' => 'Approuvés',  'key' => 'approuve',  'color' => '#22c55e', 'val' => $kpis['approuve']],
@@ -48,9 +52,9 @@ class AnalytiqueController extends Controller {
             for ($i = 11; $i >= 0; $i--) {
                 $m = $now->copy()->subMonths($i);
                 $moisLabels[]  = $m->format('M y');
-                $moisSoumis[]  = Projet::whereYear('dateSoumission', $m->year)
+                $moisSoumis[]  = (clone $base)->whereYear('dateSoumission', $m->year)
                     ->whereMonth('dateSoumission', $m->month)->count();
-                $moisValides[] = Projet::where('statutProjet', 'valide')
+                $moisValides[] = (clone $base)->where('statutProjet', 'valide')
                     ->whereYear('dateValidation', $m->year)
                     ->whereMonth('dateValidation', $m->month)->count();
             }
@@ -62,7 +66,7 @@ class AnalytiqueController extends Controller {
             $statutValues = array_map(fn($k) => (int)($kpis[$k] ?? 0), $statutKeys);
 
             // 5. TOP SECTEURS
-            $secteurs = Projet::where('statutProjet', '!=', 'brouillon')
+            $secteurs = (clone $base)->where('statutProjet', '!=', 'brouillon')
                 ->with('secteur')
                 ->select('secteur_id',
                     DB::raw('COUNT(*) as nb'),
@@ -80,27 +84,27 @@ class AnalytiqueController extends Controller {
             $sectValide  = $secteurs->pluck('nb_valide')->map(function($v) { return (int)($v ?? 0); })->toArray();
 
             // 6. DÉLAIS MOYENS
-            $rawAppro = Projet::whereNotNull('dateApprobation')
+            $rawAppro = (clone $base)->whereNotNull('dateApprobation')
                 ->whereNotNull('dateSoumission')
                 ->selectRaw('AVG(ABS(DATEDIFF(dateApprobation, dateSoumission))) as moy')
                 ->value('moy');
 
             $delaiAppro = round((float)($rawAppro ?? 0), 1);
 
-            $rawValid = Projet::whereNotNull('dateValidation')
+            $rawValid = (clone $base)->whereNotNull('dateValidation')
                 ->whereNotNull('dateApprobation')
                 ->selectRaw('AVG(ABS(DATEDIFF(dateValidation, dateApprobation))) as moy')
                 ->value('moy');
             $delaiValid = round((float)($rawValid ?? 0), 1);
 
-            $rawTotal = Projet::whereNotNull('dateValidation')
+            $rawTotal = (clone $base)->whereNotNull('dateValidation')
                 ->whereNotNull('dateSoumission')
                 ->selectRaw('AVG(ABS(DATEDIFF(dateValidation, dateSoumission))) as moy')
                 ->value('moy');
             $delaiTotal = round((float)($rawTotal ?? 0), 1);
 
             // 7. PERFORMANCE PORTEURS
-            $porteurs = Projet::where('statutProjet', '!=', 'brouillon')
+            $porteurs = (clone $base)->where('statutProjet', '!=', 'brouillon')
                 ->select(
                     'user_id',
                     DB::raw('COUNT(*) as total'),
@@ -137,7 +141,7 @@ class AnalytiqueController extends Controller {
             $motifsValues = array_fill(0, count($motifsCles), 0);
             $motifsKeys   = array_keys($motifsCles);
 
-            Projet::where('statutProjet', 'rejete')
+            (clone $base)->where('statutProjet', 'rejete')
                 ->with(['commentaires' => function ($q) {
                     $q->whereNotNull('message');
                 }])
@@ -171,7 +175,7 @@ class AnalytiqueController extends Controller {
 
             // 9. PROJETS EN ATTENTE CRITIQUE (> 10 jours)
             $critiqueStatuts = ['soumis','en_examen','approuve'];
-            $projetsBloque   = Projet::with(['porteur','secteur'])
+            $projetsBloque   = (clone $base)->with(['porteur','secteur'])
                 ->whereIn('statutProjet', $critiqueStatuts)
                 ->where('updated_at', '<', $now->copy()->subDays(10))
                 ->orderBy('updated_at')
@@ -196,15 +200,15 @@ class AnalytiqueController extends Controller {
             // approbateur_id, qui existe bien en base.
             $approbateurs = User::where('role', 'approbateur')
                 ->get()
-                ->map(function ($u) {
-                    $nb = Projet::where('statutProjet', '!=', 'brouillon')
+                ->map(function ($u) use ($base) {
+                    $nb = (clone $base)->where('statutProjet', '!=', 'brouillon')
                         ->where('approbateur_id', $u->id)->count();
                     return ['nom' => $u->nomComplet, 'nb' => (int)$nb, 'role' => 'Approbateur'];
                 });
 
             $validateurs = User::where('role', 'validateur')->get()
-                ->map(function ($u) {
-                    $nb = Projet::whereNotNull('dateValidation')
+                ->map(function ($u) use ($base) {
+                    $nb = (clone $base)->whereNotNull('dateValidation')
                         ->where('validateur_id', $u->id)->count();
                     return ['nom' => $u->nomComplet, 'nb' => (int)$nb, 'role' => 'Validateur'];
                 });
@@ -214,17 +218,43 @@ class AnalytiqueController extends Controller {
             $equipeNb     = $equipes->pluck('nb')->map(function($v) { return (int)($v ?? 0); })->toArray();
             $equipeRoles  = $equipes->pluck('role')->toArray();
 
-            return view('analytique.index', compact(
+            return view('analytique.index', array_merge(compact(
                 'kpis', 'entonnoir', 'maxEntonnoir', 'moisLabels',
                 'moisSoumis', 'moisValides', 'statutLabels',
                 'statutColors', 'statutValues', 'sectLabels',
                 'sectNb', 'sectDemande', 'sectValide', 'delaiAppro',
                 'delaiValid', 'delaiTotal', 'porteurs', 'motifsLabels',
                 'motifsValues', 'projetsBloque', 'equipeLabels',
-                'equipeNb', 'equipeRoles'
-            ));
+                'equipeNb', 'equipeRoles', 'typesProjets'
+            ), [
+                'secteursFiltres' => $secteursFiltres,
+                'porteursFiltres' => $porteursFiltres,
+            ]));
         }catch(\Exception $e){
             return back()->with('error', 'Une erreur est survenue ');
         }
+    }
+
+    private function filteredProjects(Request $request)
+    {
+        $query = Projet::query();
+
+        if ($request->filled('date_debut')) {
+            $query->whereDate('created_at', '>=', $request->date_debut);
+        }
+        if ($request->filled('date_fin')) {
+            $query->whereDate('created_at', '<=', $request->date_fin);
+        }
+        if ($request->filled('type_projet_id')) {
+            $query->where('type_projet_id', $request->type_projet_id);
+        }
+        if ($request->filled('secteur_id')) {
+            $query->where('secteur_id', $request->secteur_id);
+        }
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        return $query;
     }
 }

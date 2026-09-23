@@ -47,7 +47,7 @@ class ProjetController extends Controller {
             }
 
             $projets = $query->orderBy('updated_at', 'asc')
-                            ->paginate(4);
+                            ->paginate(5);
 
             return view('projets.index', compact('projets', 'secteurs'));
 
@@ -87,7 +87,7 @@ class ProjetController extends Controller {
                 $query->where('statutProjet', $request->statut);
             }
 
-            $projets = $query->orderBy('dateValidation', 'desc')->paginate(10);
+            $projets = $query->orderBy('dateValidation', 'desc')->paginate(5);
 
             $projets->getCollection()->transform(function ($p) {
 
@@ -105,7 +105,7 @@ class ProjetController extends Controller {
                 return $p;
             });
 
-            return view('validateur.projets.mes_projets', compact('projets', 'secteurs'));
+            return view('projets.historique-validateur', compact('projets', 'secteurs'));
 
         }catch(\Exception $e){
             Log::error('Erreur lors du chargement des projets validés', [

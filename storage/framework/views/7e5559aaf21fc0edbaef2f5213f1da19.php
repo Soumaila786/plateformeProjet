@@ -142,11 +142,6 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
             </div>
-            <div class="col-md-6">
-                <label class="form-label small">Rôle</label>
-                <input type="text" value="<?php echo e(ucfirst($u->role)); ?>" class="form-control" disabled>
-            </div>
-
             <?php if($u->role === 'porteur'): ?>
                 <div class="col-md-12">
                     <label class="form-label small">Spécialité</label>

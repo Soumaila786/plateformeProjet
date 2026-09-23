@@ -3,11 +3,10 @@
 <?php $__env->stopPush(); ?>
 
 <?php
-    $dataEntonnoir = [
-        'labels' => array_column($entonnoir, 'lbl'),
-        'values' => array_column($entonnoir, 'val'),
-        'colors' => array_column($entonnoir, 'color'),
-        'label' => 'Projets',
+    $dataPerformancePorteurs = [
+        'labels' => $porteurs->pluck('nom')->toArray(),
+        'values' => $porteurs->pluck('taux')->toArray(),
+        'label' => 'Taux de réussite (%)',
     ];
     $dataEvolution = [
         'labels' => $moisLabels,
@@ -151,8 +150,8 @@
 
 <div class="an-grid">
     <div class="an-card an-full">
-        <h6><i class="fas fa-filter me-1"></i>Entonnoir du circuit</h6>
-        <canvas id="anAdminEntonnoir" data-chart="<?php echo e(json_encode($dataEntonnoir)); ?>"></canvas>
+        <h6><i class="fas fa-ranking-star me-1"></i>Performance des porteurs</h6>
+        <canvas id="anAdminPerformancePorteurs" data-chart="<?php echo e(json_encode($dataPerformancePorteurs)); ?>"></canvas>
     </div>
 
     <div class="an-card an-full">

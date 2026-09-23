@@ -3,11 +3,12 @@
 <?php $__env->stopPush(); ?>
 
 <?php
-    $dataEntonnoir = [
-        'labels' => ['Soumis', 'Approuvés', 'Validés', 'Rejetés'],
-        'values' => [$entonnoir['soumis'], $entonnoir['approuve'], $entonnoir['valide'], $entonnoir['rejete']],
-        'colors' => ['#6366f1', '#22c55e', '#0d9488', '#ef4444'],
-        'label' => 'Projets',
+    $dataFinancesSecteurs = [
+        'labels' => $secteurLabels,
+        'datasets' => [
+            ['label' => 'Budget total', 'data' => $secteurBudget, 'backgroundColor' => '#0d9488', 'borderColor' => '#0d9488'],
+            ['label' => 'Montant demandé', 'data' => $secteurDemande, 'backgroundColor' => '#6366f1', 'borderColor' => '#6366f1'],
+        ],
     ];
     $dataStatuts = ['labels' => $donutLabels, 'values' => $donutValues];
     $dataEvolution = [
@@ -123,8 +124,8 @@
 
 <div class="an-grid">
     <div class="an-card">
-        <h6><i class="fas fa-filter me-1"></i>Entonnoir</h6>
-        <canvas id="anValidEntonnoir" data-chart="<?php echo e(json_encode($dataEntonnoir)); ?>"></canvas>
+        <h6><i class="fas fa-coins me-1"></i>Budget et demande par secteur</h6>
+        <canvas id="anValidFinancesSecteurs" data-chart="<?php echo e(json_encode($dataFinancesSecteurs)); ?>"></canvas>
     </div>
 
     <div class="an-card">

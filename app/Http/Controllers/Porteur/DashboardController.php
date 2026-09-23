@@ -31,8 +31,14 @@ class DashboardController extends Controller {
         $finance   = 0;
 
         // Finances
-        $budgetTotal    = (clone $base)->sum('budgetTotal')    ?? 0;
-        $montantDemande = (clone $base)->sum('montantDemande') ?? 0;
+        $budgetParDevise = (clone $base)
+            ->selectRaw("COALESCE(budgetDevise, 'XOF') AS devise, SUM(budgetTotal) AS total")
+            ->groupBy('budgetDevise')
+            ->pluck('total', 'devise');
+        $montantDemandeParDevise = (clone $base)
+            ->selectRaw("COALESCE(montantDemandeDevise, 'XOF') AS devise, SUM(montantDemande) AS total")
+            ->groupBy('montantDemandeDevise')
+            ->pluck('total', 'devise');
         $montantFinance = 0; // colonne non encore créée
 
         // Projets récents (max 5)
@@ -57,8 +63,8 @@ class DashboardController extends Controller {
                 'valide',
                 'rejete',
                 'finance',
-                'budgetTotal',
-                'montantDemande',
+                'budgetParDevise',
+                'montantDemandeParDevise',
                 'montantFinance',
                 'projetsRecents',
                 'notifications'

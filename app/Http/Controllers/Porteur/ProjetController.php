@@ -36,7 +36,7 @@ class ProjetController extends Controller {
                         ->orWhere('codeProjet', 'like', '%' . $search . '%'); });
             }
 
-            $projets = $query->orderBy('created_at', 'desc')->paginate(4);
+            $projets = $query->orderBy('created_at', 'desc')->paginate(5);
             $secteurs = SecteurActivite::where('statutSecteur', true)->orderBy('nomSecteur')->get();
             return view('projets.index', compact('projets','secteurs'));
 
@@ -86,7 +86,9 @@ class ProjetController extends Controller {
                 'dateDebut'      => 'nullable|date',
                 'dateFin'        => 'nullable|date|after_or_equal:dateDebut',
                 'budgetTotal'    => 'nullable|numeric|min:0',
+                'budgetDevise'   => 'required|in:USD,XOF,EUR',
                 'montantDemande' => 'nullable|numeric|min:0',
+                'montantDemandeDevise' => 'required|in:USD,XOF,EUR',
                 'documents'      => 'nullable|array',
                 'documents.*'    => 'file|max:10240|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png',
                 'document_names'   => 'nullable|array',
@@ -116,7 +118,9 @@ class ProjetController extends Controller {
                 'dateDebut'      => $request->dateDebut,
                 'dateFin'        => $request->dateFin,
                 'budgetTotal'    => $request->budgetTotal,
+                'budgetDevise'   => $request->budgetDevise,
                 'montantDemande' => $request->montantDemande,
+                'montantDemandeDevise' => $request->montantDemandeDevise,
                 'statutProjet'   => 'brouillon',
                 'user_id'        => Auth::id(),
                 'secteur_id'     => $request->secteur_id,
@@ -215,7 +219,9 @@ class ProjetController extends Controller {
             'dateDebut'     => 'nullable|date',
             'dateFin'       => 'nullable|date|after_or_equal:dateDebut',
             'budgetTotal'   => 'nullable|numeric|min:0',
+            'budgetDevise'  => 'required|in:USD,XOF,EUR',
             'montantDemande'=> 'nullable|numeric|min:0',
+            'montantDemandeDevise' => 'required|in:USD,XOF,EUR',
             ]);
 
             if ($request->filled('sous_domaine_id')
@@ -238,7 +244,9 @@ class ProjetController extends Controller {
                 'dateDebut'      => $request->dateDebut,
                 'dateFin'        => $request->dateFin,
                 'budgetTotal'    => $request->budgetTotal,
+                'budgetDevise'   => $request->budgetDevise,
                 'montantDemande' => $request->montantDemande,
+                'montantDemandeDevise' => $request->montantDemandeDevise,
                 'secteur_id'     => $request->secteur_id,
                 'planification_demandee' => False,
 

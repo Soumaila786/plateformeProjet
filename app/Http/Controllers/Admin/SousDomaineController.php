@@ -17,7 +17,7 @@ class SousDomaineController extends Controller
     public function index()
     {
         $this->authorizeAdmin();
-        $sousDomaines = SousDomaine::with('secteur')->withCount('projets')->orderBy('nom')->get();
+        $sousDomaines = SousDomaine::with('secteur')->withCount('projets')->orderBy('nom')->paginate(5);
         $secteurs = SecteurActivite::orderBy('nomSecteur')->get();
         return view('sous-domaines.index', compact('sousDomaines', 'secteurs'));
     }

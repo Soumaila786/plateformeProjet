@@ -16,7 +16,7 @@ class TypeProjetController extends Controller
     public function index()
     {
         $this->authorizeAdmin();
-        $types = TypeProjet::withCount('projets')->orderBy('nom')->get();
+        $types = TypeProjet::withCount('projets')->orderBy('nom')->paginate(5);
         return view('types-projets.index', compact('types'));
     }
 

@@ -44,6 +44,9 @@
     <?php $__env->startPush('styles'); ?>
         <link rel="stylesheet" href="<?php echo e(asset('css/projet-form.css')); ?>">
     <?php $__env->stopPush(); ?>
+    <?php $__env->startPush('scripts'); ?>
+        <script src="<?php echo e(asset('js/listes-projets.js')); ?>"></script>
+    <?php $__env->stopPush(); ?>
 
     <form action="<?php echo e(route('porteur.projets.store')); ?>"
         method="POST"
@@ -300,7 +303,7 @@ unset($__errorArgs, $__bag); ?>
                         <div class="pf-section-icon"><i class="fas fa-coins"></i></div>
                         <div>
                             <h2 class="pf-section-title">Budget</h2>
-                            <p class="pf-section-sub">Montants prévisionnels en FCFA</p>
+                            <p class="pf-section-sub">Choisissez la devise de chaque montant</p>
                         </div>
                     </div>
 
@@ -310,7 +313,7 @@ unset($__errorArgs, $__bag); ?>
                             <div class="input-group">
                                 <input type="number"
                                     name="budgetTotal"
-                                    min="0" step="1"
+                                    min="0" step="0.01"
                                     value="<?php echo e(old('budgetTotal')); ?>"
                                     class="form-control <?php $__errorArgs = ['budgetTotal'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -320,9 +323,28 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>">
-                                <span class="input-group-text">FCFA</span>
+                                <select name="budgetDevise" class="form-select <?php $__errorArgs = ['budgetDevise'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                                    <option value="USD" <?php echo e(old('budgetDevise', 'XOF') === 'USD' ? 'selected' : ''); ?>>$ (USD)</option>
+                                    <option value="XOF" <?php echo e(old('budgetDevise', 'XOF') === 'XOF' ? 'selected' : ''); ?>>FCFA (XOF)</option>
+                                    <option value="EUR" <?php echo e(old('budgetDevise', 'XOF') === 'EUR' ? 'selected' : ''); ?>>€ (EUR)</option>
+                                </select>
                             </div>
                             <?php $__errorArgs = ['budgetTotal'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback d-block"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            <?php $__errorArgs = ['budgetDevise'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -337,7 +359,7 @@ unset($__errorArgs, $__bag); ?>
                                 <input type="number"
                                     name="montantDemande"
                                     min="0"
-                                    step="1"
+                                    step="0.01"
                                     value="<?php echo e(old('montantDemande')); ?>"
                                     class="form-control <?php $__errorArgs = ['montantDemande'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -347,9 +369,28 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>">
-                                <span class="input-group-text">FCFA</span>
+                                <select name="montantDemandeDevise" class="form-select <?php $__errorArgs = ['montantDemandeDevise'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                                    <option value="USD" <?php echo e(old('montantDemandeDevise', 'XOF') === 'USD' ? 'selected' : ''); ?>>$ (USD)</option>
+                                    <option value="XOF" <?php echo e(old('montantDemandeDevise', 'XOF') === 'XOF' ? 'selected' : ''); ?>>FCFA (XOF)</option>
+                                    <option value="EUR" <?php echo e(old('montantDemandeDevise', 'XOF') === 'EUR' ? 'selected' : ''); ?>>€ (EUR)</option>
+                                </select>
                             </div>
                             <?php $__errorArgs = ['montantDemande'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback d-block"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            <?php $__errorArgs = ['montantDemandeDevise'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -370,15 +411,18 @@ unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
-                    <input type="file" name="documents[]" multiple class="form-control <?php $__errorArgs = ['documents'];
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1">Fichier</label>
+                            <input type="file" name="documents[]" class="form-control form-control-sm <?php $__errorArgs = ['documents'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>">
-                    <?php $__errorArgs = ['documents'];
+unset($__errorArgs, $__bag); ?>" required>
+                            <?php $__errorArgs = ['documents'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -386,6 +430,12 @@ $message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1">Nom à afficher (optionnel)</label>
+                            <input type="text" name="document_names[]" class="form-control form-control-sm" maxlength="255" placeholder="Ex. Rapport financier 2026">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -444,6 +494,7 @@ unset($__errorArgs, $__bag); ?>
 
             secteur.addEventListener('change', filtrerSousDomaines);
             filtrerSousDomaines();
+
         });
     </script>
 <?php $__env->stopPush(); ?>

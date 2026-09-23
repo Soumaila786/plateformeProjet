@@ -18,7 +18,7 @@
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Motifs de rejet</h1>
-            <p class="page-header-sub">{{ count($motifs) }} motif{{ count($motifs) > 1 ? 's' : '' }} configuré{{ count($motifs) > 1 ? 's' : '' }}</p>
+            <p class="page-header-sub">{{ $motifs->total() }} motif{{ $motifs->total() > 1 ? 's' : '' }} configuré{{ $motifs->total() > 1 ? 's' : '' }}</p>
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">

@@ -26,6 +26,9 @@
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/projet-form.css') }}">
     @endpush
+    @push('scripts')
+        <script src="{{ asset('js/listes-projets.js') }}"></script>
+    @endpush
 
     <form action="{{ route('porteur.projets.store') }}"
         method="POST"
@@ -153,7 +156,7 @@
                         <div class="pf-section-icon"><i class="fas fa-coins"></i></div>
                         <div>
                             <h2 class="pf-section-title">Budget</h2>
-                            <p class="pf-section-sub">Montants prévisionnels en FCFA</p>
+                            <p class="pf-section-sub">Choisissez la devise de chaque montant</p>
                         </div>
                     </div>
 
@@ -163,12 +166,17 @@
                             <div class="input-group">
                                 <input type="number"
                                     name="budgetTotal"
-                                    min="0" step="1"
+                                    min="0" step="0.01"
                                     value="{{ old('budgetTotal') }}"
                                     class="form-control @error('budgetTotal') is-invalid @enderror">
-                                <span class="input-group-text">FCFA</span>
+                                <select name="budgetDevise" class="form-select @error('budgetDevise') is-invalid @enderror">
+                                    <option value="USD" {{ old('budgetDevise', 'XOF') === 'USD' ? 'selected' : '' }}>$ (USD)</option>
+                                    <option value="XOF" {{ old('budgetDevise', 'XOF') === 'XOF' ? 'selected' : '' }}>FCFA (XOF)</option>
+                                    <option value="EUR" {{ old('budgetDevise', 'XOF') === 'EUR' ? 'selected' : '' }}>€ (EUR)</option>
+                                </select>
                             </div>
                             @error('budgetTotal')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                            @error('budgetDevise')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Montant demandé</label>
@@ -176,12 +184,17 @@
                                 <input type="number"
                                     name="montantDemande"
                                     min="0"
-                                    step="1"
+                                    step="0.01"
                                     value="{{ old('montantDemande') }}"
                                     class="form-control @error('montantDemande') is-invalid @enderror">
-                                <span class="input-group-text">FCFA</span>
+                                <select name="montantDemandeDevise" class="form-select @error('montantDemandeDevise') is-invalid @enderror">
+                                    <option value="USD" {{ old('montantDemandeDevise', 'XOF') === 'USD' ? 'selected' : '' }}>$ (USD)</option>
+                                    <option value="XOF" {{ old('montantDemandeDevise', 'XOF') === 'XOF' ? 'selected' : '' }}>FCFA (XOF)</option>
+                                    <option value="EUR" {{ old('montantDemandeDevise', 'XOF') === 'EUR' ? 'selected' : '' }}>€ (EUR)</option>
+                                </select>
                             </div>
                             @error('montantDemande')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                            @error('montantDemandeDevise')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                     </div>
                 </div>
@@ -195,8 +208,17 @@
                         </div>
                     </div>
 
-                    <input type="file" name="documents[]" multiple class="form-control @error('documents') is-invalid @enderror">
-                    @error('documents')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1">Fichier</label>
+                            <input type="file" name="documents[]" class="form-control form-control-sm @error('documents') is-invalid @enderror" required>
+                            @error('documents')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small mb-1">Nom à afficher (optionnel)</label>
+                            <input type="text" name="document_names[]" class="form-control form-control-sm" maxlength="255" placeholder="Ex. Rapport financier 2026">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -237,6 +259,7 @@
 
             secteur.addEventListener('change', filtrerSousDomaines);
             filtrerSousDomaines();
+
         });
     </script>
 @endpush

@@ -28,7 +28,7 @@
                     <form action="{{ route('porteur.projets.documents.destroy', [$projet, $document]) }}" method="POST" onsubmit="return confirm('Supprimer ce document ?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-link btn-sm text-danger text-decoration-none">
+                        <button type="submit" class="lp-btn lp-btn-red" title="Supprimer">
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>

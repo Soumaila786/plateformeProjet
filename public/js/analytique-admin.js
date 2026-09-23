@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    cifeuHorizontalBarChart('anAdminEntonnoir');
+    cifeuHorizontalBarChart('anAdminPerformancePorteurs');
     cifeuLineChart('anAdminEvolution');
     cifeuDoughnutChart('anAdminStatuts');
     cifeuBarChart('anAdminSecteurs');

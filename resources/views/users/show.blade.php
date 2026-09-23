@@ -47,24 +47,24 @@
 
             @can('utilisateurs.gerer')
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                    <button type="button" class="lp-btn" title="Modifier"
                             data-modal-edit="modalUserForm"
                             data-modal-action="{{ route('admin.users.update', $user) }}"
                             data-modal-titre-edition="Modifier l'utilisateur"
                             data-modal-fields="{{ json_encode($champsModifierUser) }}">
-                        <i class="fas fa-pen"></i> Modifier
+                        <i class="fas fa-pen"></i>
                     </button>
                     <form method="POST" action="{{ route('admin.users.toggle-status', $user) }}"
                           onsubmit="return confirm('{{ $user->actif ? 'Désactiver' : 'Activer' }} ce compte ?')">
                         @csrf
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas {{ $user->actif ? 'fa-user-slash' : 'fa-user-check' }}"></i> {{ $user->actif ? 'Désactiver' : 'Activer' }}
+                        <button type="submit" class="lp-btn {{ $user->actif ? '' : 'lp-btn-green' }}" title="{{ $user->actif ? 'Désactiver' : 'Activer' }}">
+                            <i class="fas {{ $user->actif ? 'fa-toggle-off' : 'fa-toggle-on' }}"></i>
                         </button>
                     </form>
                     <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
                           onsubmit="return confirm('Supprimer définitivement cet utilisateur ?')">
                         @csrf @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                        <button type="submit" class="lp-btn lp-btn-red" title="Supprimer"><i class="fas fa-trash"></i></button>
                     </form>
                 </div>
             @endcan

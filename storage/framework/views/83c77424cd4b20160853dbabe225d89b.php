@@ -22,6 +22,7 @@
             // ['label' => 'Configuration système','icon' => 'fa-cogs',           'route' => 'admin.configuration.index','permission' => 'configurations.gerer'],
         ],
         'porteur' => [
+            ['label' => 'Tableau Analytique', 'icon' => 'fa-chart-pie',    'route' => 'porteur.analytique'],
             ['label' => 'Mes projets',    'icon' => 'fa-folder-open',  'route' => 'porteur.projets.index'],
             ['label' => 'Nouveau projet', 'icon' => 'fa-plus-circle',  'route' => 'porteur.projets.create', 'permission' => 'projets.creer'],
         ],

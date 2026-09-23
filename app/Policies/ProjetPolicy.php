@@ -13,8 +13,9 @@ class ProjetPolicy {
             return false;
         }
 
-        // Un brouillon reste privé jusqu'à sa soumission.
-        if (in_array($projet->statutProjet, ['brouillon', 'a_corriger'])) {
+        // Seul un brouillon reste privé jusqu'à sa soumission. Un projet
+        // "a_corriger" reste consultable par les acteurs qui l'ont traité.
+        if ($projet->statutProjet === 'brouillon') {
             return $projet->user_id === $user->id;
         }
 

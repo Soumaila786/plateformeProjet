@@ -40,11 +40,6 @@
                     class="form-control @error('contact') is-invalid @enderror" maxlength="50">
                 @error('contact')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
-            <div class="col-md-6">
-                <label class="form-label small">Rôle</label>
-                <input type="text" value="{{ ucfirst($u->role) }}" class="form-control" disabled>
-            </div>
-
             @if ($u->role === 'porteur')
                 <div class="col-md-12">
                     <label class="form-label small">Spécialité</label>

@@ -16,7 +16,7 @@
     <div class="page-header-top">
         <div>
             <h1 class="page-header-title">Motifs de rejet</h1>
-            <p class="page-header-sub"><?php echo e(count($motifs)); ?> motif<?php echo e(count($motifs) > 1 ? 's' : ''); ?> configuré<?php echo e(count($motifs) > 1 ? 's' : ''); ?></p>
+            <p class="page-header-sub"><?php echo e($motifs->total()); ?> motif<?php echo e($motifs->total() > 1 ? 's' : ''); ?> configuré<?php echo e($motifs->total() > 1 ? 's' : ''); ?></p>
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-wrap">

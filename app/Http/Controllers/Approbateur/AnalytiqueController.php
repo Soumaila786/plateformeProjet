@@ -9,15 +9,20 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AnalytiqueController extends Controller {
 
-    public function index() {
+    public function index(Request $request) {
 
         $now = Carbon::now();
 
         try{
+            $base = $this->filteredProjects($request);
+            $typesProjets = \App\Models\TypeProjet::orderBy('nom')->get();
+            $secteursFiltres = \App\Models\SecteurActivite::orderBy('nomSecteur')->get();
+            $porteursFiltres = \App\Models\User::where('role', 'porteur')->orderBy('nomComplet')->get();
             //  1. ENTONNOIR
             $entonnoir = [
             ['lbl'=>'Soumis',    'key'=>'soumis',    'color'=>'#6366f1'],
@@ -26,26 +31,22 @@ class AnalytiqueController extends Controller {
             ['lbl'=>'Validés',   'key'=>'valide',    'color'=>'#0d9488'],
             ];
 
-            $totalSoumis = max(1, Projet::where('statutProjet', 'soumis')->count()
-                + Projet::where('statutProjet', 'en_examen')->count()
-                + Projet::where('statutProjet', 'approuve')->count()
-                + Projet::where('statutProjet', 'valide')->count()
-                + Projet::where('statutProjet', 'rejete')->count());
+            $totalSoumis = max(1, (clone $base)->whereIn('statutProjet', ['soumis', 'en_examen', 'approuve', 'valide', 'rejete'])->count());
 
             foreach ($entonnoir as &$step) {
-                $step['val'] = Projet::where('statutProjet', $step['key'])->count();
+                $step['val'] = (clone $base)->where('statutProjet', $step['key'])->count();
                 $step['pct'] = round($step['val'] / $totalSoumis * 100);
                 }
                 unset($step);
 
             //============== DONUT STATUTS =============================================================
 
-            $statuts = ['brouillon','soumis','en_examen','approuve','valide','rejete'];
-            $labels  = ['Brouillon','Soumis','En examen','Approuvé','Validé','Rejeté'];
-            $colors  = ['#9ca3af','#6366f1','#f97316','#22c55e','#0d9488','#ef4444'];
+            $statuts = ['soumis','en_examen','approuve','valide','rejete'];
+            $labels  = ['Soumis','En examen','Approuvé','Validé','Rejeté'];
+            $colors  = ['#6366f1','#f97316','#22c55e','#0d9488','#ef4444'];
             $donutValues = [];
             foreach ($statuts as $s) {
-                $donutValues[] = Projet::where('statutProjet', $s)->count();
+                $donutValues[] = (clone $base)->where('statutProjet', $s)->count();
             }
 
             //========== ANALYSE TEMPORELLE =============================================================
@@ -56,22 +57,22 @@ class AnalytiqueController extends Controller {
             for ($i = 11; $i >= 0; $i--) {
                 $m = $now->copy()->subMonths($i);
                 $tempLabels[]   = $m->format('M y');
-                $tempSoumis[]   = Projet::whereYear('dateSoumission', $m->year)
+                $tempSoumis[]   = (clone $base)->whereYear('dateSoumission', $m->year)
                     ->whereMonth('dateSoumission', $m->month)->count();
                 // NOTE : dateCreation a été supprimée (redondante avec created_at)
-                $tempCreation[] = Projet::whereYear('created_at', $m->year)
+                $tempCreation[] = (clone $base)->whereYear('created_at', $m->year)
                     ->whereMonth('created_at', $m->month)->count();
             }
 
             // Délai moyen soumission → approbation
-            $delaiMoyenAppro = Projet::whereNotNull('dateApprobation')
+            $delaiMoyenAppro = (clone $base)->whereNotNull('dateApprobation')
             ->whereNotNull('dateSoumission')
             ->selectRaw('AVG(ABS(DATEDIFF(dateApprobation, dateSoumission))) as moy')
                 ->value('moy') ?? 0;
 
             //================== ANALYSE BUDGÉTAIRE =============================================================
             // Budget vs demande par projet (top 8 par montant)
-            $budgetProjets = Projet::whereNotNull('montantDemande')
+            $budgetProjets = (clone $base)->whereNotNull('montantDemande')
                 ->orderByDesc('montantDemande')
                 ->take(8)
                 ->get(['titre', 'budgetTotal', 'montantDemande']);
@@ -81,34 +82,34 @@ class AnalytiqueController extends Controller {
             $budgetDemande = $budgetProjets->pluck('montantDemande')->map(fn($v) => (int)$v)->toArray();
 
             // Cumul demandes en attente (soumis + en_examen)
-            $cumulAttente = Projet::whereIn('statutProjet', ['soumis', 'en_examen'])
+            $cumulAttente = (clone $base)->whereIn('statutProjet', ['soumis', 'en_examen'])
             ->sum('montantDemande') ?? 0;
 
             // Distribution montants (tranches)
             $tranches = [
-                '< 1M'    => Projet::where('montantDemande', '<',  1000000)->count(),
-                '1-5M'    => Projet::whereBetween('montantDemande', [1000000, 4999999])->count(),
-                '5-10M'   => Projet::whereBetween('montantDemande', [5000000, 9999999])->count(),
-                '10-50M'  => Projet::whereBetween('montantDemande', [10000000, 49999999])->count(),
-                '> 50M'   => Projet::where('montantDemande', '>=', 50000000)->count(),
+                '< 1M'    => (clone $base)->where('montantDemande', '<',  1000000)->count(),
+                '1-5M'    => (clone $base)->whereBetween('montantDemande', [1000000, 4999999])->count(),
+                '5-10M'   => (clone $base)->whereBetween('montantDemande', [5000000, 9999999])->count(),
+                '10-50M'  => (clone $base)->whereBetween('montantDemande', [10000000, 49999999])->count(),
+                '> 50M'   => (clone $base)->where('montantDemande', '>=', 50000000)->count(),
             ];
 
            //================ DÉLAIS =============================================================
-            $delaiAppro = round(Projet::whereNotNull('dateApprobation')
+            $delaiAppro = round((clone $base)->whereNotNull('dateApprobation')
                 ->whereNotNull('dateSoumission')
                 ->selectRaw('AVG(ABS(DATEDIFF(dateApprobation, dateSoumission))) as moy')
                 ->value('moy') ?? 0, 1);
 
             // NOTE : validated_at renommé en dateValidation
-            $delaiValid = round(Projet::whereNotNull('dateValidation')
+            $delaiValid = round((clone $base)->whereNotNull('dateValidation')
                 ->whereNotNull('dateApprobation')
                 ->selectRaw('AVG(ABS(DATEDIFF(dateValidation, dateApprobation))) as moy')
                 ->value('moy') ?? 0, 1);
 
-                $retard30 = Projet::whereIn('statutProjet', ['soumis','en_examen'])
+                $retard30 = (clone $base)->whereIn('statutProjet', ['soumis','en_examen'])
                 ->where('dateSoumission', '<', $now->copy()->subDays(30))->count();
 
-            $retard15 = Projet::whereIn('statutProjet', ['soumis','en_examen'])
+            $retard15 = (clone $base)->whereIn('statutProjet', ['soumis','en_examen'])
                 ->where('dateSoumission', '<', $now->copy()->subDays(15))->count();
 
             //===============MOTIFS DE REJET (basé sur les commentaires)=====================================================
@@ -124,6 +125,7 @@ class AnalytiqueController extends Controller {
             $motifsValues = array_fill(0, count($motifsLabels), 0);
 
             $commentaires = Commentaire::query()
+                ->whereIn('projet_id', (clone $base)->select('id'))
                 ->whereNotNull('message')
                 ->where('message', '!=', '')
                 ->pluck('message');
@@ -152,7 +154,7 @@ class AnalytiqueController extends Controller {
                 }
             }
             //============ Par secteur =============================================================
-            $secteursData = Projet::with('secteur')
+            $secteursData = (clone $base)->with('secteur')
             ->select('secteur_id',
             DB::raw('COUNT(*) as nb'),
             DB::raw('SUM(montantDemande) as total_demande')
@@ -165,14 +167,14 @@ class AnalytiqueController extends Controller {
             $sectDemande = $secteursData->pluck('total_demande')->map(fn($v) => (int)$v)->toArray();
 
             //================ TIMELINE =============================================================
-            $timeline = Projet::whereNotNull('dateDebut')
+            $timeline = (clone $base)->whereNotNull('dateDebut')
                 ->whereIn('statutProjet', ['approuve','valide'])
                 ->orderBy('dateDebut')
                 ->take(5)
                 ->get(['titre','dateDebut','dateFin','statutProjet']);
 
             //=========== TOP PORTEURS =============================================================
-            $topPorteurs = Projet::select(
+            $topPorteurs = (clone $base)->select(
                 'user_id',
                 DB::raw('COUNT(*) as total'),
                 DB::raw('SUM(CASE WHEN statutProjet = "approuve" OR statutProjet = "valide" THEN 1 ELSE 0 END) as approuves')
@@ -191,7 +193,7 @@ class AnalytiqueController extends Controller {
                 });
 
             //================= MATRICE PRIORISATION =============================================================
-            $matrice = Projet::whereIn('statutProjet', ['soumis','en_examen'])
+            $matrice = (clone $base)->whereIn('statutProjet', ['soumis','en_examen'])
                 ->whereNotNull('montantDemande')
                 ->take(20)
                 ->get(['titre','montantDemande','duree','dateSoumission'])
@@ -212,7 +214,8 @@ class AnalytiqueController extends Controller {
                 'budgetLabels', 'budgetTotaux', 'budgetDemande', 'cumulAttente',
                 'tranches', 'delaiAppro', 'delaiValid', 'retard30',
                 'retard15', 'motifsLabels', 'motifsValues', 'sectLabels',
-                'sectNb', 'sectDemande', 'timeline', 'topPorteurs', 'matrice'
+                'sectNb', 'sectDemande', 'timeline', 'topPorteurs', 'matrice',
+                'typesProjets', 'secteursFiltres', 'porteursFiltres'
             ));
 
         }catch(\Exception $e){
@@ -224,5 +227,16 @@ class AnalytiqueController extends Controller {
 
             return back()->with('error', 'Une erreur est survenue ');
         }
+    }
+
+    private function filteredProjects(Request $request)
+    {
+        $query = Projet::query();
+        if ($request->filled('date_debut')) $query->whereDate('created_at', '>=', $request->date_debut);
+        if ($request->filled('date_fin')) $query->whereDate('created_at', '<=', $request->date_fin);
+        if ($request->filled('type_projet_id')) $query->where('type_projet_id', $request->type_projet_id);
+        if ($request->filled('secteur_id')) $query->where('secteur_id', $request->secteur_id);
+        if ($request->filled('user_id')) $query->where('user_id', $request->user_id);
+        return $query;
     }
 }

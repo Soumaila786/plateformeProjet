@@ -46,6 +46,8 @@
     </div>
 @endforelse
 
+<div class="mt-3">{{ $motifs->withQueryString()->links() }}</div>
+
 @push('scripts')
     <script src="{{ asset('js/filtres-liste.js') }}"></script>
     <script src="{{ asset('js/modals-crud.js') }}"></script>

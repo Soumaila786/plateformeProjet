@@ -15,7 +15,7 @@ class MotifRejetController extends Controller {
         $this->authorize('viewAny', MotifRejet::class);
 
         try{
-            $motifs = MotifRejet::orderBy('libelle')->get();
+            $motifs = MotifRejet::orderBy('libelle')->paginate(5);
             return view('motifs.index', compact('motifs'));
 
         }catch(\Exception $e){

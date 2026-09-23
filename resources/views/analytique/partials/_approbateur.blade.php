@@ -3,11 +3,10 @@
 @endpush
 
 @php
-    $dataEntonnoir = [
-        'labels' => array_column($entonnoir, 'lbl'),
-        'values' => array_column($entonnoir, 'val'),
-        'colors' => array_column($entonnoir, 'color'),
-        'label' => 'Projets',
+    $dataTopPorteurs = [
+        'labels' => collect($topPorteurs)->pluck('nom')->toArray(),
+        'values' => collect($topPorteurs)->pluck('total')->toArray(),
+        'label' => 'Dossiers suivis',
     ];
     $dataStatuts = ['labels' => $labels, 'values' => $donutValues, 'colors' => $colors];
     $dataTemporel = [
@@ -34,8 +33,8 @@
 
 <div class="an-grid">
     <div class="an-card">
-        <h6><i class="fas fa-filter me-1"></i>Entonnoir de traitement</h6>
-        <canvas id="anAprobEntonnoir" data-chart="{{ json_encode($dataEntonnoir) }}"></canvas>
+        <h6><i class="fas fa-users me-1"></i>Charge par porteur</h6>
+        <canvas id="anAprobTopPorteurs" data-chart="{{ json_encode($dataTopPorteurs) }}"></canvas>
     </div>
 
     <div class="an-card">

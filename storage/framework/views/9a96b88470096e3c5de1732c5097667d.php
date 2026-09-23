@@ -12,7 +12,11 @@
             <h1 class="page-header-title">Tableau analytique</h1>
             <p class="page-header-sub">Statistiques et tendances de vos projets</p>
         </div>
+        <a href="<?php echo e(route(auth()->user()->role.'.dashboard')); ?>" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Retour au tableau de bord
+        </a>
     </div>
+    <?php echo $__env->make('analytique.partials._filtres', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>

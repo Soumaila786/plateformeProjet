@@ -5,11 +5,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Porteur\DashboardController as PorteurDashboardController;
 use App\Http\Controllers\Porteur\ProjetController as PorteurProjetController;
 use App\Http\Controllers\Porteur\PlanificationController as PorteurPlanificationController;
+use App\Http\Controllers\Porteur\AnalytiqueController as PorteurAnalytiqueController;
 use App\Http\Controllers\NotificationController;
 
 Route::middleware('role:porteur')->prefix('mes-projets')->name('porteur.')->group(function () {
 
         Route::get('/dashboard',[PorteurDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/analytique', [PorteurAnalytiqueController::class, 'index'])->name('analytique');
         
         // Projets
         Route::get('projets',[PorteurProjetController::class, 'index'])->name('projets.index');

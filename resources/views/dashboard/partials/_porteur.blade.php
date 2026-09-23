@@ -22,13 +22,21 @@
     <div class="col-lg-5">
         <div class="dash-card mb-3">
             <h6 class="fw-bold mb-3">Finances</h6>
-            <div class="d-flex justify-content-between py-1 small">
-                <span class="text-muted">Budget total demandé</span>
-                <strong class="font-monospace">{{ number_format($budgetTotal, 0, ',', ' ') }} FCFA</strong>
+            <div class="small mb-2">
+                <span class="text-muted d-block">Budget total</span>
+                @forelse ($budgetParDevise as $devise => $total)
+                    <strong class="font-monospace d-block">{{ number_format($total, 2, ',', ' ') }} {{ $devise }}</strong>
+                @empty
+                    <span class="text-muted">Aucun montant enregistré</span>
+                @endforelse
             </div>
-            <div class="d-flex justify-content-between py-1 small">
-                <span class="text-muted">Montant demandé</span>
-                <strong class="font-monospace">{{ number_format($montantDemande, 0, ',', ' ') }} FCFA</strong>
+            <div class="small">
+                <span class="text-muted d-block">Montant demandé</span>
+                @forelse ($montantDemandeParDevise as $devise => $total)
+                    <strong class="font-monospace d-block">{{ number_format($total, 2, ',', ' ') }} {{ $devise }}</strong>
+                @empty
+                    <span class="text-muted">Aucun montant enregistré</span>
+                @endforelse
             </div>
         </div>
         <div class="dash-card">

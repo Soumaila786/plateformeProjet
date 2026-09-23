@@ -35,7 +35,7 @@ class ProjetController extends Controller {
                 $query->where('statutProjet', $request->statut);
             }
 
-            $projets = $query->latest()->paginate(12);
+            $projets = $query->latest()->paginate(5);
 
             Log::info('Consultation de la liste des projets',[
                 'admin_id' => Auth::id(),

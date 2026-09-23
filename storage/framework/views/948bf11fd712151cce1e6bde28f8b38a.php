@@ -47,6 +47,8 @@
     </div>
 <?php endif; ?>
 
+<div class="mt-3"><?php echo e($motifs->withQueryString()->links()); ?></div>
+
 <?php $__env->startPush('scripts'); ?>
     <script src="<?php echo e(asset('js/filtres-liste.js')); ?>"></script>
     <script src="<?php echo e(asset('js/modals-crud.js')); ?>"></script>

@@ -54,7 +54,7 @@ class ProjetController extends Controller {
                 $query->where('secteur_id', $request->secteur_id);
             }
 
-            $projets = $query->orderBy('updated_at', 'desc')->paginate(4);
+            $projets = $query->orderBy('updated_at', 'desc')->paginate(5);
 
             $motifsDisponibles = MotifRejet::actifs()->orderBy('libelle')->get();
 
@@ -95,7 +95,7 @@ class ProjetController extends Controller {
                 $query->where('secteur_id', $request->secteur_id);
             }
 
-            $projets = $query->orderBy('updated_at', 'desc')->paginate(4);
+            $projets = $query->orderBy('updated_at', 'desc')->paginate(5);
 
             $projets->getCollection()->transform(function ($projet) {
                 $projet->motifRejet = null;
@@ -109,7 +109,7 @@ class ProjetController extends Controller {
                 return $projet;
             });
 
-            return view('approbateur.projets.mes_projets', compact('projets', 'secteurs'));
+            return view('projets.historique-approbateur', compact('projets', 'secteurs'));
 
         }catch(\Exception $e){
 

@@ -41,7 +41,11 @@ class PlanificationController extends Controller {
                 });
             }
 
-            $projets = $query->orderBy('updated_at', 'desc')->paginate(4);
+            if ($request->filled('secteur_id')) {
+                $query->where('secteur_id', $request->secteur_id);
+            }
+
+            $projets = $query->orderBy('updated_at', 'desc')->paginate(5);
 
             return view('projets.index', compact('projets'));
 
@@ -187,6 +191,9 @@ class PlanificationController extends Controller {
     // Projets déjà planifiés par ce planificateur (planification_demandee = false et ont des activités)
     public function traites(Request $request) {
         try {
+            $secteurs = \App\Models\SecteurActivite::where('statutSecteur', true)
+                ->orderBy('nomSecteur')->get();
+
             $query = Projet::with(['secteur', 'user'])
                 ->where('planification_demandee', false)
                 ->whereHas('activites');
@@ -199,9 +206,9 @@ class PlanificationController extends Controller {
                 });
             }
 
-            $projets = $query->orderBy('updated_at', 'desc')->paginate(10);
+            $projets = $query->orderBy('updated_at', 'desc')->paginate(5);
 
-            return view('planificateur.projets.traites', compact('projets'));
+            return view('projets.historique', compact('projets', 'secteurs'));
 
         } catch (\Exception $e) {
             Log::error('Erreur chargement projets traités planificateur', [

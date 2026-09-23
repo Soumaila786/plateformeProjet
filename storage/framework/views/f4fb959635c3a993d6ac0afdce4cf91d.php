@@ -36,6 +36,7 @@
 <?php $__env->startSection('content'); ?>
     <?php $__env->startPush('styles'); ?>
         <link rel="stylesheet" href="<?php echo e(asset('css/notifications.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('css/listes-projets.css')); ?>">
     <?php $__env->stopPush(); ?>
 
     <?php $__empty_1 = true; $__currentLoopData = $notifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notif): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
@@ -58,7 +59,7 @@
                 <form method="POST" action="<?php echo e(route($role.'.notifications.destroy', $notif)); ?>"
                     onsubmit="return confirm('Supprimer cette notification ?')">
                     <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
-                    <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none" title="Supprimer">
+                    <button type="submit" class="lp-btn lp-btn-red" title="Supprimer">
                         <i class="fas fa-trash"></i>
                     </button>
                 </form>

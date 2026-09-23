@@ -54,6 +54,34 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = url.toString();
     });
 
+    // Sous-domaines dépendants du secteur dans les formulaires projet.
+    const secteurProjet = document.getElementById('projetSecteurSelect');
+    const sousDomaineProjet = document.getElementById('projetSousDomaineSelect');
+    if (secteurProjet && sousDomaineProjet) {
+        const filtrerSousDomaines = (valeurInitiale = sousDomaineProjet.value) => {
+            const secteurId = secteurProjet.value;
+            let valeurConservee = '';
+
+            Array.from(sousDomaineProjet.options).forEach((option, index) => {
+                if (index === 0) {
+                    option.hidden = false;
+                    option.disabled = false;
+                    return;
+                }
+
+                const visible = option.dataset.secteur === secteurId;
+                option.hidden = !visible;
+                option.disabled = !visible;
+                if (visible && option.value === valeurInitiale) valeurConservee = option.value;
+            });
+
+            sousDomaineProjet.value = valeurConservee;
+        };
+
+        secteurProjet.addEventListener('change', () => filtrerSousDomaines());
+        filtrerSousDomaines();
+    }
+
     // ── Modale mutualisée création/modification (ex: projet, utilisateur...) ──
     // Bouton "Nouveau" : data-modal-new="idModal" data-modal-action="url de création"
     document.querySelectorAll('[data-modal-new]').forEach((btn) => {

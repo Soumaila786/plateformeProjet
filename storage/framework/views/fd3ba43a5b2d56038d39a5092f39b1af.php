@@ -20,7 +20,8 @@
             'duree' => $projet->duree,
             'dateDebut' => optional($projet->dateDebut)->format('Y-m-d'),
             'dateFin' => optional($projet->dateFin)->format('Y-m-d'),
-            'budgetTotal' => $projet->budgetTotal, 'montantDemande' => $projet->montantDemande,
+            'budgetTotal' => $projet->budgetTotal, 'budgetDevise' => $projet->budgetDevise ?? 'XOF',
+            'montantDemande' => $projet->montantDemande, 'montantDemandeDevise' => $projet->montantDemandeDevise ?? 'XOF',
         ];
     ?>
 
@@ -38,7 +39,7 @@
                 <?php endif; ?>
                 <span><i class="fas fa-tag"></i><?php echo e($projet->secteur->nomSecteur ?? '—'); ?></span>
                 <?php if($projet->montantDemande): ?>
-                    <span><i class="fas fa-coins"></i><strong><?php echo e(number_format($projet->montantDemande, 0, ',', ' ')); ?> FCFA</strong></span>
+                    <span><i class="fas fa-coins"></i><strong><?php echo e(number_format($projet->montantDemande, 2, ',', ' ')); ?> <?php echo e($projet->montantDemandeDevise ?? 'XOF'); ?></strong></span>
                 <?php endif; ?>
                 <?php if($projet->statutProjet === 'rejete' && !empty($projet->motifRejet)): ?>
                     <span class="text-truncate" style="max-width:260px;"><i class="fas fa-circle-info"></i><?php echo e($projet->motifRejet); ?></span>

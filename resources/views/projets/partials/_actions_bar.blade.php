@@ -17,7 +17,8 @@
         'duree' => $projet->duree,
         'dateDebut' => optional($projet->dateDebut)->format('Y-m-d'),
         'dateFin' => optional($projet->dateFin)->format('Y-m-d'),
-        'budgetTotal' => $projet->budgetTotal, 'montantDemande' => $projet->montantDemande,
+        'budgetTotal' => $projet->budgetTotal, 'budgetDevise' => $projet->budgetDevise ?? 'XOF',
+        'montantDemande' => $projet->montantDemande, 'montantDemandeDevise' => $projet->montantDemandeDevise ?? 'XOF',
     ];
 @endphp
 

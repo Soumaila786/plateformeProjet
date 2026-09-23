@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    cifeuHorizontalBarChart('anValidEntonnoir');
+    cifeuBarChart('anValidFinancesSecteurs');
     cifeuDoughnutChart('anValidStatuts');
     cifeuLineChart('anValidEvolution');
     cifeuBarChart('anValidDelais');

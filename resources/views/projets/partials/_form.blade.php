@@ -41,7 +41,7 @@
     </div>
     <div class="col-md-4">
         <label class="form-label">Secteur d'activité</label>
-        <select name="secteur_id" class="form-select @error('secteur_id') is-invalid @enderror" required>
+        <select name="secteur_id" id="projetSecteurSelect" class="form-select @error('secteur_id') is-invalid @enderror" required>
             <option value="">Sélectionner...</option>
             @forelse ($secteurs as $secteur)
                 <option value="{{ $secteur->id }}" {{ (string) old('secteur_id', $p->secteur_id ?? '') === (string) $secteur->id ? 'selected' : '' }}>
@@ -55,7 +55,7 @@
     </div>
     <div class="col-md-4">
         <label class="form-label">Sous-domaine</label>
-        <select name="sous_domaine_id" class="form-select @error('sous_domaine_id') is-invalid @enderror">
+        <select name="sous_domaine_id" id="projetSousDomaineSelect" class="form-select @error('sous_domaine_id') is-invalid @enderror">
             <option value="">Aucun sous-domaine</option>
             @foreach ($sousDomaines as $sousDomaine)
                 <option value="{{ $sousDomaine->id }}" data-secteur="{{ $sousDomaine->secteur_id }}" {{ (string) old('sous_domaine_id', $p->sous_domaine_id ?? '') === (string) $sousDomaine->id ? 'selected' : '' }}>{{ $sousDomaine->nom }}</option>
@@ -85,14 +85,30 @@
 
 <div class="row g-3 mb-3">
     <div class="col-md-6">
-        <label class="form-label">Budget total (FCFA)</label>
-        <input type="number" name="budgetTotal" min="0" step="1" value="{{ old('budgetTotal', $p->budgetTotal ?? '') }}" class="form-control @error('budgetTotal') is-invalid @enderror">
+        <label class="form-label">Budget total</label>
+        <div class="input-group">
+            <input type="number" name="budgetTotal" min="0" step="0.01" value="{{ old('budgetTotal', $p->budgetTotal ?? '') }}" class="form-control @error('budgetTotal') is-invalid @enderror">
+            <select name="budgetDevise" class="form-select @error('budgetDevise') is-invalid @enderror" style="max-width: 135px;">
+                @foreach(['USD' => '$ (USD)', 'XOF' => 'FCFA (XOF)', 'EUR' => '€ (EUR)'] as $code => $label)
+                    <option value="{{ $code }}" {{ old('budgetDevise', $p->budgetDevise ?? 'XOF') === $code ? 'selected' : '' }}>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
         @error('budgetTotal')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        @error('budgetDevise')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
     </div>
     <div class="col-md-6">
-        <label class="form-label">Montant demandé (FCFA)</label>
-        <input type="number" name="montantDemande" min="0" step="1" value="{{ old('montantDemande', $p->montantDemande ?? '') }}" class="form-control @error('montantDemande') is-invalid @enderror">
+        <label class="form-label">Montant demandé</label>
+        <div class="input-group">
+            <input type="number" name="montantDemande" min="0" step="0.01" value="{{ old('montantDemande', $p->montantDemande ?? '') }}" class="form-control @error('montantDemande') is-invalid @enderror">
+            <select name="montantDemandeDevise" class="form-select @error('montantDemandeDevise') is-invalid @enderror" style="max-width: 135px;">
+                @foreach(['USD' => '$ (USD)', 'XOF' => 'FCFA (XOF)', 'EUR' => '€ (EUR)'] as $code => $label)
+                    <option value="{{ $code }}" {{ old('montantDemandeDevise', $p->montantDemandeDevise ?? 'XOF') === $code ? 'selected' : '' }}>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
         @error('montantDemande')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        @error('montantDemandeDevise')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
     </div>
 </div>
 

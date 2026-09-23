@@ -18,11 +18,11 @@
         </div>
         <div class="col-sm-6 col-lg-3">
             <div class="text-muted small">Budget total</div>
-            <div class="fw-semibold font-monospace">{{ number_format($projet->budgetTotal ?? 0, 0, ',', ' ') }} FCFA</div>
+            <div class="fw-semibold font-monospace">{{ number_format($projet->budgetTotal ?? 0, 2, ',', ' ') }} {{ $projet->budgetDevise ?? 'XOF' }}</div>
         </div>
         <div class="col-sm-6 col-lg-3">
             <div class="text-muted small">Montant demandé</div>
-            <div class="fw-semibold font-monospace">{{ number_format($projet->montantDemande ?? 0, 0, ',', ' ') }} FCFA</div>
+            <div class="fw-semibold font-monospace">{{ number_format($projet->montantDemande ?? 0, 2, ',', ' ') }} {{ $projet->montantDemandeDevise ?? 'XOF' }}</div>
         </div>
     </div>
 

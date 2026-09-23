@@ -25,4 +25,5 @@
         </form>
     </div>
 </div>
+
 <?php /**PATH C:\Users\dell\Desktop\Laravel\projetSoutenance\resources\views\modals\projet-form.blade.php ENDPATH**/ ?>
