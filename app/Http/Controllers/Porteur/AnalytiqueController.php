@@ -12,10 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class AnalytiqueController extends Controller
-{
-    public function index(Request $request)
-    {
+class AnalytiqueController extends Controller {
+
+    public function index(Request $request) {
+
         $base = $this->filteredProjects($request);
         $now = Carbon::now();
 
@@ -89,10 +89,9 @@ class AnalytiqueController extends Controller
         ]);
     }
 
-    private function filteredProjects(Request $request)
-    {
-        $query = Projet::where('user_id', Auth::id());
+    private function filteredProjects(Request $request) {
 
+        $query = Projet::where('user_id', Auth::id());
         if ($request->filled('date_debut')) {
             $query->whereDate('created_at', '>=', $request->date_debut);
         }
@@ -105,7 +104,6 @@ class AnalytiqueController extends Controller
         if ($request->filled('secteur_id')) {
             $query->where('secteur_id', $request->secteur_id);
         }
-
         return $query;
     }
 }

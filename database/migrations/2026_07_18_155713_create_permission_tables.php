@@ -4,10 +4,10 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePermissionTables extends Migration
-{
-    public function up()
-    {
+class CreatePermissionTables extends Migration {
+
+    public function up() {
+
         $tableNames = config('permission.table_names');
         $columnNames = config('permission.column_names');
         $teams = config('permission.teams');
@@ -26,7 +26,6 @@ class CreatePermissionTables extends Migration
             $table->string('name', 125);
             $table->string('guard_name', 125);
             $table->timestamps();
-
             $table->unique(['name', 'guard_name']);
         });
 
@@ -114,14 +113,12 @@ class CreatePermissionTables extends Migration
             ->forget(config('permission.cache.key'));
     }
 
-    public function down()
-    {
-        $tableNames = config('permission.table_names');
+    public function down() {
 
+        $tableNames = config('permission.table_names');
         if (empty($tableNames)) {
             throw new \Exception('Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding, or drop the tables manually.');
         }
-
         Schema::drop($tableNames['role_has_permissions']);
         Schema::drop($tableNames['model_has_roles']);
         Schema::drop($tableNames['model_has_permissions']);
